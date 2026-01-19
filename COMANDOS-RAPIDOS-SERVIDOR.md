@@ -1,23 +1,47 @@
-# ⚡ Comandos Rápidos para Servidor
+# ⚡ Comandos Rápidos para Servidor em Produção
+
+## 🚀 Conectar ao Servidor
+```bash
+ssh usuario@seu-servidor
+cd /var/www/gestao-ensaio
+```
 
 ## 🔍 Diagnosticar Erro 500
 
-### Ver Logs
+### 1. Testar Aplicação Localmente (CRÍTICO)
 ```bash
-pm2 logs gestao-ensaio --lines 50
+# Se funcionar aqui, problema é no Nginx
+curl http://localhost:3000
+curl http://localhost:3000/api/health
 ```
 
-### Verificar Status
+### 2. Ver Logs
+```bash
+# Logs de erro
+pm2 logs gestao-ensaio --err --lines 50
+
+# Todos os logs
+pm2 logs gestao-ensaio --lines 100
+```
+
+### 3. Verificar Status
 ```bash
 pm2 status
+pm2 info gestao-ensaio
 ```
 
-### Verificar Porta
+### 4. Verificar Porta
 ```bash
 sudo netstat -tulpn | grep 3000
 ```
 
-### Testar Rota de Health
+### 5. Ver Logs do Nginx
+```bash
+sudo tail -50 /var/log/nginx/error.log
+sudo tail -f /var/log/nginx/error.log
+```
+
+### 6. Testar Rota de Health
 ```bash
 curl http://localhost:3000/api/health
 # Ou no navegador: http://seu-servidor/api/health
