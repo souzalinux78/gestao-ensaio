@@ -56,10 +56,10 @@ export async function GET() {
 
   // Verificar se Prisma Client foi gerado
   try {
-    const prismaModule = await import('@prisma/client');
+    await import('@prisma/client');
     health.checks.prisma = {
       status: 'OK',
-      version: prismaModule.Prisma?.version || 'desconhecida',
+      message: 'Prisma Client disponivel',
     };
   } catch (error: any) {
     health.checks.prisma = {
