@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import InstallPrompt from '@/components/InstallPrompt';
+import LoadingScreen from '@/components/LoadingScreen';
 
 export const metadata: Metadata = {
   title: 'Gestão de Ensaio',
@@ -95,6 +96,7 @@ export default function RootLayout({
             `,
           }}
         />
+        <LoadingScreen />
         {children}
         <InstallPrompt />
       </body>
