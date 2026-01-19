@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gerador de Ícones PWA</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    canvas {
+      border: 1px solid #ddd;
+      margin: 10px;
+    }
+    button {
+      background: #1e3a5f;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #0f1f35;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Gerador de Ícones PWA - Gestão de Ensaio</h1>
+    <p>Use este gerador para criar os ícones PWA. Os ícones serão gerados com as cores do logo (azul escuro e dourado).</p>
+    
+    <canvas id="icon192" width="192" height="192"></canvas>
+    <canvas id="icon512" width="512" height="512"></canvas>
+    
+    <div>
+      <button onclick="generateIcons()">Gerar Ícones</button>
+      <button onclick="downloadIcon(192)">Download 192x192</button>
+      <button onclick="downloadIcon(512)">Download 512x512</button>
+    </div>
+    
+    <p><strong>Nota:</strong> Salve os ícones como icon-192.png e icon-512.png na pasta public/</p>
+  </div>
+
+  <script>
+    function generateIcons() {
+      const sizes = [192, 512];
+      sizes.forEach(size => {
+        const canvas = document.getElementById(`icon${size}`);
+        const ctx = canvas.getContext('2d');
+        
+        // Fundo azul escuro
+        ctx.fillStyle = '#1e3a5f';
+        ctx.fillRect(0, 0, size, size);
+        
+        // Círculo dourado
+        ctx.fillStyle = '#d4af37';
+        ctx.beginPath();
+        ctx.arc(size/2, size/2, size * 0.35, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Texto "GE" em azul escuro
+        ctx.fillStyle = '#1e3a5f';
+        ctx.font = `bold ${size * 0.3}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('GE', size/2, size/2);
+      });
+    }
+    
+    function downloadIcon(size) {
+      const canvas = document.getElementById(`icon${size}`);
+      const link = document.createElement('a');
+      link.download = `icon-${size}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+    
+    // Gerar automaticamente ao carregar
+    window.onload = generateIcons;
+  </script>
+</body>
+</html>

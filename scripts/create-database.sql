@@ -1,0 +1,81 @@
+CREATE DATABASE IF NOT EXISTS gestao_ensaio CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE gestao_ensaio;
+
+CREATE TABLE IF NOT EXISTS Usuario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    tipo ENUM('admin', 'instrutor') NOT NULL,
+    igreja VARCHAR(255) NULL,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_email (email),
+    INDEX idx_tipo (tipo),
+    INDEX idx_igreja (igreja)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS Instrumento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL UNIQUE,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_nome (nome)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS Ensaio (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    data DATETIME NOT NULL,
+    instrutorId INT NOT NULL,
+    totalGeral INT NOT NULL DEFAULT 0,
+    hinosEnsaidos VARCHAR(500) NULL,
+    regencia TEXT NULL,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (instrutorId) REFERENCES Usuario(id) ON DELETE RESTRICT,
+    INDEX idx_data (data),
+    INDEX idx_instrutor (instrutorId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS EnsaioInstrumento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ensaioId INT NOT NULL,
+    instrumentoId INT NOT NULL,
+    quantidade INT NOT NULL DEFAULT 0,
+    FOREIGN KEY (ensaioId) REFERENCES Ensaio(id) ON DELETE CASCADE,
+    FOREIGN KEY (instrumentoId) REFERENCES Instrumento(id) ON DELETE RESTRICT,
+    INDEX idx_ensaio (ensaioId),
+    INDEX idx_instrumento (instrumentoId),
+    UNIQUE KEY unique_ensaio_instrumento (ensaioId, instrumentoId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS EnsaioFuncoes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ensaioId INT NOT NULL UNIQUE,
+    ancioes INT NOT NULL DEFAULT 0,
+    diaconos INT NOT NULL DEFAULT 0,
+    cooperadorOficio INT NOT NULL DEFAULT 0,
+    cooperadorJovens INT NOT NULL DEFAULT 0,
+    encarregadosLocais INT NOT NULL DEFAULT 0,
+    encarregadosRegionais INT NOT NULL DEFAULT 0,
+    instrutores INT NOT NULL DEFAULT 0,
+    FOREIGN KEY (ensaioId) REFERENCES Ensaio(id) ON DELETE CASCADE,
+    INDEX idx_ensaio (ensaioId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS Configuracoes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    webhook VARCHAR(500) NULL,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS Contato (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    telefone VARCHAR(20) NOT NULL,
+    usuarioId INT NOT NULL,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuarioId) REFERENCES Usuario(id) ON DELETE CASCADE,
+    INDEX idx_contato_usuario (usuarioId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

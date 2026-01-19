@@ -1,0 +1,6 @@
+# Arquivos e pastas que o OneDrive deve ignorar
+.next/
+node_modules/
+.env
+.env.local
+*.log

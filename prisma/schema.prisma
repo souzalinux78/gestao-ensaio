@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  nome      String   @db.VarChar(255)
+  email     String   @unique @db.VarChar(255)
+  senha     String   @db.VarChar(255)
+  tipo      String   @db.VarChar(20)
+  igreja    String?  @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("createdAt")
+  updatedAt DateTime @updatedAt @map("updatedAt")
+  ensaios   Ensaio[]
+  contatos  Contato[]
+
+  @@index([email])
+  @@index([tipo])
+  @@index([igreja])
+  @@map("Usuario")
+}
+
+model Instrumento {
+  id        Int      @id @default(autoincrement())
+  nome      String   @unique @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("createdAt")
+  ensaios   EnsaioInstrumento[]
+
+  @@index([nome])
+  @@map("Instrumento")
+}
+
+model Ensaio {
+  id          Int                @id @default(autoincrement())
+  data        DateTime
+  instrutorId Int
+  instrutor   Usuario            @relation(fields: [instrutorId], references: [id])
+  instrumentos EnsaioInstrumento[]
+  funcoes     EnsaioFuncoes?
+  totalGeral  Int                @default(0)
+  hinosEnsaidos String?          @db.VarChar(500)
+  regencia    String?            @db.Text
+  createdAt   DateTime           @default(now()) @map("createdAt")
+  updatedAt   DateTime           @updatedAt @map("updatedAt")
+
+  @@index([data])
+  @@index([instrutorId])
+  @@map("Ensaio")
+}
+
+model EnsaioInstrumento {
+  id           Int        @id @default(autoincrement())
+  ensaioId     Int
+  ensaio       Ensaio     @relation(fields: [ensaioId], references: [id], onDelete: Cascade)
+  instrumentoId Int
+  instrumento  Instrumento @relation(fields: [instrumentoId], references: [id])
+  quantidade   Int        @default(0)
+
+  @@unique([ensaioId, instrumentoId])
+  @@index([ensaioId])
+  @@index([instrumentoId])
+  @@map("EnsaioInstrumento")
+}
+
+model EnsaioFuncoes {
+  id                    Int     @id @default(autoincrement())
+  ensaioId              Int     @unique
+  ensaio                Ensaio  @relation(fields: [ensaioId], references: [id], onDelete: Cascade)
+  ancioes               Int     @default(0)
+  diaconos              Int     @default(0)
+  cooperadorOficio      Int     @default(0)
+  cooperadorJovens      Int     @default(0)
+  encarregadosLocais    Int     @default(0)
+  encarregadosRegionais Int     @default(0)
+  instrutores           Int     @default(0)
+
+  @@index([ensaioId])
+  @@map("EnsaioFuncoes")
+}
+
+model Configuracoes {
+  id        Int      @id @default(autoincrement())
+  webhook   String?  @db.VarChar(500)
+  createdAt DateTime @default(now()) @map("createdAt")
+  updatedAt DateTime @updatedAt @map("updatedAt")
+
+  @@map("Configuracoes")
+}
+
+model Contato {
+  id        Int      @id @default(autoincrement())
+  nome      String   @db.VarChar(255)
+  telefone  String   @db.VarChar(20)
+  usuarioId Int
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("createdAt")
+  updatedAt DateTime @updatedAt @map("updatedAt")
+
+  @@index([usuarioId])
+  @@map("Contato")
+}
