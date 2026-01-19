@@ -38,3 +38,11 @@ next-env.d.ts
 # Prisma
 *.db
 *.db-journal
+
+# PWA
+*.log
+.DS_Store
+*.pem
+
+# OneDrive
+.onedriveignore
