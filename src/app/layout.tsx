@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import InstallPrompt from '@/components/InstallPrompt';
 
 export const metadata: Metadata = {
   title: 'Gestão de Ensaio',
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'Gestão de Ensaio',
   },
   formatDetection: {
@@ -20,8 +21,14 @@ export const metadata: Metadata = {
     description: 'Sistema de gestão de ensaios musicais',
   },
   icons: {
-    icon: '/icon-192.png',
-    apple: '/icon-192.png',
+    icon: [
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
   },
 };
 
@@ -44,8 +51,11 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Gestão de Ensaio" />
+        <meta name="application-name" content="Gestão de Ensaio" />
+        <meta name="msapplication-TileColor" content="#1e3a5f" />
+        <meta name="msapplication-tap-highlight" content="no" />
       </head>
       <body>
         <script
@@ -55,17 +65,38 @@ export default function RootLayout({
                 window.addEventListener('load', function() {
                   navigator.serviceWorker.register('/sw.js')
                     .then(function(registration) {
-                      console.log('Service Worker registrado:', registration.scope);
+                      console.log('✅ Service Worker registrado:', registration.scope);
+                      // Atualizar service worker quando houver nova versão
+                      registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        if (newWorker) {
+                          newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                              console.log('🔄 Nova versão disponível!');
+                            }
+                          });
+                        }
+                      });
                     })
                     .catch(function(error) {
-                      console.log('Erro ao registrar Service Worker:', error);
+                      console.error('❌ Erro ao registrar Service Worker:', error);
                     });
                 });
+                
+                // Atualizar service worker quando voltar para a página
+                if (navigator.serviceWorker.controller) {
+                  navigator.serviceWorker.controller.addEventListener('statechange', () => {
+                    if (navigator.serviceWorker.controller?.state === 'redundant') {
+                      window.location.reload();
+                    }
+                  });
+                }
               }
             `,
           }}
         />
         {children}
+        <InstallPrompt />
       </body>
     </html>
   );
