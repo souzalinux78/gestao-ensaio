@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import InstrumentoForm from '@/components/InstrumentoForm';
 import FuncoesForm from '@/components/FuncoesForm';
+import DateInputBR from '@/components/DateInputBR';
 import { Instrumento, Usuario, Ensaio } from '@/types';
 import { obterSessao } from '@/lib/session';
 
@@ -202,25 +203,11 @@ function NovoEnsaioContent() {
         <div className="space-y-6 bg-white p-4 sm:p-6 rounded-lg shadow-sm">
           <div>
             <label className="block mb-2 text-sm font-medium text-gray-700">Data do Ensaio</label>
-            <input
-              type="date"
+            <DateInputBR
               value={data}
-              onChange={(e) => setData(e.target.value)}
-              lang="pt-BR"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-              style={{ 
-                colorScheme: 'light',
-              }}
+              onChange={(value) => setData(value)}
+              required
             />
-            {data && (
-              <p className="text-sm text-gray-500 mt-1">
-                Data selecionada: {new Date(data + 'T00:00:00').toLocaleDateString('pt-BR', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric'
-                })}
-              </p>
-            )}
           </div>
 
           <InstrumentoForm
