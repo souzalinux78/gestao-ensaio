@@ -180,7 +180,7 @@ export default function NovoEnsaioPage() {
             <textarea
               value={regencia}
               onChange={(e) => setRegencia(e.target.value)}
-              placeholder="Ex:&#10;Eduardo Souza Bragança Paulista Bairro do Cruzeiro&#10;Elaiabe Amaro Joanopolis Central"
+              placeholder="Ex:&#10;João Silva São Paulo Central&#10;Pedro Oliveira Campinas Bairro Novo"
               rows={4}
               className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors resize-y"
             />
