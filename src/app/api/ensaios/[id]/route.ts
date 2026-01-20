@@ -63,6 +63,7 @@ export async function PUT(
             id: true,
           },
         },
+        funcoes: true,
       },
     });
 
