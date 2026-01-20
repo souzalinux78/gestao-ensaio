@@ -9,6 +9,7 @@ interface RelatorioTableProps {
   instrumentos: Instrumento[];
   onGerarPDF: (ensaio: Ensaio) => void;
   onEnviarWebhook?: (ensaio: Ensaio) => void;
+  onEditar?: (ensaio: Ensaio) => void;
 }
 
 export default function RelatorioTable({
@@ -16,6 +17,7 @@ export default function RelatorioTable({
   instrumentos,
   onGerarPDF,
   onEnviarWebhook,
+  onEditar,
 }: RelatorioTableProps) {
   return (
     <div className="overflow-x-auto bg-white rounded-lg shadow-sm">
@@ -34,7 +36,16 @@ export default function RelatorioTable({
                     </p>
                     <p className="text-sm text-gray-600">Total: {ensaio.totalGeral}</p>
                   </div>
-                  <div className="flex gap-2 items-center">
+                  <div className="flex gap-2 items-center flex-wrap">
+                    {onEditar ? (
+                      <button
+                        onClick={() => onEditar(ensaio)}
+                        className="bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium whitespace-nowrap"
+                        title="Editar ensaio"
+                      >
+                        ✏️ Editar
+                      </button>
+                    ) : null}
                     {onEnviarWebhook ? (
                       <button
                         onClick={() => onEnviarWebhook(ensaio)}
@@ -81,7 +92,16 @@ export default function RelatorioTable({
                 </td>
                 <td className="px-4 py-3 font-medium">{ensaio.totalGeral}</td>
                 <td className="px-4 py-3">
-                  <div className="flex gap-2 items-center">
+                  <div className="flex gap-2 items-center flex-wrap">
+                    {onEditar ? (
+                      <button
+                        onClick={() => onEditar(ensaio)}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium whitespace-nowrap"
+                        title="Editar ensaio"
+                      >
+                        ✏️ Editar
+                      </button>
+                    ) : null}
                     {onEnviarWebhook ? (
                       <button
                         onClick={() => onEnviarWebhook(ensaio)}

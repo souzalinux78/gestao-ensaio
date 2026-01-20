@@ -76,6 +76,10 @@ export default function InstrutorPage() {
     }
   }
 
+  function handleEditar(ensaio: Ensaio) {
+    router.push(`/instrutor/novo-ensaio?id=${ensaio.id}`);
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -102,6 +106,7 @@ export default function InstrutorPage() {
           instrumentos={instrumentos}
           onGerarPDF={handleGerarPDF}
           onEnviarWebhook={handleEnviarWebhook}
+          onEditar={handleEditar}
         />
       </div>
     </div>

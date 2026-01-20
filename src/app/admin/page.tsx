@@ -81,6 +81,10 @@ export default function AdminPage() {
     }
   }
 
+  function handleEditar(ensaio: Ensaio) {
+    router.push(`/instrutor/novo-ensaio?id=${ensaio.id}`);
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -137,6 +141,7 @@ export default function AdminPage() {
           instrumentos={instrumentos}
           onGerarPDF={handleGerarPDF}
           onEnviarWebhook={handleEnviarWebhook}
+          onEditar={handleEditar}
         />
       </div>
     </div>

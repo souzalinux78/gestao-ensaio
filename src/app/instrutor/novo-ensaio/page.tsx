@@ -1,15 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import InstrumentoForm from '@/components/InstrumentoForm';
 import FuncoesForm from '@/components/FuncoesForm';
-import { Instrumento, Usuario } from '@/types';
+import { Instrumento, Usuario, Ensaio } from '@/types';
 import { obterSessao } from '@/lib/session';
 
 export default function NovoEnsaioPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const ensaioId = searchParams.get('id');
+  const isEditando = !!ensaioId;
+
   const [instrumentos, setInstrumentos] = useState<Instrumento[]>([]);
   const [quantidades, setQuantidades] = useState<{ [key: number]: number }>({});
   const [funcoes, setFuncoes] = useState<{
@@ -33,6 +37,7 @@ export default function NovoEnsaioPage() {
   const [hinosEnsaidos, setHinosEnsaidos] = useState('');
   const [regencia, setRegencia] = useState('');
   const [carregando, setCarregando] = useState(false);
+  const [carregandoEnsaio, setCarregandoEnsaio] = useState(false);
   const [usuario, setUsuario] = useState<Usuario | null>(null);
 
   useEffect(() => {
@@ -43,7 +48,59 @@ export default function NovoEnsaioPage() {
     }
     setUsuario(sessao);
     carregarInstrumentos();
-  }, [router]);
+    
+    if (isEditando && ensaioId) {
+      carregarEnsaio(parseInt(ensaioId));
+    }
+  }, [router, ensaioId, isEditando]);
+
+  async function carregarEnsaio(id: number) {
+    setCarregandoEnsaio(true);
+    try {
+      const res = await fetch(`/api/ensaios/${id}`);
+      if (!res.ok) {
+        alert('Erro ao carregar ensaio. Redirecionando...');
+        router.push('/instrutor');
+        return;
+      }
+      
+      const ensaio: Ensaio = await res.json();
+      
+      // Preencher data
+      const dataEnsaio = new Date(ensaio.data);
+      setData(dataEnsaio.toISOString().split('T')[0]);
+      
+      // Preencher quantidades de instrumentos
+      const novasQuantidades: { [key: number]: number } = {};
+      ensaio.instrumentos.forEach((item) => {
+        novasQuantidades[item.instrumentoId] = item.quantidade;
+      });
+      setQuantidades(novasQuantidades);
+      
+      // Preencher funções
+      if (ensaio.funcoes) {
+        setFuncoes({
+          ancioes: ensaio.funcoes.ancioes || undefined,
+          diaconos: ensaio.funcoes.diaconos || undefined,
+          cooperadorOficio: ensaio.funcoes.cooperadorOficio || undefined,
+          cooperadorJovens: ensaio.funcoes.cooperadorJovens || undefined,
+          encarregadosLocais: ensaio.funcoes.encarregadosLocais || undefined,
+          encarregadosRegionais: ensaio.funcoes.encarregadosRegionais || undefined,
+          instrutores: ensaio.funcoes.instrutores || undefined,
+        });
+      }
+      
+      // Preencher hinos e regência
+      setHinosEnsaidos(ensaio.hinosEnsaidos || '');
+      setRegencia(ensaio.regencia || '');
+    } catch (error) {
+      console.error('Erro ao carregar ensaio:', error);
+      alert('Erro ao carregar ensaio. Redirecionando...');
+      router.push('/instrutor');
+    } finally {
+      setCarregandoEnsaio(false);
+    }
+  }
 
   async function carregarInstrumentos() {
     const res = await fetch('/api/instrumentos');
@@ -86,35 +143,42 @@ export default function NovoEnsaioPage() {
         return;
       }
 
-      const res = await fetch('/api/ensaios', {
-        method: 'POST',
+      const body = {
+        data,
+        instrumentos: Object.entries(quantidades)
+          .filter(([_, qtd]) => qtd > 0)
+          .map(([id, qtd]) => ({
+            instrumentoId: parseInt(id),
+            quantidade: qtd,
+          })),
+        funcoes: {
+          ancioes: funcoes.ancioes ?? 0,
+          diaconos: funcoes.diaconos ?? 0,
+          cooperadorOficio: funcoes.cooperadorOficio ?? 0,
+          cooperadorJovens: funcoes.cooperadorJovens ?? 0,
+          encarregadosLocais: funcoes.encarregadosLocais ?? 0,
+          encarregadosRegionais: funcoes.encarregadosRegionais ?? 0,
+          instrutores: funcoes.instrutores ?? 0,
+        },
+        totalGeral,
+        hinosEnsaidos: hinosEnsaidos.trim() || null,
+        regencia: regencia.trim() || null,
+      };
+
+      const url = isEditando && ensaioId ? `/api/ensaios/${ensaioId}` : '/api/ensaios';
+      const method = isEditando && ensaioId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          data,
-          instrumentos: Object.entries(quantidades)
-            .filter(([_, qtd]) => qtd > 0)
-            .map(([id, qtd]) => ({
-              instrumentoId: parseInt(id),
-              quantidade: qtd,
-            })),
-          funcoes: {
-            ancioes: funcoes.ancioes ?? 0,
-            diaconos: funcoes.diaconos ?? 0,
-            cooperadorOficio: funcoes.cooperadorOficio ?? 0,
-            cooperadorJovens: funcoes.cooperadorJovens ?? 0,
-            encarregadosLocais: funcoes.encarregadosLocais ?? 0,
-            encarregadosRegionais: funcoes.encarregadosRegionais ?? 0,
-            instrutores: funcoes.instrutores ?? 0,
-          },
-          totalGeral,
-          hinosEnsaidos: hinosEnsaidos.trim() || null,
-          regencia: regencia.trim() || null,
-          instrutorId: usuario.id,
-        }),
+        body: JSON.stringify(isEditando ? body : { ...body, instrutorId: usuario.id }),
       });
 
       if (res.ok) {
         router.push('/instrutor');
+      } else {
+        const errorData = await res.json();
+        alert(`Erro ao ${isEditando ? 'atualizar' : 'salvar'} ensaio: ${errorData.error || 'Erro desconhecido'}`);
       }
     } finally {
       setCarregando(false);
@@ -125,7 +189,15 @@ export default function NovoEnsaioPage() {
     <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
-        <h1 className="text-xl sm:text-2xl font-bold mb-6 text-primary">Novo Ensaio</h1>
+        <h1 className="text-xl sm:text-2xl font-bold mb-6 text-primary">
+          {isEditando ? 'Editar Ensaio' : 'Novo Ensaio'}
+        </h1>
+        
+        {carregandoEnsaio && (
+          <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg mb-4">
+            Carregando dados do ensaio...
+          </div>
+        )}
 
         <div className="space-y-6 bg-white p-4 sm:p-6 rounded-lg shadow-sm">
           <div>
@@ -134,8 +206,21 @@ export default function NovoEnsaioPage() {
               type="date"
               value={data}
               onChange={(e) => setData(e.target.value)}
+              lang="pt-BR"
               className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+              style={{ 
+                colorScheme: 'light',
+              }}
             />
+            {data && (
+              <p className="text-sm text-gray-500 mt-1">
+                Data selecionada: {new Date(data + 'T00:00:00').toLocaleDateString('pt-BR', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric'
+                })}
+              </p>
+            )}
           </div>
 
           <InstrumentoForm
@@ -192,10 +277,10 @@ export default function NovoEnsaioPage() {
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
               onClick={salvarEnsaio}
-              disabled={carregando}
+              disabled={carregando || carregandoEnsaio}
               className="flex-1 bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors shadow-md hover:shadow-lg"
             >
-              {carregando ? 'Salvando...' : 'Salvar Ensaio'}
+              {carregando ? (isEditando ? 'Atualizando...' : 'Salvando...') : (isEditando ? 'Atualizar Ensaio' : 'Salvar Ensaio')}
             </button>
             <button
               onClick={() => router.back()}
