@@ -15,7 +15,8 @@ export default function InstallPrompt() {
 
   useEffect(() => {
     // Verificar se já está instalado
-    if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone) {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
+    if (isStandalone) {
       setIsInstalled(true);
       return;
     }
@@ -32,33 +33,41 @@ export default function InstallPrompt() {
       ? Math.floor((Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24))
       : null;
 
-    // Mostrar banner se nunca foi mostrado ou se passou mais de 7 dias
-    if (!bannerDismissed || (daysSinceDismiss && daysSinceDismiss > 7)) {
-      // Mostrar banner após 3 segundos
-      setTimeout(() => {
-        setShowBanner(true);
-      }, 3000);
+    // Para iOS: sempre mostrar após 3 segundos (se não foi dispensado nos últimos 7 dias)
+    // Para Android/Chrome: mostrar quando o evento beforeinstallprompt for disparado
+    if (isIOSDevice) {
+      // iOS não tem evento beforeinstallprompt, então mostramos sempre (respeitando localStorage)
+      if (!bannerDismissed || (daysSinceDismiss && daysSinceDismiss > 7)) {
+        setTimeout(() => {
+          setShowBanner(true);
+        }, 3000);
+      }
+    } else {
+      // Para Android/Chrome, esperar pelo evento beforeinstallprompt
+      const handleBeforeInstallPrompt = (e: Event) => {
+        e.preventDefault();
+        setDeferredPrompt(e as BeforeInstallPromptEvent);
+        // Só mostrar se não foi dispensado recentemente
+        if (!bannerDismissed || (daysSinceDismiss && daysSinceDismiss > 7)) {
+          setTimeout(() => {
+            setShowBanner(true);
+          }, 1000);
+        }
+      };
+
+      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+      // Escutar evento appinstalled
+      window.addEventListener('appinstalled', () => {
+        setShowBanner(false);
+        setIsInstalled(true);
+        setDeferredPrompt(null);
+      });
+
+      return () => {
+        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      };
     }
-
-    // Escutar evento beforeinstallprompt (Chrome, Edge, etc)
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setShowBanner(true);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // Escutar evento appinstalled
-    window.addEventListener('appinstalled', () => {
-      setShowBanner(false);
-      setIsInstalled(true);
-      setDeferredPrompt(null);
-    });
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
   }, []);
 
   const handleInstallClick = async () => {
@@ -106,20 +115,25 @@ export default function InstallPrompt() {
             </div>
           </div>
           
-          <div className="flex gap-3 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
             {isIOS ? (
               <>
+                <div className="flex-1 bg-white/10 rounded-lg p-3 mb-2 sm:mb-0">
+                  <div className="text-xs sm:text-sm text-white mb-2 font-semibold">
+                    📱 Como instalar no iPhone:
+                  </div>
+                  <ol className="text-xs text-white/90 space-y-1 list-decimal list-inside">
+                    <li>Toque no botão <span className="font-bold">Compartilhar</span> <span className="text-lg">📤</span> (barra inferior do Safari)</li>
+                    <li>Role para baixo e toque em <span className="font-bold">"Adicionar à Tela Inicial"</span> <span className="text-lg">➕</span></li>
+                    <li>Toque em <span className="font-bold">"Adicionar"</span> no canto superior direito</li>
+                  </ol>
+                </div>
                 <button
                   onClick={handleDismiss}
-                  className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-sm font-medium"
+                  className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
                 >
-                  Depois
+                  Entendi
                 </button>
-                <div className="flex-1 sm:flex-none">
-                  <div className="text-xs text-primary-light mb-2 text-center sm:text-left">
-                    Toque em <span className="font-bold">Compartilhar</span> → <span className="font-bold">Adicionar à Tela Inicial</span>
-                  </div>
-                </div>
               </>
             ) : (
               <>
@@ -131,7 +145,8 @@ export default function InstallPrompt() {
                 </button>
                 <button
                   onClick={handleInstallClick}
-                  className="px-6 py-2 bg-accent hover:bg-accent-dark rounded-lg transition-colors text-sm font-bold shadow-lg"
+                  disabled={!deferredPrompt}
+                  className="px-6 py-2 bg-accent hover:bg-accent-dark rounded-lg transition-colors text-sm font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Instalar
                 </button>
