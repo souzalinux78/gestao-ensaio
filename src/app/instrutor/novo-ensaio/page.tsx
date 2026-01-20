@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import InstrumentoForm from '@/components/InstrumentoForm';
@@ -8,7 +8,7 @@ import FuncoesForm from '@/components/FuncoesForm';
 import { Instrumento, Usuario, Ensaio } from '@/types';
 import { obterSessao } from '@/lib/session';
 
-export default function NovoEnsaioPage() {
+function NovoEnsaioContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const ensaioId = searchParams.get('id');
@@ -292,5 +292,20 @@ export default function NovoEnsaioPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function NovoEnsaioPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
+          <div className="text-center py-8 text-gray-600">Carregando...</div>
+        </div>
+      </div>
+    }>
+      <NovoEnsaioContent />
+    </Suspense>
   );
 }
