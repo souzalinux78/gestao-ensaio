@@ -125,9 +125,16 @@ export default function NovoEnsaioPage() {
           <InstrumentoForm
             instrumentos={instrumentos}
             valores={quantidades}
-            onChange={(id, qtd) =>
-              setQuantidades({ ...quantidades, [id]: qtd })
-            }
+            onChange={(id, qtd) => {
+              if (qtd === undefined || qtd === 0) {
+                // Remover do estado se for 0 ou undefined
+                const novasQuantidades = { ...quantidades };
+                delete novasQuantidades[id];
+                setQuantidades(novasQuantidades);
+              } else {
+                setQuantidades({ ...quantidades, [id]: qtd });
+              }
+            }}
             onAdicionarNovo={adicionarNovoInstrumento}
           />
 

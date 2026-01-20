@@ -147,20 +147,109 @@ export async function POST(request: NextRequest) {
       .filter((l) => l.length > 0)
       .join('\n');
 
-    // Mensagem completa formatada para WhatsApp (Organistas ANTES de Músicos)
-    const mensagemWhatsApp = `🎵 *Relatório de Ensaio*
+    // Formatar lista de músicos com bullet points
+    const musicosLista = outrosInstrumentos
+      .map((item) => `• ${item.instrumento.nome}: ${item.quantidade}`)
+      .concat(
+        instrutoresCount > 0 ? `• Instrutores: ${instrutoresCount}` : null,
+        encarregadosLocaisCount > 0 ? `• Encarregados Locais: ${encarregadosLocaisCount}` : null,
+        encarregadosRegionaisCount > 0 ? `• Encarregados Regionais: ${encarregadosRegionaisCount}` : null
+      )
+      .filter(Boolean)
+      .join('\n');
 
-📅 *Data:* ${dataFormatadaCompleta}
-👤 *Instrutor:* ${ensaio.instrutor.nome}
+    // Formatar lista de ministério com bullet points
+    const ministerioLista = ensaio.funcoes
+      ? [
+          ensaio.funcoes.ancioes > 0 && `• Anciões: ${ensaio.funcoes.ancioes}`,
+          ensaio.funcoes.diaconos > 0 && `• Diáconos: ${ensaio.funcoes.diaconos}`,
+          ensaio.funcoes.cooperadorOficio > 0 && `• Cooperador de Ofício: ${ensaio.funcoes.cooperadorOficio}`,
+          ensaio.funcoes.cooperadorJovens > 0 && `• Cooperador de Jovens: ${ensaio.funcoes.cooperadorJovens}`,
+        ]
+          .filter(Boolean)
+          .join('\n')
+      : '';
 
-${organistasWhatsApp ? `🎹 *ORGANISTAS:*\n${organistasWhatsApp}\n\n📊 *Total de Organistas:* ${totalOrganistas}\n` : ''}🎼 *MÚSICOS:*
-${musicosWhatsApp}
+    // Formatar hinos com separador
+    const hinosFormatadosLista = hinosArray.length > 0
+      ? `• ${hinosArray.join(' | ')}`
+      : '';
 
-📊 *Total de Músicos:* ${totalMusicos}
+    // Formatar regência com bullet points
+    const regenciaLista = regenciaFormatada
+      .split('\n')
+      .filter((l) => l.trim().length > 0)
+      .map((l) => `• ${l.trim()}`)
+      .join('\n');
 
-${ensaio.funcoes && totalMinisterio > 0 ? `👥 *MINISTÉRIO:*\n${ministerioWhatsApp}\n\n📊 *Total de Ministério:* ${totalMinisterio}\n` : ''}${hinosEnsaidos ? `🎵 *HINOS ENSAIADOS:*\n${hinosFormatados}\n\n📊 *Total de Hinos:* ${totalHinos}\n` : ''}${regencia ? `🎼 *REGÊNCIA:*\n${regenciaFormatada}\n` : ''}━━━━━━━━━━━━━━━━
-📈 *TOTAL GERAL:* ${totalGeralCalculado}
-━━━━━━━━━━━━━━━━`;
+    // Mensagem completa formatada para WhatsApp no formato solicitado
+    let mensagemWhatsApp = `🎵 RELATÓRIO DE ENSAIO
+
+📅 Data: ${dataFormatadaCompleta}
+👤 Instrutor: ${ensaio.instrutor.nome}
+
+━━━━━━━━━━━━━━━━━━
+
+`;
+
+    // Organistas
+    if (totalOrganistas > 0) {
+      mensagemWhatsApp += `🎹 ORGANISTAS
+• Quantidade: ${totalOrganistas}
+
+━━━━━━━━━━━━━━━━━━
+
+`;
+    }
+
+    // Músicos
+    mensagemWhatsApp += `🎼 MÚSICOS
+${musicosLista}
+
+📊 Total de Músicos: ${totalMusicos}
+
+━━━━━━━━━━━━━━━━━━
+
+`;
+
+    // Ministério
+    if (totalMinisterio > 0) {
+      mensagemWhatsApp += `👥 MINISTÉRIO
+${ministerioLista}
+
+📊 Total do Ministério: ${totalMinisterio}
+
+━━━━━━━━━━━━━━━━━━
+
+`;
+    }
+
+    // Hinos Ensaiados
+    if (hinosArray.length > 0) {
+      mensagemWhatsApp += `🎵 HINOS ENSAIADOS
+${hinosFormatadosLista}
+
+📊 Total de Hinos: ${totalHinos}
+
+━━━━━━━━━━━━━━━━━━
+
+`;
+    }
+
+    // Regência
+    if (regenciaLista) {
+      mensagemWhatsApp += `🎼 REGÊNCIA
+${regenciaLista}
+
+━━━━━━━━━━━━━━━━━━
+
+`;
+    }
+
+    // Total Geral
+    mensagemWhatsApp += `📈 TOTAL GERAL DE PARTICIPANTES: ${totalGeralCalculado}
+
+━━━━━━━━━━━━━━━━━━`;
 
     // Preparar dados formatados para enviar no webhook
     const dadosWebhook = {

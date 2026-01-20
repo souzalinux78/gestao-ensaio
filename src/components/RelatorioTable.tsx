@@ -8,12 +8,14 @@ interface RelatorioTableProps {
   ensaios: Ensaio[];
   instrumentos: Instrumento[];
   onGerarPDF: (ensaio: Ensaio) => void;
+  onEnviarWebhook?: (ensaio: Ensaio) => void;
 }
 
 export default function RelatorioTable({
   ensaios,
   instrumentos,
   onGerarPDF,
+  onEnviarWebhook,
 }: RelatorioTableProps) {
   return (
     <div className="overflow-x-auto bg-white rounded-lg shadow-sm">
@@ -32,12 +34,22 @@ export default function RelatorioTable({
                     </p>
                     <p className="text-sm text-gray-600">Total: {ensaio.totalGeral}</p>
                   </div>
-                  <button
-                    onClick={() => onGerarPDF(ensaio)}
-                    className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
-                  >
-                    PDF
-                  </button>
+                  <div className="flex gap-2">
+                    {onEnviarWebhook && (
+                      <button
+                        onClick={() => onEnviarWebhook(ensaio)}
+                        className="bg-accent text-white px-3 py-2 rounded-lg hover:bg-accent-dark transition-colors text-sm font-medium"
+                      >
+                        Enviar
+                      </button>
+                    )}
+                    <button
+                      onClick={() => onGerarPDF(ensaio)}
+                      className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+                    >
+                      PDF
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -69,12 +81,22 @@ export default function RelatorioTable({
                 </td>
                 <td className="px-4 py-3 font-medium">{ensaio.totalGeral}</td>
                 <td className="px-4 py-3">
-                  <button
-                    onClick={() => onGerarPDF(ensaio)}
-                    className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
-                  >
-                    Gerar PDF
-                  </button>
+                  <div className="flex gap-2">
+                    {onEnviarWebhook && (
+                      <button
+                        onClick={() => onEnviarWebhook(ensaio)}
+                        className="bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent-dark transition-colors text-sm font-medium"
+                      >
+                        Enviar
+                      </button>
+                    )}
+                    <button
+                      onClick={() => onGerarPDF(ensaio)}
+                      className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+                    >
+                      Gerar PDF
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))

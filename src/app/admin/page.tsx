@@ -61,6 +61,26 @@ export default function AdminPage() {
     }
   }
 
+  async function handleEnviarWebhook(ensaio: Ensaio) {
+    try {
+      const res = await fetch('/api/webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ensaioId: ensaio.id }),
+      });
+
+      if (res.ok) {
+        alert('Relatório enviado com sucesso!');
+      } else {
+        const error = await res.json();
+        alert(`Erro ao enviar: ${error.error || 'Erro desconhecido'}`);
+      }
+    } catch (error) {
+      console.error('Erro ao enviar webhook:', error);
+      alert('Erro ao enviar relatório. Tente novamente.');
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -116,6 +136,7 @@ export default function AdminPage() {
           ensaios={ensaios}
           instrumentos={instrumentos}
           onGerarPDF={handleGerarPDF}
+          onEnviarWebhook={handleEnviarWebhook}
         />
       </div>
     </div>

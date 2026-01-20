@@ -40,24 +40,28 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
               <div key={campo.key} className="flex items-center gap-3">
                 <label className="flex-1 text-sm sm:text-base text-gray-700">{campo.label}</label>
                 <input
-                  type="tel"
+                  type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  value={valores[campo.key as keyof typeof valores] && valores[campo.key as keyof typeof valores] > 0 ? valores[campo.key as keyof typeof valores].toString() : ''}
+                  value={(valores[campo.key as keyof typeof valores] && valores[campo.key as keyof typeof valores] > 0) ? String(valores[campo.key as keyof typeof valores]) : ''}
                   onChange={(e) => {
                     // Permitir apenas números
                     const valorDigitado = e.target.value.replace(/[^0-9]/g, '');
-                    if (valorDigitado === '') {
-                      // Se estiver vazio, não atualizar (mantém vazio visualmente)
+                    if (valorDigitado === '' || valorDigitado === '0') {
+                      // Se estiver vazio ou for 0, passar 0 mas não mostrar
                       onChange(campo.key, 0);
                     } else {
-                      const valor = parseInt(valorDigitado) || 0;
-                      onChange(campo.key, valor);
+                      const valor = parseInt(valorDigitado);
+                      if (!isNaN(valor) && valor > 0) {
+                        onChange(campo.key, valor);
+                      } else {
+                        onChange(campo.key, 0);
+                      }
                     }
                   }}
                   onKeyDown={(e) => {
                     // Bloquear teclas que não são números, backspace, delete, tab, etc
-                    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+                    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
                     const isNumber = /^[0-9]$/.test(e.key);
                     if (!isNumber && !allowedKeys.includes(e.key) && !e.ctrlKey && !e.metaKey) {
                       e.preventDefault();
@@ -78,24 +82,28 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
               <div key={campo.key} className="flex items-center gap-3">
                 <label className="flex-1 text-sm sm:text-base text-gray-700">{campo.label}</label>
                 <input
-                  type="tel"
+                  type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  value={valores[campo.key as keyof typeof valores] && valores[campo.key as keyof typeof valores] > 0 ? valores[campo.key as keyof typeof valores].toString() : ''}
+                  value={(valores[campo.key as keyof typeof valores] && valores[campo.key as keyof typeof valores] > 0) ? String(valores[campo.key as keyof typeof valores]) : ''}
                   onChange={(e) => {
                     // Permitir apenas números
                     const valorDigitado = e.target.value.replace(/[^0-9]/g, '');
-                    if (valorDigitado === '') {
-                      // Se estiver vazio, não atualizar (mantém vazio visualmente)
+                    if (valorDigitado === '' || valorDigitado === '0') {
+                      // Se estiver vazio ou for 0, passar 0 mas não mostrar
                       onChange(campo.key, 0);
                     } else {
-                      const valor = parseInt(valorDigitado) || 0;
-                      onChange(campo.key, valor);
+                      const valor = parseInt(valorDigitado);
+                      if (!isNaN(valor) && valor > 0) {
+                        onChange(campo.key, valor);
+                      } else {
+                        onChange(campo.key, 0);
+                      }
                     }
                   }}
                   onKeyDown={(e) => {
                     // Bloquear teclas que não são números, backspace, delete, tab, etc
-                    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+                    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
                     const isNumber = /^[0-9]$/.test(e.key);
                     if (!isNumber && !allowedKeys.includes(e.key) && !e.ctrlKey && !e.metaKey) {
                       e.preventDefault();

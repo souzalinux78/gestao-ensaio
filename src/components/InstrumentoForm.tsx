@@ -6,7 +6,7 @@ import { Instrumento } from '@/types';
 interface InstrumentoFormProps {
   instrumentos: Instrumento[];
   valores: { [key: number]: number };
-  onChange: (instrumentoId: number, quantidade: number) => void;
+  onChange: (instrumentoId: number, quantidade: number | undefined) => void;
   onAdicionarNovo: (nome: string) => void;
 }
 
@@ -31,24 +31,28 @@ export default function InstrumentoForm({
                 {instrumento.nome}
               </label>
               <input
-                type="tel"
+                type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                value={valores[instrumento.id] && valores[instrumento.id] > 0 ? valores[instrumento.id].toString() : ''}
+                value={(valores[instrumento.id] && valores[instrumento.id] > 0) ? String(valores[instrumento.id]) : ''}
                 onChange={(e) => {
                   // Permitir apenas números
                   const valorDigitado = e.target.value.replace(/[^0-9]/g, '');
-                  if (valorDigitado === '') {
-                    // Se estiver vazio, não atualizar (mantém vazio visualmente)
-                    onChange(instrumento.id, 0);
+                  if (valorDigitado === '' || valorDigitado === '0') {
+                    // Se estiver vazio ou for 0, passar undefined para remover do estado
+                    onChange(instrumento.id, undefined);
                   } else {
-                    const valor = parseInt(valorDigitado) || 0;
-                    onChange(instrumento.id, valor);
+                    const valor = parseInt(valorDigitado);
+                    if (!isNaN(valor) && valor > 0) {
+                      onChange(instrumento.id, valor);
+                    } else {
+                      onChange(instrumento.id, undefined);
+                    }
                   }
                 }}
                 onKeyDown={(e) => {
                   // Bloquear teclas que não são números, backspace, delete, tab, etc
-                  const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+                  const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
                   const isNumber = /^[0-9]$/.test(e.key);
                   if (!isNumber && !allowedKeys.includes(e.key) && !e.ctrlKey && !e.metaKey) {
                     e.preventDefault();
