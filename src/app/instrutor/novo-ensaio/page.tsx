@@ -12,14 +12,22 @@ export default function NovoEnsaioPage() {
   const router = useRouter();
   const [instrumentos, setInstrumentos] = useState<Instrumento[]>([]);
   const [quantidades, setQuantidades] = useState<{ [key: number]: number }>({});
-  const [funcoes, setFuncoes] = useState({
-    ancioes: 0,
-    diaconos: 0,
-    cooperadorOficio: 0,
-    cooperadorJovens: 0,
-    encarregadosLocais: 0,
-    encarregadosRegionais: 0,
-    instrutores: 0,
+  const [funcoes, setFuncoes] = useState<{
+    ancioes: number | undefined;
+    diaconos: number | undefined;
+    cooperadorOficio: number | undefined;
+    cooperadorJovens: number | undefined;
+    encarregadosLocais: number | undefined;
+    encarregadosRegionais: number | undefined;
+    instrutores: number | undefined;
+  }>({
+    ancioes: undefined,
+    diaconos: undefined,
+    cooperadorOficio: undefined,
+    cooperadorJovens: undefined,
+    encarregadosLocais: undefined,
+    encarregadosRegionais: undefined,
+    instrutores: undefined,
   });
   const [data, setData] = useState(new Date().toISOString().split('T')[0]);
   const [hinosEnsaidos, setHinosEnsaidos] = useState('');
@@ -64,7 +72,7 @@ export default function NovoEnsaioPage() {
       // Calcular total de músicos (todos os instrumentos EXCETO Órgão)
       const totalMusicos = Object.entries(quantidades)
         .filter(([id, _]) => parseInt(id) !== orgaoId)
-        .reduce((sum, [_, qtd]) => sum + qtd, 0);
+        .reduce((sum, [_, qtd]) => sum + (qtd || 0), 0);
 
       // Calcular total de organistas (apenas Órgão)
       const totalOrganistas = orgaoId ? (quantidades[orgaoId] || 0) : 0;
@@ -89,7 +97,15 @@ export default function NovoEnsaioPage() {
               instrumentoId: parseInt(id),
               quantidade: qtd,
             })),
-          funcoes,
+          funcoes: {
+            ancioes: funcoes.ancioes ?? 0,
+            diaconos: funcoes.diaconos ?? 0,
+            cooperadorOficio: funcoes.cooperadorOficio ?? 0,
+            cooperadorJovens: funcoes.cooperadorJovens ?? 0,
+            encarregadosLocais: funcoes.encarregadosLocais ?? 0,
+            encarregadosRegionais: funcoes.encarregadosRegionais ?? 0,
+            instrutores: funcoes.instrutores ?? 0,
+          },
           totalGeral,
           hinosEnsaidos: hinosEnsaidos.trim() || null,
           regencia: regencia.trim() || null,
@@ -140,9 +156,9 @@ export default function NovoEnsaioPage() {
 
           <FuncoesForm
             valores={funcoes}
-            onChange={(campo, valor) =>
-              setFuncoes({ ...funcoes, [campo]: valor })
-            }
+            onChange={(campo, valor) => {
+              setFuncoes({ ...funcoes, [campo]: valor });
+            }}
           />
 
           <div>

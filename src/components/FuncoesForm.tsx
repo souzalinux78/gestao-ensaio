@@ -2,15 +2,15 @@
 
 interface FuncoesFormProps {
   valores: {
-    ancioes: number;
-    diaconos: number;
-    cooperadorOficio: number;
-    cooperadorJovens: number;
-    encarregadosLocais: number;
-    encarregadosRegionais: number;
-    instrutores: number;
+    ancioes: number | undefined;
+    diaconos: number | undefined;
+    cooperadorOficio: number | undefined;
+    cooperadorJovens: number | undefined;
+    encarregadosLocais: number | undefined;
+    encarregadosRegionais: number | undefined;
+    instrutores: number | undefined;
   };
-  onChange: (campo: string, valor: number) => void;
+  onChange: (campo: string, valor: number | undefined) => void;
 }
 
 export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
@@ -43,20 +43,37 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  value={(valores[campo.key as keyof typeof valores] && valores[campo.key as keyof typeof valores] > 0) ? String(valores[campo.key as keyof typeof valores]) : ''}
+                  value={
+                    valores[campo.key as keyof typeof valores] !== undefined && 
+                    valores[campo.key as keyof typeof valores] !== null && 
+                    valores[campo.key as keyof typeof valores] > 0 
+                      ? String(valores[campo.key as keyof typeof valores]) 
+                      : ''
+                  }
                   onChange={(e) => {
                     // Permitir apenas números
                     const valorDigitado = e.target.value.replace(/[^0-9]/g, '');
+                    
+                    // Se estiver vazio, definir como undefined (não mostra)
                     if (valorDigitado === '' || valorDigitado === '0') {
-                      // Se estiver vazio ou for 0, passar 0 mas não mostrar
-                      onChange(campo.key, 0);
+                      onChange(campo.key, undefined);
+                      return;
+                    }
+                    
+                    // Converter para número
+                    const valor = parseInt(valorDigitado, 10);
+                    
+                    // Se for um número válido e maior que 0, salvar
+                    if (!isNaN(valor) && valor > 0) {
+                      onChange(campo.key, valor);
                     } else {
-                      const valor = parseInt(valorDigitado);
-                      if (!isNaN(valor) && valor > 0) {
-                        onChange(campo.key, valor);
-                      } else {
-                        onChange(campo.key, 0);
-                      }
+                      onChange(campo.key, undefined);
+                    }
+                  }}
+                  onBlur={(e) => {
+                    // Ao sair do campo, se estiver vazio, garantir que está limpo
+                    if (e.target.value === '' || e.target.value === '0') {
+                      onChange(campo.key, undefined);
                     }
                   }}
                   onKeyDown={(e) => {
@@ -85,20 +102,37 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  value={(valores[campo.key as keyof typeof valores] && valores[campo.key as keyof typeof valores] > 0) ? String(valores[campo.key as keyof typeof valores]) : ''}
+                  value={
+                    valores[campo.key as keyof typeof valores] !== undefined && 
+                    valores[campo.key as keyof typeof valores] !== null && 
+                    valores[campo.key as keyof typeof valores] > 0 
+                      ? String(valores[campo.key as keyof typeof valores]) 
+                      : ''
+                  }
                   onChange={(e) => {
                     // Permitir apenas números
                     const valorDigitado = e.target.value.replace(/[^0-9]/g, '');
+                    
+                    // Se estiver vazio, definir como undefined (não mostra)
                     if (valorDigitado === '' || valorDigitado === '0') {
-                      // Se estiver vazio ou for 0, passar 0 mas não mostrar
-                      onChange(campo.key, 0);
+                      onChange(campo.key, undefined);
+                      return;
+                    }
+                    
+                    // Converter para número
+                    const valor = parseInt(valorDigitado, 10);
+                    
+                    // Se for um número válido e maior que 0, salvar
+                    if (!isNaN(valor) && valor > 0) {
+                      onChange(campo.key, valor);
                     } else {
-                      const valor = parseInt(valorDigitado);
-                      if (!isNaN(valor) && valor > 0) {
-                        onChange(campo.key, valor);
-                      } else {
-                        onChange(campo.key, 0);
-                      }
+                      onChange(campo.key, undefined);
+                    }
+                  }}
+                  onBlur={(e) => {
+                    // Ao sair do campo, se estiver vazio, garantir que está limpo
+                    if (e.target.value === '' || e.target.value === '0') {
+                      onChange(campo.key, undefined);
                     }
                   }}
                   onKeyDown={(e) => {

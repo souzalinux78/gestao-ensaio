@@ -34,20 +34,44 @@ export default function InstrumentoForm({
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                value={(valores[instrumento.id] && valores[instrumento.id] > 0) ? String(valores[instrumento.id]) : ''}
+                value={
+                  valores[instrumento.id] !== undefined && 
+                  valores[instrumento.id] !== null && 
+                  valores[instrumento.id] > 0 
+                    ? String(valores[instrumento.id]) 
+                    : ''
+                }
                 onChange={(e) => {
                   // Permitir apenas números
                   const valorDigitado = e.target.value.replace(/[^0-9]/g, '');
-                  if (valorDigitado === '' || valorDigitado === '0') {
-                    // Se estiver vazio ou for 0, passar undefined para remover do estado
+                  
+                  // Se estiver vazio, remover do estado
+                  if (valorDigitado === '') {
                     onChange(instrumento.id, undefined);
+                    return;
+                  }
+                  
+                  // Se for apenas "0", também remover
+                  if (valorDigitado === '0') {
+                    onChange(instrumento.id, undefined);
+                    return;
+                  }
+                  
+                  // Converter para número
+                  const valor = parseInt(valorDigitado, 10);
+                  
+                  // Se for um número válido e maior que 0, salvar
+                  if (!isNaN(valor) && valor > 0) {
+                    onChange(instrumento.id, valor);
                   } else {
-                    const valor = parseInt(valorDigitado);
-                    if (!isNaN(valor) && valor > 0) {
-                      onChange(instrumento.id, valor);
-                    } else {
-                      onChange(instrumento.id, undefined);
-                    }
+                    // Se não for válido, remover
+                    onChange(instrumento.id, undefined);
+                  }
+                }}
+                onBlur={(e) => {
+                  // Ao sair do campo, se estiver vazio ou 0, garantir que está limpo
+                  if (e.target.value === '' || e.target.value === '0') {
+                    onChange(instrumento.id, undefined);
                   }
                 }}
                 onKeyDown={(e) => {
