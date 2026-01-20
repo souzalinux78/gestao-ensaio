@@ -148,15 +148,12 @@ export async function POST(request: NextRequest) {
       .join('\n');
 
     // Formatar lista de músicos com bullet points
-    const musicosLista = outrosInstrumentos
-      .map((item) => `• ${item.instrumento.nome}: ${item.quantidade}`)
-      .concat(
-        instrutoresCount > 0 ? `• Instrutores: ${instrutoresCount}` : null,
-        encarregadosLocaisCount > 0 ? `• Encarregados Locais: ${encarregadosLocaisCount}` : null,
-        encarregadosRegionaisCount > 0 ? `• Encarregados Regionais: ${encarregadosRegionaisCount}` : null
-      )
-      .filter(Boolean)
-      .join('\n');
+    const musicosLista = [
+      ...outrosInstrumentos.map((item) => `• ${item.instrumento.nome}: ${item.quantidade}`),
+      ...(instrutoresCount > 0 ? [`• Instrutores: ${instrutoresCount}`] : []),
+      ...(encarregadosLocaisCount > 0 ? [`• Encarregados Locais: ${encarregadosLocaisCount}`] : []),
+      ...(encarregadosRegionaisCount > 0 ? [`• Encarregados Regionais: ${encarregadosRegionaisCount}`] : [])
+    ].join('\n');
 
     // Formatar lista de ministério com bullet points
     const ministerioLista = ensaio.funcoes
