@@ -33,6 +33,11 @@ export interface Ensaio {
   id: number;
   data: Date;
   instrutorId: number;
+  instrutor?: {
+    id?: number;
+    nome: string;
+    igreja?: string | null;
+  };
   instrumentos: EnsaioInstrumento[];
   funcoes?: EnsaioFuncoes;
   totalGeral: number;
