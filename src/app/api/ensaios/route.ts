@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   const dataInicio = searchParams.get('dataInicio');
   const dataFim = searchParams.get('dataFim');
   const instrutorId = searchParams.get('instrutorId');
+  const igreja = searchParams.get('igreja');
 
   const where: any = {};
   
@@ -25,6 +26,15 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  // Filtrar por igreja (através do instrutor)
+  if (igreja && igreja.trim() !== '') {
+    where.instrutor = {
+      igreja: {
+        contains: igreja.trim(),
+      },
+    };
+  }
+
   const ensaios = await prisma.ensaio.findMany({
     where,
     include: {
@@ -36,7 +46,9 @@ export async function GET(request: NextRequest) {
       funcoes: true,
       instrutor: {
         select: {
+          id: true,
           nome: true,
+          igreja: true,
         },
       },
     },

@@ -34,6 +34,12 @@ export default function RelatorioTable({
                     <p className="font-semibold text-primary">
                       {format(new Date(ensaio.data), 'dd/MM/yyyy', { locale: ptBR })}
                     </p>
+                    <p className="text-sm text-gray-600">
+                      Instrutor: {ensaio.instrutor?.nome || 'N/A'}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Igreja: {ensaio.instrutor?.igreja || '-'}
+                    </p>
                     <p className="text-sm text-gray-600">Total: {ensaio.totalGeral}</p>
                   </div>
                   <div className="flex gap-2 items-center flex-wrap">
@@ -73,6 +79,8 @@ export default function RelatorioTable({
         <thead>
           <tr className="bg-primary text-white">
             <th className="px-4 py-3 text-left font-semibold">Data</th>
+            <th className="px-4 py-3 text-left font-semibold">Instrutor</th>
+            <th className="px-4 py-3 text-left font-semibold">Igreja</th>
             <th className="px-4 py-3 text-left font-semibold">Total Geral</th>
             <th className="px-4 py-3 text-left font-semibold">Ações</th>
           </tr>
@@ -80,7 +88,7 @@ export default function RelatorioTable({
         <tbody className="divide-y divide-gray-200">
           {ensaios.length === 0 ? (
             <tr>
-              <td colSpan={3} className="px-4 py-8 text-center text-gray-500">
+              <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
                 Nenhum ensaio encontrado
               </td>
             </tr>
@@ -89,6 +97,12 @@ export default function RelatorioTable({
               <tr key={ensaio.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-4 py-3">
                   {format(new Date(ensaio.data), 'dd/MM/yyyy', { locale: ptBR })}
+                </td>
+                <td className="px-4 py-3">
+                  {ensaio.instrutor?.nome || 'N/A'}
+                </td>
+                <td className="px-4 py-3">
+                  {ensaio.instrutor?.igreja || '-'}
                 </td>
                 <td className="px-4 py-3 font-medium">{ensaio.totalGeral}</td>
                 <td className="px-4 py-3">

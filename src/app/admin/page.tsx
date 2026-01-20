@@ -13,6 +13,7 @@ export default function AdminPage() {
   const [instrumentos, setInstrumentos] = useState<Instrumento[]>([]);
   const [dataInicio, setDataInicio] = useState('');
   const [dataFim, setDataFim] = useState('');
+  const [igrejaFiltro, setIgrejaFiltro] = useState('');
 
   useEffect(() => {
     carregarDados();
@@ -22,6 +23,9 @@ export default function AdminPage() {
     const params = new URLSearchParams();
     if (dataInicio) params.append('dataInicio', dataInicio);
     if (dataFim) params.append('dataFim', dataFim);
+    if (igrejaFiltro && igrejaFiltro.trim() !== '') {
+      params.append('igreja', igrejaFiltro.trim());
+    }
 
     const [resEnsaios, resInstrumentos] = await Promise.all([
       fetch(`/api/ensaios?${params.toString()}`),
@@ -108,7 +112,7 @@ export default function AdminPage() {
         </div>
 
         <div className="mb-6 bg-white p-4 rounded-lg shadow-sm">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
             <div>
               <label className="block mb-2 text-sm font-medium text-gray-700">Data Início</label>
               <input
@@ -124,6 +128,16 @@ export default function AdminPage() {
                 type="date"
                 value={dataFim}
                 onChange={(e) => setDataFim(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block mb-2 text-sm font-medium text-gray-700">Igreja</label>
+              <input
+                type="text"
+                value={igrejaFiltro}
+                onChange={(e) => setIgrejaFiltro(e.target.value)}
+                placeholder="Digite o nome da igreja"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
               />
             </div>
