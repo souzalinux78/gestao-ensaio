@@ -43,13 +43,12 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  value={
-                    valores[campo.key as keyof typeof valores] !== undefined && 
-                    valores[campo.key as keyof typeof valores] !== null && 
-                    valores[campo.key as keyof typeof valores] > 0 
-                      ? String(valores[campo.key as keyof typeof valores]) 
-                      : ''
-                  }
+                  value={(() => {
+                    const valor = valores[campo.key as keyof typeof valores];
+                    return valor !== undefined && valor !== null && valor > 0 
+                      ? String(valor) 
+                      : '';
+                  })()}
                   onChange={(e) => {
                     // Permitir apenas números
                     const valorDigitado = e.target.value.replace(/[^0-9]/g, '');
@@ -102,13 +101,12 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  value={
-                    valores[campo.key as keyof typeof valores] !== undefined && 
-                    valores[campo.key as keyof typeof valores] !== null && 
-                    valores[campo.key as keyof typeof valores] > 0 
-                      ? String(valores[campo.key as keyof typeof valores]) 
-                      : ''
-                  }
+                  value={(() => {
+                    const valor = valores[campo.key as keyof typeof valores];
+                    return valor !== undefined && valor !== null && valor > 0 
+                      ? String(valor) 
+                      : '';
+                  })()}
                   onChange={(e) => {
                     // Permitir apenas números
                     const valorDigitado = e.target.value.replace(/[^0-9]/g, '');
