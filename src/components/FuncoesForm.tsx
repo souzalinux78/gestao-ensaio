@@ -40,14 +40,30 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
               <div key={campo.key} className="flex items-center gap-3">
                 <label className="flex-1 text-sm sm:text-base text-gray-700">{campo.label}</label>
                 <input
-                  type="number"
-                  min="0"
-                  value={valores[campo.key as keyof typeof valores] > 0 ? valores[campo.key as keyof typeof valores] : ''}
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={valores[campo.key as keyof typeof valores] && valores[campo.key as keyof typeof valores] > 0 ? valores[campo.key as keyof typeof valores].toString() : ''}
                   onChange={(e) => {
-                    const valor = e.target.value === '' ? 0 : parseInt(e.target.value) || 0;
-                    onChange(campo.key, valor);
+                    // Permitir apenas números
+                    const valorDigitado = e.target.value.replace(/[^0-9]/g, '');
+                    if (valorDigitado === '') {
+                      // Se estiver vazio, não atualizar (mantém vazio visualmente)
+                      onChange(campo.key, 0);
+                    } else {
+                      const valor = parseInt(valorDigitado) || 0;
+                      onChange(campo.key, valor);
+                    }
                   }}
-                  placeholder="0"
+                  onKeyDown={(e) => {
+                    // Bloquear teclas que não são números, backspace, delete, tab, etc
+                    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+                    const isNumber = /^[0-9]$/.test(e.key);
+                    if (!isNumber && !allowedKeys.includes(e.key) && !e.ctrlKey && !e.metaKey) {
+                      e.preventDefault();
+                    }
+                  }}
+                  placeholder=""
                   className="border border-gray-300 rounded-lg px-3 py-2 w-20 sm:w-24 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-center"
                 />
               </div>
@@ -62,14 +78,30 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
               <div key={campo.key} className="flex items-center gap-3">
                 <label className="flex-1 text-sm sm:text-base text-gray-700">{campo.label}</label>
                 <input
-                  type="number"
-                  min="0"
-                  value={valores[campo.key as keyof typeof valores] > 0 ? valores[campo.key as keyof typeof valores] : ''}
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={valores[campo.key as keyof typeof valores] && valores[campo.key as keyof typeof valores] > 0 ? valores[campo.key as keyof typeof valores].toString() : ''}
                   onChange={(e) => {
-                    const valor = e.target.value === '' ? 0 : parseInt(e.target.value) || 0;
-                    onChange(campo.key, valor);
+                    // Permitir apenas números
+                    const valorDigitado = e.target.value.replace(/[^0-9]/g, '');
+                    if (valorDigitado === '') {
+                      // Se estiver vazio, não atualizar (mantém vazio visualmente)
+                      onChange(campo.key, 0);
+                    } else {
+                      const valor = parseInt(valorDigitado) || 0;
+                      onChange(campo.key, valor);
+                    }
                   }}
-                  placeholder="0"
+                  onKeyDown={(e) => {
+                    // Bloquear teclas que não são números, backspace, delete, tab, etc
+                    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+                    const isNumber = /^[0-9]$/.test(e.key);
+                    if (!isNumber && !allowedKeys.includes(e.key) && !e.ctrlKey && !e.metaKey) {
+                      e.preventDefault();
+                    }
+                  }}
+                  placeholder=""
                   className="border border-gray-300 rounded-lg px-3 py-2 w-20 sm:w-24 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-center"
                 />
               </div>

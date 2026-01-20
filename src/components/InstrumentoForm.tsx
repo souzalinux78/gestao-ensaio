@@ -31,14 +31,30 @@ export default function InstrumentoForm({
                 {instrumento.nome}
               </label>
               <input
-                type="number"
-                min="0"
-                value={valores[instrumento.id] > 0 ? valores[instrumento.id] : ''}
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={valores[instrumento.id] && valores[instrumento.id] > 0 ? valores[instrumento.id].toString() : ''}
                 onChange={(e) => {
-                  const valor = e.target.value === '' ? 0 : parseInt(e.target.value) || 0;
-                  onChange(instrumento.id, valor);
+                  // Permitir apenas números
+                  const valorDigitado = e.target.value.replace(/[^0-9]/g, '');
+                  if (valorDigitado === '') {
+                    // Se estiver vazio, não atualizar (mantém vazio visualmente)
+                    onChange(instrumento.id, 0);
+                  } else {
+                    const valor = parseInt(valorDigitado) || 0;
+                    onChange(instrumento.id, valor);
+                  }
                 }}
-                placeholder="0"
+                onKeyDown={(e) => {
+                  // Bloquear teclas que não são números, backspace, delete, tab, etc
+                  const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+                  const isNumber = /^[0-9]$/.test(e.key);
+                  if (!isNumber && !allowedKeys.includes(e.key) && !e.ctrlKey && !e.metaKey) {
+                    e.preventDefault();
+                  }
+                }}
+                placeholder=""
                 className="border border-gray-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 w-16 sm:w-20 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-center"
               />
             </div>
