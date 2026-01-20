@@ -33,9 +33,13 @@ export default function InstrumentoForm({
               <input
                 type="number"
                 min="0"
-                value={valores[instrumento.id] || 0}
-                onChange={(e) => onChange(instrumento.id, parseInt(e.target.value) || 0)}
-                className="border border-gray-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 w-16 sm:w-20 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                value={valores[instrumento.id] > 0 ? valores[instrumento.id] : ''}
+                onChange={(e) => {
+                  const valor = e.target.value === '' ? 0 : parseInt(e.target.value) || 0;
+                  onChange(instrumento.id, valor);
+                }}
+                placeholder="0"
+                className="border border-gray-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 w-16 sm:w-20 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-center"
               />
             </div>
           ))}

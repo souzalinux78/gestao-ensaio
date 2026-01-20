@@ -42,11 +42,13 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
                 <input
                   type="number"
                   min="0"
-                  value={valores[campo.key as keyof typeof valores]}
-                  onChange={(e) =>
-                    onChange(campo.key, parseInt(e.target.value) || 0)
-                  }
-                  className="border border-gray-300 rounded-lg px-3 py-2 w-20 sm:w-24 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  value={valores[campo.key as keyof typeof valores] > 0 ? valores[campo.key as keyof typeof valores] : ''}
+                  onChange={(e) => {
+                    const valor = e.target.value === '' ? 0 : parseInt(e.target.value) || 0;
+                    onChange(campo.key, valor);
+                  }}
+                  placeholder="0"
+                  className="border border-gray-300 rounded-lg px-3 py-2 w-20 sm:w-24 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-center"
                 />
               </div>
             ))}
@@ -62,11 +64,13 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
                 <input
                   type="number"
                   min="0"
-                  value={valores[campo.key as keyof typeof valores]}
-                  onChange={(e) =>
-                    onChange(campo.key, parseInt(e.target.value) || 0)
-                  }
-                  className="border border-gray-300 rounded-lg px-3 py-2 w-20 sm:w-24 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  value={valores[campo.key as keyof typeof valores] > 0 ? valores[campo.key as keyof typeof valores] : ''}
+                  onChange={(e) => {
+                    const valor = e.target.value === '' ? 0 : parseInt(e.target.value) || 0;
+                    onChange(campo.key, valor);
+                  }}
+                  placeholder="0"
+                  className="border border-gray-300 rounded-lg px-3 py-2 w-20 sm:w-24 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-center"
                 />
               </div>
             ))}
