@@ -1,5 +1,6 @@
 // Service Worker para PWA
-const CACHE_NAME = 'gestao-ensaio-v2';
+// IMPORTANTE: Incrementar a versão a cada deploy para forçar atualização do cache
+const CACHE_NAME = 'gestao-ensaio-v3';
 const urlsToCache = [
   '/',
   '/login',

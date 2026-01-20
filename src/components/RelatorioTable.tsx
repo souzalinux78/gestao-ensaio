@@ -34,18 +34,18 @@ export default function RelatorioTable({
                     </p>
                     <p className="text-sm text-gray-600">Total: {ensaio.totalGeral}</p>
                   </div>
-                  <div className="flex gap-2">
-                    {onEnviarWebhook && (
+                  <div className="flex gap-2 items-center">
+                    {onEnviarWebhook ? (
                       <button
                         onClick={() => onEnviarWebhook(ensaio)}
-                        className="bg-accent text-white px-3 py-2 rounded-lg hover:bg-accent-dark transition-colors text-sm font-medium"
+                        className="bg-accent text-white px-3 py-2 rounded-lg hover:bg-accent-dark transition-colors text-sm font-medium whitespace-nowrap"
                       >
                         Enviar
                       </button>
-                    )}
+                    ) : null}
                     <button
                       onClick={() => onGerarPDF(ensaio)}
-                      className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+                      className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium whitespace-nowrap"
                     >
                       PDF
                     </button>
@@ -81,18 +81,18 @@ export default function RelatorioTable({
                 </td>
                 <td className="px-4 py-3 font-medium">{ensaio.totalGeral}</td>
                 <td className="px-4 py-3">
-                  <div className="flex gap-2">
-                    {onEnviarWebhook && (
+                  <div className="flex gap-2 items-center">
+                    {onEnviarWebhook ? (
                       <button
                         onClick={() => onEnviarWebhook(ensaio)}
-                        className="bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent-dark transition-colors text-sm font-medium"
+                        className="bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent-dark transition-colors text-sm font-medium whitespace-nowrap"
                       >
                         Enviar
                       </button>
-                    )}
+                    ) : null}
                     <button
                       onClick={() => onGerarPDF(ensaio)}
-                      className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium"
+                      className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium whitespace-nowrap"
                     >
                       Gerar PDF
                     </button>
