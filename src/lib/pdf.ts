@@ -6,8 +6,38 @@ import { Ensaio, Instrumento } from '@/types';
 export function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]) {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 20;
   let yPos = margin;
+
+  const ensureSpace = (neededHeight: number) => {
+    if (yPos + neededHeight <= pageHeight - margin) return;
+    doc.addPage();
+    yPos = margin;
+  };
+
+  const writeLine = (text: string, x: number, fontSize: number, lineHeight = 7) => {
+    doc.setFontSize(fontSize);
+    ensureSpace(lineHeight);
+    doc.text(text, x, yPos);
+    yPos += lineHeight;
+  };
+
+  const writeWrapped = (
+    text: string,
+    x: number,
+    fontSize: number,
+    maxWidth: number,
+    lineHeight = 7
+  ) => {
+    doc.setFontSize(fontSize);
+    const lines = doc.splitTextToSize(text, maxWidth) as string[];
+    lines.forEach((line) => {
+      ensureSpace(lineHeight);
+      doc.text(line, x, yPos);
+      yPos += lineHeight;
+    });
+  };
 
   doc.setFontSize(18);
   doc.text('Relatório de Ensaio', pageWidth / 2, yPos, { align: 'center' });
@@ -30,56 +60,49 @@ export function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]) {
 
   // Organistas (ANTES de Músicos)
   if (orgaoItem) {
+    ensureSpace(8);
     doc.setFontSize(14);
     doc.text('Organistas:', margin, yPos);
     yPos += 8;
 
-    doc.setFontSize(11);
-    doc.text(`Organistas: ${orgaoItem.quantidade}`, margin + 10, yPos);
-    yPos += 7;
+    writeLine(`Organistas: ${orgaoItem.quantidade}`, margin + 10, 11, 7);
 
     yPos += 5;
-    doc.setFontSize(12);
-    doc.text(`Total de Organistas: ${orgaoItem.quantidade}`, margin, yPos);
-    yPos += 15;
+    writeLine(`Total de Organistas: ${orgaoItem.quantidade}`, margin, 12, 7);
+    yPos += 8;
   }
 
   // Músicos
+  ensureSpace(8);
   doc.setFontSize(14);
   doc.text('Músicos:', margin, yPos);
   yPos += 8;
 
-  doc.setFontSize(11);
   let totalMusicos = 0;
   outrosInstrumentos.forEach((item) => {
     const instrumento = instrumentos.find((i) => i.id === item.instrumentoId);
     if (instrumento) {
-      doc.text(`${instrumento.nome}: ${item.quantidade}`, margin + 10, yPos);
+      writeLine(`${instrumento.nome}: ${item.quantidade}`, margin + 10, 11, 7);
       totalMusicos += item.quantidade;
-      yPos += 7;
     }
   });
 
   // Adicionar instrutores, encarregados locais e regionais (não contam no total)
   if (ensaio.funcoes) {
     if (ensaio.funcoes.instrutores > 0) {
-      doc.text(`Instrutores: ${ensaio.funcoes.instrutores}`, margin + 10, yPos);
-      yPos += 7;
+      writeLine(`Instrutores: ${ensaio.funcoes.instrutores}`, margin + 10, 11, 7);
     }
     if (ensaio.funcoes.encarregadosLocais > 0) {
-      doc.text(`Encarregados Locais: ${ensaio.funcoes.encarregadosLocais}`, margin + 10, yPos);
-      yPos += 7;
+      writeLine(`Encarregados Locais: ${ensaio.funcoes.encarregadosLocais}`, margin + 10, 11, 7);
     }
     if (ensaio.funcoes.encarregadosRegionais > 0) {
-      doc.text(`Encarregados Regionais: ${ensaio.funcoes.encarregadosRegionais}`, margin + 10, yPos);
-      yPos += 7;
+      writeLine(`Encarregados Regionais: ${ensaio.funcoes.encarregadosRegionais}`, margin + 10, 11, 7);
     }
   }
 
   yPos += 5;
-  doc.setFontSize(12);
-  doc.text(`Total de Músicos: ${totalMusicos}`, margin, yPos);
-  yPos += 15;
+  writeLine(`Total de Músicos: ${totalMusicos}`, margin, 12, 7);
+  yPos += 8;
 
   if (ensaio.funcoes) {
     const totalMinisterio = 
@@ -89,11 +112,11 @@ export function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]) {
       ensaio.funcoes.cooperadorJovens;
 
     if (totalMinisterio > 0) {
+      ensureSpace(8);
       doc.setFontSize(14);
       doc.text('Ministério:', margin, yPos);
       yPos += 8;
 
-      doc.setFontSize(11);
       const ministerio = [
         { label: 'Anciões', valor: ensaio.funcoes.ancioes },
         { label: 'Diáconos', valor: ensaio.funcoes.diaconos },
@@ -103,15 +126,13 @@ export function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]) {
 
       ministerio.forEach((item) => {
         if (item.valor > 0) {
-          doc.text(`${item.label}: ${item.valor}`, margin + 10, yPos);
-          yPos += 7;
+          writeLine(`${item.label}: ${item.valor}`, margin + 10, 11, 7);
         }
       });
 
       yPos += 5;
-      doc.setFontSize(12);
-      doc.text(`Total de Ministério: ${totalMinisterio}`, margin, yPos);
-      yPos += 10;
+      writeLine(`Total de Ministério: ${totalMinisterio}`, margin, 12, 7);
+      yPos += 3;
     }
   }
 
@@ -125,33 +146,30 @@ export function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]) {
 
     if (totalHinos > 0) {
       yPos += 10;
+      ensureSpace(8);
       doc.setFontSize(14);
       doc.text('Hinos Ensaiados:', margin, yPos);
       yPos += 8;
 
-      doc.setFontSize(11);
-      doc.text(hinosArray.join(', '), margin + 10, yPos);
-      yPos += 7;
+      writeWrapped(hinosArray.join(', '), margin + 10, 11, pageWidth - margin * 2 - 10, 7);
 
       yPos += 5;
-      doc.setFontSize(12);
-      doc.text(`Total de Hinos: ${totalHinos}`, margin, yPos);
-      yPos += 10;
+      writeLine(`Total de Hinos: ${totalHinos}`, margin, 12, 7);
+      yPos += 3;
     }
   }
 
   // Regência
   if (ensaio.regencia) {
     yPos += 10;
+    ensureSpace(8);
     doc.setFontSize(14);
     doc.text('Regência:', margin, yPos);
     yPos += 8;
 
-    doc.setFontSize(11);
     const regenciaLinhas = ensaio.regencia.split('\n').filter((l) => l.trim().length > 0);
     regenciaLinhas.forEach((linha) => {
-      doc.text(linha.trim(), margin + 10, yPos);
-      yPos += 7;
+      writeWrapped(linha.trim(), margin + 10, 11, pageWidth - margin * 2 - 10, 7);
     });
     yPos += 5;
   }
@@ -161,6 +179,7 @@ export function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]) {
   const totalGeral = totalMusicos + totalOrganistas;
 
   yPos += 10;
+  ensureSpace(8);
   doc.setFontSize(14);
   doc.text(`Total Geral: ${totalGeral}`, margin, yPos, {
     align: 'left',
