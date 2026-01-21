@@ -47,6 +47,7 @@ export async function obterUsuarioDaRequisicao(
           email: true,
           tipo: true,
           igreja: true,
+          aprovado: true,
         },
       });
       if (usuario) {
