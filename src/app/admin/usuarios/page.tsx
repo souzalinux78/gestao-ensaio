@@ -18,6 +18,7 @@ export default function UsuariosPage() {
     senha: '',
     tipo: 'instrutor' as 'admin' | 'instrutor',
     igreja: '',
+    aprovado: true, // Por padrão, quando admin cria, aprovar automaticamente
   });
   const [senhaForm, setSenhaForm] = useState({
     senhaAtual: '',
@@ -51,6 +52,7 @@ export default function UsuariosPage() {
       senha: '',
       tipo: usuario.tipo,
       igreja: usuario.igreja || '',
+      aprovado: usuario.aprovado ?? true,
     });
     setMostrarForm(true);
   }
@@ -63,6 +65,7 @@ export default function UsuariosPage() {
       senha: '',
       tipo: 'instrutor',
       igreja: '',
+      aprovado: true, // Por padrão, quando admin cria, aprovar automaticamente
     });
     setMostrarForm(false);
     setMostrarAlterarSenha(null);
@@ -95,6 +98,12 @@ export default function UsuariosPage() {
 
       if (formData.senha) {
         body.senha = formData.senha;
+      }
+
+      // Se for criação de novo usuário, incluir campo aprovado
+      // Se for admin, sempre aprovar automaticamente
+      if (!editandoId) {
+        body.aprovado = formData.tipo === 'admin' ? true : formData.aprovado;
       }
 
       const res = await fetch(url, {
@@ -244,6 +253,7 @@ export default function UsuariosPage() {
                   senha: '',
                   tipo: 'instrutor',
                   igreja: '',
+                  aprovado: true, // Por padrão, quando admin cria, aprovar automaticamente
                 });
               }}
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -322,6 +332,24 @@ export default function UsuariosPage() {
                     placeholder="Deixe em branco para manter a atual"
                     className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                   />
+                </div>
+              )}
+              {!editandoId && formData.tipo === 'instrutor' && (
+                <div className="col-span-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.aprovado}
+                      onChange={(e) => setFormData({ ...formData, aprovado: e.target.checked })}
+                      className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-accent"
+                    />
+                    <span className="text-sm font-medium text-gray-700">
+                      Aprovar usuário automaticamente (permitir login imediato)
+                    </span>
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1 ml-6">
+                    Se desmarcado, o usuário precisará ser aprovado manualmente antes de poder fazer login.
+                  </p>
                 </div>
               )}
             </div>

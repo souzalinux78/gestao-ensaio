@@ -10,7 +10,7 @@ export async function PUT(
   try {
     const id = parseInt(params.id);
     const body = await request.json();
-    const { nome, email, tipo, igreja, senha } = body;
+    const { nome, email, tipo, igreja, senha, aprovado } = body;
 
     const updateData: any = {};
     if (nome) updateData.nome = nome.trim();
@@ -33,6 +33,10 @@ export async function PUT(
         updateData.senha = await bcrypt.hash(senhaTrimmed, 10);
         console.log(`[USUARIOS] Senha atualizada para usuário ID: ${id}`);
       }
+    }
+    // Permitir atualizar campo aprovado (apenas para instrutores)
+    if (aprovado !== undefined && tipo !== 'admin') {
+      updateData.aprovado = aprovado;
     }
 
     const usuario = await prisma.usuario.update({
