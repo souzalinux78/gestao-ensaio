@@ -19,6 +19,7 @@ export async function obterUsuarioDaRequisicao(
             email: true,
             tipo: true,
             igreja: true,
+            aprovado: true,
           },
         });
         if (usuario) {
@@ -28,6 +29,7 @@ export async function obterUsuarioDaRequisicao(
             email: usuario.email,
             tipo: usuario.tipo as 'admin' | 'instrutor',
             igreja: usuario.igreja,
+            aprovado: usuario.aprovado,
           };
         }
       }
@@ -54,6 +56,7 @@ export async function obterUsuarioDaRequisicao(
           email: usuario.email,
           tipo: usuario.tipo as 'admin' | 'instrutor',
           igreja: usuario.igreja,
+          aprovado: usuario.aprovado,
         };
       }
     }

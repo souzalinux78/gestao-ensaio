@@ -25,6 +25,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Se o usuário não estiver aprovado (e não for admin), retornar erro
+    if (usuario.tipo !== 'admin' && !usuario.aprovado) {
+      return NextResponse.json(
+        { error: 'Sua conta ainda não foi aprovada pelo administrador. Aguarde a aprovação.' },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json(usuario);
   } catch (error: any) {
     console.error('[AUTH] Erro no login:', error);

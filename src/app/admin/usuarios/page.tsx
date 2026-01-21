@@ -158,6 +158,29 @@ export default function UsuariosPage() {
     }
   }
 
+  async function aprovarUsuario(id: number, aprovado: boolean) {
+    try {
+      const res = await fetch(`/api/usuarios/${id}/aprovar`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ aprovado }),
+      });
+
+      if (res.ok) {
+        await carregarUsuarios();
+        setMensagem({ 
+          tipo: 'sucesso', 
+          texto: aprovado ? 'Usuário aprovado!' : 'Usuário reprovado!' 
+        });
+      } else {
+        const error = await res.json();
+        setMensagem({ tipo: 'erro', texto: error.error || 'Erro ao alterar status de aprovação' });
+      }
+    } catch (error) {
+      setMensagem({ tipo: 'erro', texto: 'Erro ao alterar status de aprovação' });
+    }
+  }
+
   async function excluirUsuario(id: number) {
     if (!confirm('Tem certeza que deseja excluir este usuário?')) {
       return;
@@ -208,7 +231,7 @@ export default function UsuariosPage() {
 
         <div className="flex justify-between items-center mb-6">
           <p className="text-gray-600">
-            Gerencie usuários do sistema. Cada instrutor terá acesso apenas aos seus próprios ensaios.
+            Gerencie usuários do sistema. Aprove novos cadastros para permitir acesso. Cada instrutor terá acesso apenas aos seus próprios ensaios.
           </p>
           {!mostrarForm && (
             <button
@@ -344,9 +367,30 @@ export default function UsuariosPage() {
                       {usuario.igreja && (
                         <p className="text-xs text-gray-500 mt-1">{usuario.igreja}</p>
                       )}
+                      {usuario.tipo !== 'admin' && (
+                        <span className={`inline-block mt-1 px-2 py-1 rounded text-xs ${
+                          usuario.aprovado 
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-yellow-100 text-yellow-700'
+                        }`}>
+                          {usuario.aprovado ? '✓ Aprovado' : '⏳ Aguardando'}
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
+                    {usuario.tipo !== 'admin' && (
+                      <button
+                        onClick={() => aprovarUsuario(usuario.id, !usuario.aprovado)}
+                        className={`flex-1 text-white px-3 py-2 rounded-lg text-xs transition-colors font-medium ${
+                          usuario.aprovado
+                            ? 'bg-yellow-600 hover:bg-yellow-700'
+                            : 'bg-green-600 hover:bg-green-700'
+                        }`}
+                      >
+                        {usuario.aprovado ? 'Reprovar' : 'Aprovar'}
+                      </button>
+                    )}
                     <button
                       onClick={() => iniciarEdicao(usuario)}
                       className="flex-1 bg-primary text-white px-3 py-2 rounded-lg text-xs hover:bg-primary-dark transition-colors font-medium"
@@ -355,7 +399,7 @@ export default function UsuariosPage() {
                     </button>
                     <button
                       onClick={() => setMostrarAlterarSenha(usuario.id)}
-                      className="flex-1 bg-green-600 text-white px-3 py-2 rounded-lg text-xs hover:bg-green-700 transition-colors font-medium"
+                      className="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-xs hover:bg-blue-700 transition-colors font-medium"
                     >
                       Senha
                     </button>
@@ -378,6 +422,7 @@ export default function UsuariosPage() {
                   <th className="px-4 py-3 text-left font-semibold">Email</th>
                   <th className="px-4 py-3 text-left font-semibold">Tipo</th>
                   <th className="px-4 py-3 text-left font-semibold">Igreja</th>
+                  <th className="px-4 py-3 text-left font-semibold">Status</th>
                   <th className="px-4 py-3 text-center font-semibold">Ações</th>
                 </tr>
               </thead>
@@ -395,7 +440,32 @@ export default function UsuariosPage() {
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">{usuario.igreja || '-'}</td>
                     <td className="px-4 py-3">
-                      <div className="flex gap-2 justify-center">
+                      {usuario.tipo !== 'admin' ? (
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          usuario.aprovado 
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-yellow-100 text-yellow-700'
+                        }`}>
+                          {usuario.aprovado ? '✓ Aprovado' : '⏳ Aguardando'}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-400">-</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2 justify-center flex-wrap">
+                        {usuario.tipo !== 'admin' && (
+                          <button
+                            onClick={() => aprovarUsuario(usuario.id, !usuario.aprovado)}
+                            className={`text-white px-3 py-1.5 rounded-lg text-xs transition-colors font-medium ${
+                              usuario.aprovado
+                                ? 'bg-yellow-600 hover:bg-yellow-700'
+                                : 'bg-green-600 hover:bg-green-700'
+                            }`}
+                          >
+                            {usuario.aprovado ? 'Reprovar' : 'Aprovar'}
+                          </button>
+                        )}
                         <button
                           onClick={() => iniciarEdicao(usuario)}
                           className="bg-primary text-white px-3 py-1.5 rounded-lg text-xs hover:bg-primary-dark transition-colors font-medium"
@@ -404,7 +474,7 @@ export default function UsuariosPage() {
                         </button>
                         <button
                           onClick={() => setMostrarAlterarSenha(usuario.id)}
-                          className="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-green-700 transition-colors font-medium"
+                          className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-700 transition-colors font-medium"
                         >
                           Senha
                         </button>

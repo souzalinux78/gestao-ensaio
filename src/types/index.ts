@@ -6,6 +6,7 @@ export interface Usuario {
   email: string;
   tipo: TipoUsuario;
   igreja?: string | null;
+  aprovado?: boolean;
 }
 
 export interface Instrumento {

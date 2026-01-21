@@ -40,7 +40,9 @@ export function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]) {
   };
 
   doc.setFontSize(18);
-  doc.text('Relatório de Ensaio', pageWidth / 2, yPos, { align: 'center' });
+  const nomeIgreja = ensaio.instrutor?.igreja || '';
+  const titulo = nomeIgreja ? `Relatório de Ensaio - ${nomeIgreja}` : 'Relatório de Ensaio';
+  doc.text(titulo, pageWidth / 2, yPos, { align: 'center' });
   yPos += 10;
 
   doc.setFontSize(12);

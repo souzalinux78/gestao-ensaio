@@ -18,7 +18,13 @@ export async function PUT(
       // Normalizar email (trim e lowercase)
       updateData.email = email.trim().toLowerCase();
     }
-    if (tipo) updateData.tipo = tipo;
+    if (tipo) {
+      updateData.tipo = tipo;
+      // Se mudar para admin, automaticamente aprovar
+      if (tipo === 'admin') {
+        updateData.aprovado = true;
+      }
+    }
     if (igreja !== undefined) updateData.igreja = igreja ? igreja.trim() : null;
     if (senha) {
       // Garantir que a senha seja hasheada corretamente
@@ -38,6 +44,7 @@ export async function PUT(
         email: true,
         tipo: true,
         igreja: true,
+        aprovado: true,
       },
     });
 

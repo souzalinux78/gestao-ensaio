@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
         email: true,
         tipo: true,
         igreja: true,
+        aprovado: true,
         createdAt: true,
       },
     });
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { nome, email, senha, tipo, igreja } = await request.json();
+    const { nome, email, senha, tipo, igreja, aprovado } = await request.json();
 
     if (!nome || !email || !senha || !tipo) {
       return NextResponse.json(
@@ -37,14 +38,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Se for cadastro público (sem aprovado), criar como não aprovado
+    // Se for admin criando, usar o valor de aprovado fornecido (ou true para admin)
+    const usuarioAprovado = aprovado !== undefined ? aprovado : (tipo === 'admin' ? true : false);
+
     const usuario = await criarUsuario(nome, email, senha, tipo, igreja);
 
+    // Atualizar o campo aprovado
+    const usuarioAtualizado = await prisma.usuario.update({
+      where: { id: usuario.id },
+      data: { aprovado: usuarioAprovado },
+    });
+
     return NextResponse.json({
-      id: usuario.id,
-      nome: usuario.nome,
-      email: usuario.email,
-      tipo: usuario.tipo,
-      igreja: usuario.igreja,
+      id: usuarioAtualizado.id,
+      nome: usuarioAtualizado.nome,
+      email: usuarioAtualizado.email,
+      tipo: usuarioAtualizado.tipo,
+      igreja: usuarioAtualizado.igreja,
+      aprovado: usuarioAtualizado.aprovado,
     });
   } catch (error: any) {
     if (error.code === 'P2002') {

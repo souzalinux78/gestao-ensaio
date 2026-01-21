@@ -9,10 +9,16 @@ export async function GET(request: NextRequest) {
   const instrutorId = searchParams.get('instrutorId');
   const igreja = searchParams.get('igreja');
 
+  // Obter usuário da requisição para verificar se é admin
+  const usuario = await obterUsuarioDaRequisicao(request);
+
   const where: any = {};
   
-  // Se for instrutor, filtrar apenas seus ensaios
-  if (instrutorId) {
+  // Se for instrutor (não admin), filtrar apenas seus ensaios
+  // Admin pode ver todos os ensaios (a menos que especifique instrutorId)
+  if (usuario && usuario.tipo === 'instrutor' && !instrutorId) {
+    where.instrutorId = usuario.id;
+  } else if (instrutorId) {
     where.instrutorId = parseInt(instrutorId);
   }
   

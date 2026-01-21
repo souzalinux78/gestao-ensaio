@@ -31,12 +31,19 @@ export async function verificarCredenciais(
         where: { id: usuario.id },
         data: { senha: senhaHash },
       });
+      // Verificar se o usuário está aprovado (admin sempre aprovado)
+      if (usuario.tipo !== 'admin' && !usuario.aprovado) {
+        console.log(`[AUTH] Usuário ${emailNormalizado} não está aprovado`);
+        return null;
+      }
+
       return {
         id: usuario.id,
         nome: usuario.nome,
         email: usuario.email,
         tipo: usuario.tipo as TipoUsuario,
         igreja: usuario.igreja,
+        aprovado: usuario.aprovado,
       };
     }
     return null;
@@ -48,12 +55,19 @@ export async function verificarCredenciais(
     return null;
   }
 
+  // Verificar se o usuário está aprovado (admin sempre aprovado)
+  if (usuario.tipo !== 'admin' && !usuario.aprovado) {
+    console.log(`[AUTH] Usuário ${emailNormalizado} não está aprovado`);
+    return null;
+  }
+
   return {
     id: usuario.id,
     nome: usuario.nome,
     email: usuario.email,
     tipo: usuario.tipo as TipoUsuario,
     igreja: usuario.igreja,
+    aprovado: usuario.aprovado,
   };
 }
 
@@ -65,8 +79,10 @@ export async function criarUsuario(
   igreja?: string | null
 ) {
   const senhaHash = await bcrypt.hash(senha, 10);
+  // Admin sempre aprovado, instrutor não aprovado por padrão
+  const aprovado = tipo === 'admin';
   return prisma.usuario.create({
-    data: { nome, email, senha: senhaHash, tipo, igreja: igreja || null },
+    data: { nome, email, senha: senhaHash, tipo, igreja: igreja || null, aprovado },
   });
 }
 

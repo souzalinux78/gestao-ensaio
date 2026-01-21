@@ -35,7 +35,13 @@ export default function LoginPage() {
           router.push('/instrutor');
         }
       } else {
-        setErro(data.error || 'Credenciais inválidas');
+        const errorMsg = data.error || 'Credenciais inválidas';
+        // Se o erro for sobre aprovação, mostrar mensagem específica
+        if (errorMsg.includes('aprovado') || errorMsg.includes('aprov')) {
+          setErro('Sua conta ainda não foi aprovada pelo administrador. Aguarde a aprovação.');
+        } else {
+          setErro(errorMsg);
+        }
       }
     } catch (error) {
       setErro('Erro ao fazer login');
@@ -111,6 +117,14 @@ export default function LoginPage() {
             {carregando ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600">
+            Não tem uma conta?{' '}
+            <a href="/cadastro" className="text-primary hover:text-primary-dark font-medium">
+              Criar conta
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );
