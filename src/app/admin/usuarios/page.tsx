@@ -18,7 +18,7 @@ export default function UsuariosPage() {
     senha: '',
     tipo: 'instrutor' as 'admin' | 'instrutor',
     igreja: '',
-    aprovado: true, // Por padrão, quando admin cria, aprovar automaticamente
+    aprovado: false, // Por padrão, não aprovar - admin decide se aprova na hora
   });
   const [senhaForm, setSenhaForm] = useState({
     senhaAtual: '',
@@ -102,8 +102,9 @@ export default function UsuariosPage() {
 
       // Se for criação de novo usuário, incluir campo aprovado
       // Se for admin, sempre aprovar automaticamente
+      // Se for instrutor, usar o valor da checkbox
       if (!editandoId) {
-        body.aprovado = formData.tipo === 'admin' ? true : formData.aprovado;
+        body.aprovado = formData.tipo === 'admin' ? true : (formData.aprovado ?? false);
       }
 
       const res = await fetch(url, {
@@ -253,7 +254,7 @@ export default function UsuariosPage() {
                   senha: '',
                   tipo: 'instrutor',
                   igreja: '',
-                  aprovado: true, // Por padrão, quando admin cria, aprovar automaticamente
+                  aprovado: false, // Por padrão, não aprovar - admin decide se aprova na hora
                 });
               }}
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"

@@ -58,9 +58,7 @@ export default function CadastroPage() {
 
       if (res.ok) {
         setSucesso(true);
-        setTimeout(() => {
-          router.push('/login');
-        }, 3000);
+        // Não redirecionar automaticamente - deixar o usuário ler a mensagem
       } else {
         setErro(data.error || 'Erro ao criar conta');
       }
@@ -83,12 +81,18 @@ export default function CadastroPage() {
             </div>
           </div>
           <h2 className="text-2xl font-bold text-primary mb-4">Cadastro Realizado!</h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-4">
             Seu cadastro foi enviado com sucesso. Aguarde a aprovação do administrador para acessar o sistema.
           </p>
-          <p className="text-sm text-gray-500">
-            Redirecionando para a página de login...
+          <p className="text-sm text-gray-500 mb-6">
+            Você receberá uma notificação quando sua conta for aprovada e poderá fazer login.
           </p>
+          <a
+            href="/login"
+            className="inline-block bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary-dark transition-colors font-medium"
+          >
+            Ir para Login
+          </a>
         </div>
       </div>
     );
@@ -107,8 +111,11 @@ export default function CadastroPage() {
               className="object-contain"
             />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-2">Criar Conta</h1>
-          <p className="text-gray-600 text-sm">Preencha os dados para se cadastrar</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-2">Criar Conta de Instrutor</h1>
+          <p className="text-gray-600 text-sm mb-2">Preencha os dados para se cadastrar como instrutor</p>
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-xs text-yellow-800">
+            ⚠️ Sua conta precisará ser aprovada por um administrador antes de poder fazer login.
+          </div>
         </div>
 
         {erro && (

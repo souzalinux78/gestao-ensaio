@@ -38,11 +38,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Se for cadastro público (sem aprovado), criar como não aprovado
+    // Garantir que cadastros públicos sejam sempre instrutores
+    const tipoFinal = tipo === 'admin' ? tipo : 'instrutor';
+    
+    // Se for cadastro público (sem aprovado definido), criar como não aprovado
     // Se for admin criando, usar o valor de aprovado fornecido (ou true para admin)
-    const usuarioAprovado = aprovado !== undefined ? aprovado : (tipo === 'admin' ? true : false);
+    const usuarioAprovado = aprovado !== undefined ? aprovado : (tipoFinal === 'admin' ? true : false);
 
-    const usuario = await criarUsuario(nome, email, senha, tipo, igreja);
+    const usuario = await criarUsuario(nome, email, senha, tipoFinal, igreja);
 
     // Atualizar o campo aprovado
     const usuarioAtualizado = await prisma.usuario.update({
