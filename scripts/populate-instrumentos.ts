@@ -1,47 +1,46 @@
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 const INSTRUMENTOS_PADRAO = [
-  'Acordeon',
-  'Barítono de Pisto',
+  'Violino',
+  'Violino Contralto',
+  'Viola',
+  'Violoncelo',
+  'Flauta',
+  'Flauta Contralto',
+  'Flauta Baixo',
   'Clarinete',
   'Clarinete Alto',
   'Clarinete Baixo',
   'Clarinete Contra Baixo',
-  'Corne Inglês',
-  'Cornet',
-  'Euphonium',
-  'Fagote',
-  'Flauta',
-  'Flauta Baixo',
-  'Flauta Contralto',
-  'Flugelhorn',
-  'Melofone',
   'Oboé',
-  'Oboé D\'amore',
-  'Pocket',
-  'Sax Horn',
+  'Oboé d’Amore',
+  'Corne Inglês',
+  'Fagote',
+  'Saxofone Sopranino C',
+  'Saxofone Sopranino R',
+  'Saxofone Soprano Curvo',
+  'Saxofone Soprano Reto',
   'Saxofone Alto',
-  'Saxofone Baixo',
-  'Saxofone Barítono',
-  'Saxofone Sopraniro C',
-  'Saxofone Sopraniro R',
-  'Saxofone Soprano Cur',
-  'Saxofone Soprano Ret',
   'Saxofone Tenor',
-  'Trombone',
-  'Trombonito',
-  'Trompa',
+  'Saxofone Barítono',
+  'Saxofone Baixo',
+  'Pocket',
+  'Cornet',
   'Trompete',
+  'Flugelhorn',
+  'Trompa',
+  'Trombonito',
+  'Barítono de Pisto',
+  'Melofone',
+  'Trombone',
+  'Sax Horn',
+  'Tuba Wagneriana',
+  'Euphonium',
   'Tuba',
   'Tuba Helicon',
-  'Tuba Wagneriana',
-  'Viola',
-  'Violino',
-  'Violino Contralto',
-  'Violoncelo',
+  'Acordeon',
   'Órgão',
 ];
 
@@ -60,42 +59,9 @@ async function popularInstrumentos() {
   console.log('\nInstrumentos populados com sucesso!');
 }
 
-async function criarUsuariosIniciais() {
-  console.log('\nCriando usuários iniciais...');
-  
-  const senhaAdmin = await bcrypt.hash('admin123', 10);
-  await prisma.usuario.upsert({
-    where: { email: 'admin@congregacao.com' },
-    update: {},
-    create: {
-      nome: 'Administrador',
-      email: 'admin@congregacao.com',
-      senha: senhaAdmin,
-      tipo: 'admin',
-      igreja: null,
-    },
-  });
-  console.log('✓ Usuário admin criado (email: admin@congregacao.com, senha: admin123)');
-  
-  const senhaInstrutor = await bcrypt.hash('instrutor123', 10);
-  await prisma.usuario.upsert({
-    where: { email: 'instrutor@congregacao.com' },
-    update: {},
-    create: {
-      nome: 'Instrutor',
-      email: 'instrutor@congregacao.com',
-      senha: senhaInstrutor,
-      tipo: 'instrutor',
-      igreja: null,
-    },
-  });
-  console.log('✓ Usuário instrutor criado (email: instrutor@congregacao.com, senha: instrutor123)');
-}
-
 async function main() {
   try {
     await popularInstrumentos();
-    await criarUsuariosIniciais();
     console.log('\n✅ Inicialização concluída!');
   } catch (error) {
     console.error('❌ Erro:', error);
