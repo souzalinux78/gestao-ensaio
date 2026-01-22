@@ -72,6 +72,12 @@ export async function POST(request: NextRequest) {
     }
 
     const usuario = await obterUsuarioDaRequisicao(request);
+    console.info('[POST /api/musicos] inicio', {
+      instrutorIdBody: instrutorId,
+      usuarioId: usuario?.id,
+      usuarioTipo: usuario?.tipo,
+      authHeader: request.headers.get('authorization') ? 'presente' : 'ausente',
+    });
     if (!usuario) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }

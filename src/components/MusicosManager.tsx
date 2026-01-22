@@ -63,6 +63,11 @@ export default function MusicosManager() {
       return;
     }
 
+    console.info('[MusicosManager] salvarMusico', {
+      usuarioId: usuario.id,
+      nome: nome.trim(),
+    });
+
     setSalvando(true);
     setMensagem(null);
 
