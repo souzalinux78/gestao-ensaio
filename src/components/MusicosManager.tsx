@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Musico, Usuario } from '@/types';
-import { obterSessao } from '@/lib/session';
+import { obterSessao, removerSessao } from '@/lib/session';
 
 export default function MusicosManager() {
+  const router = useRouter();
   const [musicos, setMusicos] = useState<Musico[]>([]);
   const [carregando, setCarregando] = useState(false);
   const [salvando, setSalvando] = useState(false);
@@ -22,6 +24,14 @@ export default function MusicosManager() {
     }
   }, []);
 
+  function lidarSessaoInvalida(mensagem?: string) {
+    if (mensagem) {
+      setMensagem({ tipo: 'erro', texto: mensagem });
+    }
+    removerSessao();
+    router.push('/login');
+  }
+
   async function carregarMusicos(instrutorId: number) {
     setCarregando(true);
     try {
@@ -30,6 +40,10 @@ export default function MusicosManager() {
       });
       const data = await res.json();
       if (!res.ok) {
+        if (res.status === 401) {
+          lidarSessaoInvalida('Sessão expirada. Faça login novamente.');
+          return;
+        }
         throw new Error(data.error || 'Erro ao carregar músicos');
       }
       setMusicos(data);
@@ -88,6 +102,14 @@ export default function MusicosManager() {
       });
 
       const data = await res.json();
+      if (!res.ok && res.status === 401) {
+        lidarSessaoInvalida('Sessão expirada. Faça login novamente.');
+        return;
+      }
+      if (!res.ok && data?.error === 'Instrutor não encontrado') {
+        lidarSessaoInvalida('Sessão inválida. Faça login novamente.');
+        return;
+      }
       if (!res.ok) {
         throw new Error(data.error || 'Erro ao salvar músico');
       }
