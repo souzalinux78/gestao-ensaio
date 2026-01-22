@@ -6,6 +6,11 @@ export async function GET(request: NextRequest) {
   try {
     const usuario = await obterUsuarioDaRequisicao(request);
     const instrutorIdParam = request.nextUrl.searchParams.get('instrutorId');
+    console.info('[GET /api/musicos] inicio', {
+      instrutorIdParam,
+      usuarioId: usuario?.id,
+      usuarioTipo: usuario?.tipo,
+    });
     if (!usuario && !instrutorIdParam) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
@@ -41,8 +46,16 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    console.info('[GET /api/musicos] sucesso', {
+      instrutorId,
+      total: musicos.length,
+    });
     return NextResponse.json(musicos);
   } catch (error: any) {
+    console.error('[GET /api/musicos] erro', {
+      mensagem: error?.message,
+      code: error?.code,
+    });
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
