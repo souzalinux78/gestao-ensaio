@@ -87,6 +87,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
+    const instrutorExistente = await prisma.usuario.findUnique({
+      where: { id: instrutorIdFinal },
+      select: { id: true, tipo: true },
+    });
+
+    if (!instrutorExistente) {
+      return NextResponse.json(
+        { error: 'Instrutor não encontrado' },
+        { status: 400 }
+      );
+    }
+
     const musico = await prisma.musico.create({
       data: {
         nome: nome.trim(),
