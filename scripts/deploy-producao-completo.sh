@@ -35,9 +35,9 @@ rm -rf node_modules/.cache
 rm -rf .next/cache
 echo -e "${GREEN}✅ Caches limpos${NC}"
 
-# 3. Atualizar dependências (se necessário)
+# 3. Atualizar dependências
 echo -e "${YELLOW}📦 Verificando dependências...${NC}"
-npm ci --production=false || npm install
+npm ci || npm install
 echo -e "${GREEN}✅ Dependências atualizadas${NC}"
 
 # 4. Gerar Prisma Client
@@ -45,7 +45,12 @@ echo -e "${YELLOW}🔧 Gerando Prisma Client...${NC}"
 npm run db:generate
 echo -e "${GREEN}✅ Prisma Client gerado${NC}"
 
-# 5. Build da aplicação
+# 5. Aplicar migrações do Prisma em produção
+echo -e "${YELLOW}🗃️ Aplicando migrações do Prisma...${NC}"
+npx prisma migrate deploy
+echo -e "${GREEN}✅ Migrações aplicadas${NC}"
+
+# 6. Build da aplicação
 echo -e "${YELLOW}🔨 Construindo aplicação...${NC}"
 NODE_ENV=production npm run build
 
@@ -56,28 +61,28 @@ fi
 
 echo -e "${GREEN}✅ Build concluído com sucesso${NC}"
 
-# 6. Verificar se o build foi criado
+# 7. Verificar se o build foi criado
 if [ ! -d ".next" ]; then
     echo -e "${RED}❌ Pasta .next não foi criada!${NC}"
     exit 1
 fi
 
-# 7. Reiniciar aplicação
+# 8. Reiniciar aplicação
 echo -e "${YELLOW}🔄 Reiniciando aplicação...${NC}"
 pm2 restart gestao-ensaio || pm2 start npm --name "gestao-ensaio" -- start
 
-# 8. Aguardar aplicação iniciar
+# 9. Aguardar aplicação iniciar
 sleep 3
 
-# 9. Verificar status
+# 10. Verificar status
 echo -e "${YELLOW}📊 Verificando status da aplicação...${NC}"
 pm2 status gestao-ensaio
 
-# 10. Verificar logs
+# 11. Verificar logs
 echo -e "${YELLOW}📝 Últimas linhas dos logs:${NC}"
 pm2 logs gestao-ensaio --lines 20 --nostream
 
-# 11. Limpar cache do Nginx (se aplicável)
+# 12. Limpar cache do Nginx (se aplicável)
 if command -v nginx &> /dev/null; then
     echo -e "${YELLOW}🌐 Recarregando Nginx...${NC}"
     sudo nginx -t && sudo systemctl reload nginx || echo "Nginx não configurado ou sem permissão"

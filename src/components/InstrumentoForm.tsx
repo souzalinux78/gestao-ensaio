@@ -14,44 +14,46 @@ type Naipe = 'Cordas' | 'Madeiras' | 'Metais' | 'Teclas' | 'Outros';
 
 const ORDEM_NAIPES: Naipe[] = ['Cordas', 'Madeiras', 'Metais', 'Teclas', 'Outros'];
 
-const PALAVRAS_CHAVE_POR_NAIPE: Record<Naipe, string[]> = {
-  Cordas: [
-    'violino',
-    'viola',
-    'violoncelo',
-    'contrabaixo',
-    'harpa',
-    'violao',
-    'guitarra',
-    'bandolim',
-    'cavaquinho',
-  ],
-  Madeiras: [
-    'flauta',
-    'flautim',
-    'piccolo',
-    'clarinete',
-    'oboe',
-    'oboé',
-    'fagote',
-    'sax',
-  ],
-  Metais: [
-    'trompete',
-    'trombone',
-    'tuba',
-    'trompa',
-    'cornet',
-    'corneta',
-    'bombardino',
-    'baritono',
-    'barítono',
-    'eufonio',
-    'eufônio',
-    'pisto',
-  ],
-  Teclas: ['orgao', 'órgão', 'piano', 'teclado', 'acordeon', 'acordeão'],
-  Outros: [],
+const MAPEAMENTO_NAIPES: Record<string, Naipe> = {
+  'violino': 'Cordas',
+  'violino contralto': 'Cordas',
+  'viola': 'Cordas',
+  'violoncelo': 'Cordas',
+  'flauta': 'Madeiras',
+  'flauta contralto': 'Madeiras',
+  'flauta baixo': 'Madeiras',
+  'clarinete': 'Madeiras',
+  'clarinete alto': 'Madeiras',
+  'clarinete baixo': 'Madeiras',
+  'clarinete contra baixo': 'Madeiras',
+  'oboe': 'Madeiras',
+  'oboe d amore': 'Madeiras',
+  'corne ingles': 'Madeiras',
+  'fagote': 'Madeiras',
+  'saxofone sopranino c': 'Madeiras',
+  'saxofone sopranino r': 'Madeiras',
+  'saxofone soprano curvo': 'Madeiras',
+  'saxofone soprano reto': 'Madeiras',
+  'saxofone alto': 'Madeiras',
+  'saxofone tenor': 'Madeiras',
+  'saxofone baritono': 'Madeiras',
+  'saxofone baixo': 'Madeiras',
+  'pocket': 'Metais',
+  'cornet': 'Metais',
+  'trompete': 'Metais',
+  'flugelhorn': 'Metais',
+  'trompa': 'Metais',
+  'trombonito': 'Metais',
+  'baritono de pisto': 'Metais',
+  'melofone': 'Metais',
+  'trombone': 'Metais',
+  'sax horn': 'Metais',
+  'tuba wagneriana': 'Metais',
+  'euphonium': 'Metais',
+  'tuba': 'Metais',
+  'tuba helicon': 'Metais',
+  'acordeon': 'Teclas',
+  'orgao': 'Teclas',
 };
 
 function normalizarTexto(valor: string) {
@@ -63,15 +65,7 @@ function normalizarTexto(valor: string) {
 
 function identificarNaipe(nomeInstrumento: string): Naipe {
   const nomeNormalizado = normalizarTexto(nomeInstrumento);
-
-  for (const naipe of ORDEM_NAIPES) {
-    const palavrasChave = PALAVRAS_CHAVE_POR_NAIPE[naipe];
-    if (palavrasChave.some((palavra) => nomeNormalizado.includes(normalizarTexto(palavra)))) {
-      return naipe;
-    }
-  }
-
-  return 'Outros';
+  return MAPEAMENTO_NAIPES[nomeNormalizado] ?? 'Outros';
 }
 
 export default function InstrumentoForm({
