@@ -14,6 +14,17 @@ export interface Instrumento {
   nome: string;
 }
 
+export interface Musico {
+  id: number;
+  nome: string;
+  instrutorId: number;
+}
+
+export interface EnsaioMusico {
+  musicoId: number;
+  musico?: Musico;
+}
+
 export interface EnsaioInstrumento {
   instrumentoId: number;
   quantidade: number;
@@ -40,6 +51,7 @@ export interface Ensaio {
     igreja?: string | null;
   };
   instrumentos: EnsaioInstrumento[];
+  musicos?: EnsaioMusico[];
   funcoes?: EnsaioFuncoes;
   totalGeral: number;
   hinosEnsaidos?: string | null;

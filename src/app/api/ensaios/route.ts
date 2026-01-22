@@ -69,7 +69,16 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { data, instrumentos, funcoes, totalGeral, hinosEnsaidos, regencia, instrutorId } = body;
+    const {
+      data,
+      instrumentos,
+      funcoes,
+      totalGeral,
+      hinosEnsaidos,
+      regencia,
+      instrutorId,
+      musicos,
+    } = body;
 
     // Usar instrutorId do body ou tentar obter da sessão
     let instrutorIdFinal = instrutorId;
@@ -99,6 +108,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const musicosSelecionados = Array.isArray(musicos) ? musicos : [];
+    if (musicosSelecionados.length > 0) {
+      const ids = musicosSelecionados.map((item: any) => item.musicoId);
+      const total = await prisma.musico.count({
+        where: {
+          id: { in: ids },
+          instrutorId: instrutorIdFinal,
+        },
+      });
+      if (total !== ids.length) {
+        return NextResponse.json(
+          { error: 'Há músicos inválidos para este instrutor' },
+          { status: 400 }
+        );
+      }
+    }
+
     const ensaio = await prisma.ensaio.create({
       data: {
         data: new Date(data),
@@ -112,6 +138,11 @@ export async function POST(request: NextRequest) {
             quantidade: item.quantidade,
           })),
         },
+        musicos: {
+          create: musicosSelecionados.map((item: any) => ({
+            musicoId: item.musicoId,
+          })),
+        },
         funcoes: {
           create: funcoes,
         },
@@ -120,6 +151,11 @@ export async function POST(request: NextRequest) {
         instrumentos: {
           include: {
             instrumento: true,
+          },
+        },
+        musicos: {
+          include: {
+            musico: true,
           },
         },
         funcoes: true,

@@ -5,8 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import InstrumentoForm from '@/components/InstrumentoForm';
 import FuncoesForm from '@/components/FuncoesForm';
+import MusicosForm from '@/components/MusicosForm';
 import DateInputBR from '@/components/DateInputBR';
-import { Instrumento, Usuario, Ensaio } from '@/types';
+import { Instrumento, Usuario, Ensaio, Musico } from '@/types';
 import { obterSessao } from '@/lib/session';
 
 function NovoEnsaioContent() {
@@ -17,6 +18,8 @@ function NovoEnsaioContent() {
 
   const [instrumentos, setInstrumentos] = useState<Instrumento[]>([]);
   const [quantidades, setQuantidades] = useState<{ [key: number]: number }>({});
+  const [musicos, setMusicos] = useState<Musico[]>([]);
+  const [musicosSelecionados, setMusicosSelecionados] = useState<number[]>([]);
   const [funcoes, setFuncoes] = useState<{
     ancioes: number | undefined;
     diaconos: number | undefined;
@@ -49,6 +52,7 @@ function NovoEnsaioContent() {
     }
     setUsuario(sessao);
     carregarInstrumentos();
+    carregarMusicos(sessao.id);
     
     if (isEditando && ensaioId) {
       carregarEnsaio(parseInt(ensaioId));
@@ -94,6 +98,13 @@ function NovoEnsaioContent() {
       // Preencher hinos e regência
       setHinosEnsaidos(ensaio.hinosEnsaidos || '');
       setRegencia(ensaio.regencia || '');
+
+      // Preencher músicos presentes
+      if (ensaio.musicos) {
+        setMusicosSelecionados(ensaio.musicos.map((item) => item.musicoId));
+      } else {
+        setMusicosSelecionados([]);
+      }
     } catch (error) {
       console.error('Erro ao carregar ensaio:', error);
       alert('Erro ao carregar ensaio. Redirecionando...');
@@ -107,6 +118,25 @@ function NovoEnsaioContent() {
     const res = await fetch('/api/instrumentos');
     const data = await res.json();
     setInstrumentos(data);
+  }
+
+  async function carregarMusicos(instrutorId: number) {
+    const res = await fetch('/api/musicos', {
+      headers: { Authorization: `Bearer ${instrutorId}` },
+    });
+    if (!res.ok) {
+      return;
+    }
+    const data = await res.json();
+    setMusicos(data);
+  }
+
+  function alternarMusico(musicoId: number) {
+    setMusicosSelecionados((atual) =>
+      atual.includes(musicoId)
+        ? atual.filter((id) => id !== musicoId)
+        : [...atual, musicoId]
+    );
   }
 
   async function adicionarNovoInstrumento(nome: string) {
@@ -152,6 +182,9 @@ function NovoEnsaioContent() {
             instrumentoId: parseInt(id),
             quantidade: qtd,
           })),
+        musicos: musicosSelecionados.map((musicoId) => ({
+          musicoId,
+        })),
         funcoes: {
           ancioes: funcoes.ancioes ?? 0,
           diaconos: funcoes.diaconos ?? 0,
@@ -224,6 +257,12 @@ function NovoEnsaioContent() {
               }
             }}
             onAdicionarNovo={adicionarNovoInstrumento}
+          />
+
+          <MusicosForm
+            musicos={musicos}
+            selecionados={musicosSelecionados}
+            onToggle={alternarMusico}
           />
 
           <FuncoesForm

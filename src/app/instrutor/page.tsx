@@ -94,6 +94,12 @@ export default function InstrutorPage() {
               📞 Meus Contatos
             </button>
             <button
+              onClick={() => router.push('/instrutor/musicos')}
+              className="w-full sm:w-auto bg-yellow-600 text-white px-4 py-2.5 rounded-lg hover:bg-yellow-700 transition-colors font-medium"
+            >
+              🎵 Cadastro de Músicos
+            </button>
+            <button
               onClick={() => router.push('/instrutor/novo-ensaio')}
               className="w-full sm:w-auto bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary-dark transition-colors font-medium shadow-md hover:shadow-lg"
             >

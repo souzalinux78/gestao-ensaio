@@ -18,6 +18,11 @@ export async function GET(
             instrumento: true,
           },
         },
+        musicos: {
+          include: {
+            musico: true,
+          },
+        },
         funcoes: true,
         instrutor: {
           select: {
@@ -52,7 +57,7 @@ export async function PUT(
   try {
     const id = parseInt(params.id);
     const body = await request.json();
-    const { data, instrumentos, funcoes, totalGeral, hinosEnsaidos, regencia } = body;
+    const { data, instrumentos, funcoes, totalGeral, hinosEnsaidos, regencia, musicos } = body;
 
     // Verificar se o ensaio existe
     const ensaioExistente = await prisma.ensaio.findUnique({
@@ -95,10 +100,31 @@ export async function PUT(
       where: { ensaioId: id },
     });
 
+    await prisma.ensaioMusico.deleteMany({
+      where: { ensaioId: id },
+    });
+
     if (ensaioExistente.funcoes) {
       await prisma.ensaioFuncoes.delete({
         where: { ensaioId: id },
       });
+    }
+
+    const musicosSelecionados = Array.isArray(musicos) ? musicos : [];
+    if (musicosSelecionados.length > 0) {
+      const ids = musicosSelecionados.map((item: any) => item.musicoId);
+      const total = await prisma.musico.count({
+        where: {
+          id: { in: ids },
+          instrutorId: ensaioExistente.instrutorId,
+        },
+      });
+      if (total !== ids.length) {
+        return NextResponse.json(
+          { error: 'Há músicos inválidos para este instrutor' },
+          { status: 400 }
+        );
+      }
     }
 
     // Atualizar o ensaio
@@ -115,6 +141,11 @@ export async function PUT(
             quantidade: item.quantidade,
           })),
         },
+        musicos: {
+          create: musicosSelecionados.map((item: any) => ({
+            musicoId: item.musicoId,
+          })),
+        },
         funcoes: {
           create: funcoes,
         },
@@ -123,6 +154,11 @@ export async function PUT(
         instrumentos: {
           include: {
             instrumento: true,
+          },
+        },
+        musicos: {
+          include: {
+            musico: true,
           },
         },
         funcoes: true,
