@@ -25,7 +25,7 @@ export default function MusicosManager() {
   async function carregarMusicos(instrutorId: number) {
     setCarregando(true);
     try {
-      const res = await fetch('/api/musicos', {
+      const res = await fetch(`/api/musicos?instrutorId=${instrutorId}`, {
         headers: { Authorization: `Bearer ${instrutorId}` },
       });
       const data = await res.json();

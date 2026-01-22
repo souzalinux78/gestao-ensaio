@@ -5,13 +5,13 @@ import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
 export async function GET(request: NextRequest) {
   try {
     const usuario = await obterUsuarioDaRequisicao(request);
-    if (!usuario) {
+    const instrutorIdParam = request.nextUrl.searchParams.get('instrutorId');
+    if (!usuario && !instrutorIdParam) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    let instrutorId = usuario.id;
-    if (usuario.tipo === 'admin') {
-      const instrutorIdParam = request.nextUrl.searchParams.get('instrutorId');
+    let instrutorId = usuario?.id;
+    if (usuario?.tipo === 'admin') {
       if (!instrutorIdParam) {
         return NextResponse.json(
           { error: 'ID do instrutor é obrigatório' },
@@ -19,6 +19,17 @@ export async function GET(request: NextRequest) {
         );
       }
       instrutorId = parseInt(instrutorIdParam);
+    }
+
+    if (!instrutorId && instrutorIdParam) {
+      instrutorId = parseInt(instrutorIdParam);
+    }
+
+    if (!instrutorId) {
+      return NextResponse.json(
+        { error: 'ID do instrutor é obrigatório' },
+        { status: 400 }
+      );
     }
 
     const musicos = await prisma.musico.findMany({
