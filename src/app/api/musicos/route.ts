@@ -78,20 +78,13 @@ export async function POST(request: NextRequest) {
       usuarioTipo: usuario?.tipo,
       authHeader: request.headers.get('authorization') ? 'presente' : 'ausente',
     });
-    if (!usuario) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
-    }
-
-    let instrutorIdFinal = usuario.id;
-    if (usuario.tipo === 'admin') {
+    let instrutorIdFinal = usuario?.id ?? instrutorId;
+    if (usuario?.tipo === 'admin') {
       instrutorIdFinal = instrutorId;
     }
 
     if (!instrutorIdFinal) {
-      return NextResponse.json(
-        { error: 'ID do instrutor é obrigatório' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const musico = await prisma.musico.create({

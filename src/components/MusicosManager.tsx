@@ -83,6 +83,7 @@ export default function MusicosManager() {
         },
         body: JSON.stringify({
           nome: nome.trim(),
+          instrutorId: usuario.id,
         }),
       });
 
