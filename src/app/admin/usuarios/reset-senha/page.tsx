@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import AdminLayout from '@/components/AdminLayout';
 import { apiFetch } from '@/lib/api-client';
 
-export default function ResetSenhaPage() {
+function ResetSenhaContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const usuarioId = searchParams.get('usuarioId');
@@ -157,5 +157,24 @@ export default function ResetSenhaPage() {
         </div>
       </div>
     </AdminLayout>
+  );
+}
+
+export default function ResetSenhaPage() {
+  return (
+    <Suspense
+      fallback={
+        <AdminLayout>
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center py-8">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-[var(--text-secondary)]">Carregando...</p>
+            </div>
+          </div>
+        </AdminLayout>
+      }
+    >
+      <ResetSenhaContent />
+    </Suspense>
   );
 }
