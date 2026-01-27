@@ -8,10 +8,13 @@ import { Usuario } from '@/types';
 export default function UsuariosPage() {
   const router = useRouter();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [usuariosFiltrados, setUsuariosFiltrados] = useState<Usuario[]>([]);
   const [carregando, setCarregando] = useState(false);
   const [mostrarForm, setMostrarForm] = useState(false);
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [mostrarAlterarSenha, setMostrarAlterarSenha] = useState<number | null>(null);
+  const [filtroNome, setFiltroNome] = useState('');
+  const [filtroStatus, setFiltroStatus] = useState<'todos' | 'aprovados' | 'pendentes'>('todos');
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -37,12 +40,47 @@ export default function UsuariosPage() {
       const res = await fetch('/api/usuarios');
       const data = await res.json();
       setUsuarios(data);
+      // Aplicar filtros com os dados carregados e os filtros atuais
+      aplicarFiltros(data, filtroNome, filtroStatus);
     } catch (error) {
       setMensagem({ tipo: 'erro', texto: 'Erro ao carregar usuários' });
     } finally {
       setCarregando(false);
     }
   }
+
+  function aplicarFiltros(lista: Usuario[], nome: string, status: 'todos' | 'aprovados' | 'pendentes') {
+    let filtrados = [...lista];
+
+    // Filtro por nome
+    if (nome.trim()) {
+      const nomeLower = nome.trim().toLowerCase();
+      filtrados = filtrados.filter(
+        (u) =>
+          u.nome.toLowerCase().includes(nomeLower) ||
+          u.email.toLowerCase().includes(nomeLower) ||
+          (u.igreja && u.igreja.toLowerCase().includes(nomeLower))
+      );
+    }
+
+    // Filtro por status de aprovação
+    if (status !== 'todos') {
+      filtrados = filtrados.filter((u) => {
+        if (u.tipo === 'admin') return false; // Admins não aparecem no filtro de status
+        return status === 'aprovados' ? u.aprovado === true : u.aprovado === false;
+      });
+    }
+
+    setUsuariosFiltrados(filtrados);
+  }
+
+  // Aplicar filtros quando mudarem
+  useEffect(() => {
+    if (usuarios.length > 0 || filtroNome || filtroStatus !== 'todos') {
+      aplicarFiltros(usuarios, filtroNome, filtroStatus);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtroNome, filtroStatus, usuarios]);
 
   function iniciarEdicao(usuario: Usuario) {
     setEditandoId(usuario.id);
@@ -239,29 +277,79 @@ export default function UsuariosPage() {
           </div>
         )}
 
-        <div className="flex justify-between items-center mb-6">
-          <p className="text-gray-600">
-            Gerencie usuários do sistema. Aprove novos cadastros para permitir acesso. Cada instrutor terá acesso apenas aos seus próprios ensaios.
-          </p>
-          {!mostrarForm && (
-            <button
-              onClick={() => {
-                setMostrarForm(true);
-                setEditandoId(null);
-                setFormData({
-                  nome: '',
-                  email: '',
-                  senha: '',
-                  tipo: 'instrutor',
-                  igreja: '',
-                  aprovado: false, // Por padrão, não aprovar - admin decide se aprova na hora
-                });
-              }}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              + Novo Usuário
-            </button>
-          )}
+        <div className="mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <p className="text-gray-600">
+              Gerencie usuários do sistema. Aprove novos cadastros para permitir acesso. Cada instrutor terá acesso apenas aos seus próprios ensaios.
+            </p>
+            {!mostrarForm && (
+              <button
+                onClick={() => {
+                  setMostrarForm(true);
+                  setEditandoId(null);
+                  setFormData({
+                    nome: '',
+                    email: '',
+                    senha: '',
+                    tipo: 'instrutor',
+                    igreja: '',
+                    aprovado: false, // Por padrão, não aprovar - admin decide se aprova na hora
+                  });
+                }}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap"
+              >
+                + Novo Usuário
+              </button>
+            )}
+          </div>
+
+          {/* Filtros */}
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  🔍 Pesquisar por nome, email ou igreja
+                </label>
+                <input
+                  type="text"
+                  value={filtroNome}
+                  onChange={(e) => setFiltroNome(e.target.value)}
+                  placeholder="Digite para pesquisar..."
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  📊 Filtrar por status
+                </label>
+                <select
+                  value={filtroStatus}
+                  onChange={(e) => setFiltroStatus(e.target.value as 'todos' | 'aprovados' | 'pendentes')}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                >
+                  <option value="todos">Todos</option>
+                  <option value="aprovados">Aprovados</option>
+                  <option value="pendentes">Pendentes</option>
+                </select>
+              </div>
+            </div>
+            {(filtroNome || filtroStatus !== 'todos') && (
+              <div className="mt-3 flex items-center gap-2">
+                <span className="text-sm text-gray-600">
+                  Mostrando {usuariosFiltrados.length} de {usuarios.length} usuário(s)
+                </span>
+                <button
+                  onClick={() => {
+                    setFiltroNome('');
+                    setFiltroStatus('todos');
+                  }}
+                  className="text-sm text-primary hover:text-primary-dark font-medium"
+                >
+                  Limpar filtros
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {mostrarForm && (
@@ -378,11 +466,15 @@ export default function UsuariosPage() {
           <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
             Nenhum usuário cadastrado.
           </div>
+        ) : usuariosFiltrados.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+            Nenhum usuário encontrado com os filtros aplicados.
+          </div>
         ) : (
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             {/* Versão mobile: cards */}
             <div className="block sm:hidden divide-y">
-              {usuarios.map((usuario) => (
+              {usuariosFiltrados.map((usuario) => (
                 <div key={usuario.id} className="p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1 min-w-0">
@@ -456,7 +548,7 @@ export default function UsuariosPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {usuarios.map((usuario) => (
+                {usuariosFiltrados.map((usuario) => (
                   <tr key={usuario.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">{usuario.nome}</td>
                     <td className="px-4 py-3 text-sm text-gray-600">{usuario.email}</td>
