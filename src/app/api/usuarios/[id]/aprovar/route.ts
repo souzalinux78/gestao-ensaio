@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { resolveTenantFromRequest } from '@/lib/middleware';
 import { safeParseInt } from '@/lib/validators';
 
 export async function PUT(
@@ -21,6 +22,31 @@ export async function PUT(
       return NextResponse.json(
         { error: 'Campo aprovado deve ser um booleano' },
         { status: 400 }
+      );
+    }
+
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
+    // Verificar se usuário existe e pertence ao mesmo tenant
+    const usuarioExistente = await prisma.usuario.findUnique({
+      where: { id },
+      select: { id: true, tenantId: true },
+    });
+
+    if (!usuarioExistente) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // ISOLAMENTO: Verificar se usuário pertence ao mesmo tenant
+    if (usuarioExistente.tenantId !== tenantIdFinal) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
       );
     }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { alterarSenha } from '@/lib/auth';
+import { resolveTenantFromRequest } from '@/lib/middleware';
 import bcrypt from 'bcryptjs';
 import { safeParseInt, sanitizeString, validateEmail, validatePassword } from '@/lib/validators';
 
@@ -78,6 +79,31 @@ export async function PUT(
       updateData.aprovado = aprovado;
     }
 
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
+    // Verificar se usuário existe e pertence ao mesmo tenant
+    const usuarioExistente = await prisma.usuario.findUnique({
+      where: { id },
+      select: { id: true, tenantId: true },
+    });
+
+    if (!usuarioExistente) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // ISOLAMENTO: Verificar se usuário pertence ao mesmo tenant
+    if (usuarioExistente.tenantId !== tenantIdFinal) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      );
+    }
+
     const usuario = await prisma.usuario.update({
       where: { id },
       data: updateData,
@@ -127,12 +153,24 @@ export async function DELETE(
       );
     }
 
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
     // Não permitir deletar a si mesmo
     const usuario = await prisma.usuario.findUnique({
       where: { id },
     });
 
     if (!usuario) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // ISOLAMENTO: Verificar se usuário pertence ao mesmo tenant
+    if (usuario.tenantId !== tenantIdFinal) {
       return NextResponse.json(
         { error: 'Usuário não encontrado' },
         { status: 404 }

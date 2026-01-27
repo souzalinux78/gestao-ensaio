@@ -136,8 +136,16 @@ export async function POST(request: NextRequest) {
     const usuarioAprovado = aprovado !== undefined ? aprovado : (tipoFinal === 'admin' ? true : false);
 
     // Obter tenantId para isolamento
+    // Se for cadastro público (sem autenticação), usar tenant padrão
+    // Se for admin criando, usar o tenant do admin
+    let tenantIdFinal = 1; // Padrão: tenant padrão (ID = 1)
+    
+    // Tentar obter tenantId da requisição (pode ser null para cadastros públicos)
     const tenantId = await resolveTenantFromRequest(request);
-    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+    if (tenantId) {
+      tenantIdFinal = tenantId;
+    }
+    // Se tenantId for null, já está usando o padrão (1)
 
     // Criar usuário diretamente com aprovado (evita query duplicada)
     const senhaHash = await bcrypt.hash(senha, 10);

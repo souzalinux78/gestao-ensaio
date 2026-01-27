@@ -80,13 +80,24 @@ export async function criarUsuario(
   email: string,
   senha: string,
   tipo: TipoUsuario,
-  igreja?: string | null
+  igreja?: string | null,
+  tenantId?: number | null
 ) {
   const senhaHash = await bcrypt.hash(senha, 10);
   // Admin sempre aprovado, instrutor não aprovado por padrão
   const aprovado = tipo === 'admin';
+  // Se não fornecido, usar tenant padrão (ID = 1)
+  const tenantIdFinal = tenantId || 1;
   return prisma.usuario.create({
-    data: { nome, email, senha: senhaHash, tipo, igreja: igreja || null, aprovado },
+    data: { 
+      nome, 
+      email, 
+      senha: senhaHash, 
+      tipo, 
+      igreja: igreja || null, 
+      aprovado,
+      tenantId: tenantIdFinal, // ISOLAMENTO: associar ao tenant
+    },
   });
 }
 

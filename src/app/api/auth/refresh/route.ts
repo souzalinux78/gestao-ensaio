@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Gerar novo access token
+    // Gerar novo access token (incluindo tenantId)
     const accessToken = generateAccessToken({
       id: usuario.id,
       nome: usuario.nome,
@@ -83,6 +83,7 @@ export async function POST(request: NextRequest) {
       tipo: usuario.tipo as 'admin' | 'instrutor',
       igreja: usuario.igreja,
       aprovado: usuario.aprovado,
+      tenantId: usuario.tenantId ?? null, // ISOLAMENTO: incluir tenantId
     });
 
     logger.info('Access token renovado', { userId: usuario.id });
