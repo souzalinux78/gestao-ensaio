@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from './db';
 import { Usuario, TipoUsuario } from '@/types';
+import { logger } from './logger';
 
 export async function verificarCredenciais(
   email: string,
@@ -14,7 +15,7 @@ export async function verificarCredenciais(
   });
 
   if (!usuario) {
-    console.log(`[AUTH] Usuário não encontrado para email: ${emailNormalizado}`);
+    logger.debug('Usuário não encontrado', { email: emailNormalizado });
     return null;
   }
 
@@ -22,7 +23,7 @@ export async function verificarCredenciais(
   const senhaEstaHasheada = usuario.senha.startsWith('$2a$') || usuario.senha.startsWith('$2b$');
   
   if (!senhaEstaHasheada) {
-    console.log(`[AUTH] Senha do usuário ${emailNormalizado} não está hasheada!`);
+    logger.warn('Senha não hasheada detectada - migrando', { userId: usuario.id });
     // Se a senha não está hasheada, comparar diretamente (para migração)
     if (usuario.senha === senha) {
       // Re-hashear a senha
@@ -31,9 +32,10 @@ export async function verificarCredenciais(
         where: { id: usuario.id },
         data: { senha: senhaHash },
       });
+      logger.info('Senha migrada com sucesso', { userId: usuario.id });
       // Verificar se o usuário está aprovado (admin sempre aprovado)
       if (usuario.tipo !== 'admin' && !usuario.aprovado) {
-        console.log(`[AUTH] Usuário ${emailNormalizado} não está aprovado`);
+        logger.debug('Usuário não aprovado', { userId: usuario.id });
         return null;
       }
 
@@ -51,13 +53,13 @@ export async function verificarCredenciais(
 
   const senhaValida = await bcrypt.compare(senha, usuario.senha);
   if (!senhaValida) {
-    console.log(`[AUTH] Senha inválida para usuário: ${emailNormalizado}`);
+    logger.debug('Senha inválida', { userId: usuario.id });
     return null;
   }
 
   // Verificar se o usuário está aprovado (admin sempre aprovado)
   if (usuario.tipo !== 'admin' && !usuario.aprovado) {
-    console.log(`[AUTH] Usuário ${emailNormalizado} não está aprovado`);
+    logger.debug('Usuário não aprovado', { userId: usuario.id });
     return null;
   }
 
