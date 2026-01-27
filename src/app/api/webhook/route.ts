@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { Ensaio, Instrumento } from '@/types';
 import { safeParseInt } from '@/lib/validators';
+import { getConfig } from '@/lib/config-cache';
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,8 +23,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Buscar configurações
-    const config = await prisma.configuracoes.findFirst();
+    // Buscar configurações e dados do ensaio em paralelo
+    const [config, ensaio] = await Promise.all([
+      getConfig(),
+      prisma.ensaio.findUnique({
+        where: { id: ensaioIdNum },
+        include: {
+          instrumentos: {
+            include: {
+              instrumento: true,
+            },
+          },
+          funcoes: true,
+          instrutor: {
+            select: {
+              nome: true,
+            },
+          },
+        },
+      }),
+    ]);
 
     if (!config || !config.webhook) {
       return NextResponse.json(
@@ -31,24 +50,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    // Buscar dados do ensaio
-    const ensaio = await prisma.ensaio.findUnique({
-      where: { id: ensaioIdNum },
-      include: {
-        instrumentos: {
-          include: {
-            instrumento: true,
-          },
-        },
-        funcoes: true,
-        instrutor: {
-          select: {
-            nome: true,
-          },
-        },
-      },
-    });
 
     if (!ensaio) {
       return NextResponse.json(

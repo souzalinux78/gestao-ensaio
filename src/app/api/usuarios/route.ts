@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { criarUsuario } from '@/lib/auth';
 import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
 import { validateEmail, validatePassword, sanitizeString } from '@/lib/validators';
+import bcrypt from 'bcryptjs';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,21 +15,51 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const usuarios = await prisma.usuario.findMany({
-      orderBy: {
-        nome: 'asc',
-      },
-      select: {
-        id: true,
-        nome: true,
-        email: true,
-        tipo: true,
-        igreja: true,
-        aprovado: true,
-        createdAt: true,
+    // Paginação
+    const searchParams = request.nextUrl.searchParams;
+    const page = parseInt(searchParams.get('page') || '1');
+    const limitParam = searchParams.get('limit');
+    const limit = limitParam ? Math.min(parseInt(limitParam), 100) : 50; // Max 100, default 50
+    const skip = (page - 1) * limit;
+
+    // Buscar usuários e total em paralelo
+    const [usuarios, total] = await Promise.all([
+      prisma.usuario.findMany({
+        orderBy: {
+          nome: 'asc',
+        },
+        select: {
+          id: true,
+          nome: true,
+          email: true,
+          tipo: true,
+          igreja: true,
+          aprovado: true,
+          createdAt: true,
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.usuario.count(),
+    ]);
+
+  // Se não há parâmetros de paginação, retornar formato antigo (compatibilidade)
+  const hasPagination = searchParams.has('page') || searchParams.has('limit');
+  
+  if (hasPagination) {
+    return NextResponse.json({
+      data: usuarios,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
     });
-    return NextResponse.json(usuarios);
+  }
+  
+  // Formato antigo (compatibilidade)
+  return NextResponse.json(usuarios);
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message },
@@ -93,22 +123,28 @@ export async function POST(request: NextRequest) {
     // Se for admin criando, usar o valor de aprovado fornecido (ou true para admin)
     const usuarioAprovado = aprovado !== undefined ? aprovado : (tipoFinal === 'admin' ? true : false);
 
-    const usuario = await criarUsuario(nomeSanitizado, email.trim().toLowerCase(), senha, tipoFinal, igrejaSanitizada);
-
-    // Atualizar o campo aprovado
-    const usuarioAtualizado = await prisma.usuario.update({
-      where: { id: usuario.id },
-      data: { aprovado: usuarioAprovado },
+    // Criar usuário diretamente com aprovado (evita query duplicada)
+    const senhaHash = await bcrypt.hash(senha, 10);
+    const usuario = await prisma.usuario.create({
+      data: {
+        nome: nomeSanitizado,
+        email: email.trim().toLowerCase(),
+        senha: senhaHash,
+        tipo: tipoFinal,
+        igreja: igrejaSanitizada,
+        aprovado: usuarioAprovado,
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        tipo: true,
+        igreja: true,
+        aprovado: true,
+      },
     });
 
-    return NextResponse.json({
-      id: usuarioAtualizado.id,
-      nome: usuarioAtualizado.nome,
-      email: usuarioAtualizado.email,
-      tipo: usuarioAtualizado.tipo,
-      igreja: usuarioAtualizado.igreja,
-      aprovado: usuarioAtualizado.aprovado,
-    });
+    return NextResponse.json(usuario);
   } catch (error: any) {
     if (error.code === 'P2002') {
       return NextResponse.json(

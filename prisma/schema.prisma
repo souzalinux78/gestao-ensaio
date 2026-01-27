@@ -26,6 +26,7 @@ model Usuario {
   @@index([tipo])
   @@index([igreja])
   @@index([aprovado])
+  @@index([tipo, aprovado]) // Índice composto para filtro de usuários
   @@map("Usuario")
 }
 
@@ -55,6 +56,7 @@ model Ensaio {
 
   @@index([data])
   @@index([instrutorId])
+  @@index([instrutorId, data(sort: Desc)]) // Índice composto para filtro comum
   @@map("Ensaio")
 }
 

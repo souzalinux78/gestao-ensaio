@@ -125,37 +125,39 @@ export async function PUT(
       );
     }
 
-    // Deletar instrumentos e funções antigas
-    await prisma.ensaioInstrumento.deleteMany({
-      where: { ensaioId: id },
-    });
-
-    await prisma.ensaioMusico.deleteMany({
-      where: { ensaioId: id },
-    });
-
-    if (ensaioExistente.funcoes) {
-      await prisma.ensaioFuncoes.delete({
-        where: { ensaioId: id },
-      });
-    }
-
     const musicosSelecionados = Array.isArray(musicos) ? musicos : [];
+    
+    // Validar musicos primeiro (antes de deletar)
+    let totalMusicos = 0;
     if (musicosSelecionados.length > 0) {
       const ids = musicosSelecionados.map((item: any) => item.musicoId);
-      const total = await prisma.musico.count({
+      totalMusicos = await prisma.musico.count({
         where: {
           id: { in: ids },
           instrutorId: ensaioExistente.instrutorId,
         },
       });
-      if (total !== ids.length) {
+      if (totalMusicos !== ids.length) {
         return NextResponse.json(
           { error: 'Há músicos inválidos para este instrutor' },
           { status: 400 }
         );
       }
     }
+
+    // Deletar dados antigos em paralelo
+    const deletePromises = [
+      prisma.ensaioInstrumento.deleteMany({ where: { ensaioId: id } }),
+      prisma.ensaioMusico.deleteMany({ where: { ensaioId: id } }),
+    ];
+    
+    if (ensaioExistente.funcoes) {
+      deletePromises.push(
+        prisma.ensaioFuncoes.delete({ where: { ensaioId: id } })
+      );
+    }
+
+    await Promise.all(deletePromises);
 
     // Atualizar o ensaio
     const ensaio = await prisma.ensaio.update({

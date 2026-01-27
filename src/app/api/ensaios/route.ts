@@ -48,28 +48,56 @@ export async function GET(request: NextRequest) {
     };
   }
 
-  const ensaios = await prisma.ensaio.findMany({
-    where,
-    include: {
-      instrumentos: {
-        include: {
-          instrumento: true,
-        },
-      },
-      funcoes: true,
-      instrutor: {
-        select: {
-          id: true,
-          nome: true,
-          igreja: true,
-        },
-      },
-    },
-    orderBy: {
-      data: 'desc',
-    },
-  });
+  // Paginação
+  const page = parseInt(searchParams.get('page') || '1');
+  const limitParam = searchParams.get('limit');
+  const limit = limitParam ? Math.min(parseInt(limitParam), 100) : 20; // Max 100, default 20
+  const skip = (page - 1) * limit;
 
+  // Buscar ensaios e total em paralelo
+  const [ensaios, total] = await Promise.all([
+    prisma.ensaio.findMany({
+      where,
+      include: {
+        instrumentos: {
+          include: {
+            instrumento: true,
+          },
+        },
+        funcoes: true,
+        instrutor: {
+          select: {
+            id: true,
+            nome: true,
+            igreja: true,
+          },
+        },
+      },
+      orderBy: {
+        data: 'desc',
+      },
+      skip,
+      take: limit,
+    }),
+    prisma.ensaio.count({ where }),
+  ]);
+
+  // Se não há parâmetros de paginação, retornar formato antigo (compatibilidade)
+  const hasPagination = searchParams.has('page') || searchParams.has('limit');
+  
+  if (hasPagination) {
+    return NextResponse.json({
+      data: ensaios,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  }
+  
+  // Formato antigo (compatibilidade)
   return NextResponse.json(ensaios);
 }
 
@@ -104,9 +132,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const instrutor = await prisma.usuario.findUnique({
-      where: { id: instrutorIdFinal },
-    });
+    const musicosSelecionados = Array.isArray(musicos) ? musicos : [];
+    
+    // Validar instrutor e musicos em paralelo
+    const [instrutor, totalMusicos] = await Promise.all([
+      prisma.usuario.findUnique({
+        where: { id: instrutorIdFinal },
+      }),
+      musicosSelecionados.length > 0
+        ? prisma.musico.count({
+            where: {
+              id: { in: musicosSelecionados.map((item: any) => item.musicoId) },
+              instrutorId: instrutorIdFinal,
+            },
+          })
+        : Promise.resolve(0),
+    ]);
 
     if (!instrutor) {
       return NextResponse.json(
@@ -115,21 +156,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const musicosSelecionados = Array.isArray(musicos) ? musicos : [];
-    if (musicosSelecionados.length > 0) {
-      const ids = musicosSelecionados.map((item: any) => item.musicoId);
-      const total = await prisma.musico.count({
-        where: {
-          id: { in: ids },
-          instrutorId: instrutorIdFinal,
-        },
-      });
-      if (total !== ids.length) {
-        return NextResponse.json(
-          { error: 'Há músicos inválidos para este instrutor' },
-          { status: 400 }
-        );
-      }
+    if (musicosSelecionados.length > 0 && totalMusicos !== musicosSelecionados.length) {
+      return NextResponse.json(
+        { error: 'Há músicos inválidos para este instrutor' },
+        { status: 400 }
+      );
     }
 
     const ensaio = await prisma.ensaio.create({

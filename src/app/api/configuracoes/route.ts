@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
+import { getConfig, clearConfigCache } from '@/lib/config-cache';
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,16 +22,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Buscar ou criar configuração (sempre teremos apenas uma)
-    let config = await prisma.configuracoes.findFirst();
-    
-    if (!config) {
-      config = await prisma.configuracoes.create({
-        data: {
-          webhook: null,
-        },
-      });
-    }
+    // Buscar configuração com cache
+    const config = await getConfig();
 
     return NextResponse.json(config);
   } catch (error: any) {
@@ -128,6 +121,9 @@ export async function POST(request: NextRequest) {
         },
       });
     }
+
+    // Limpar cache após atualização
+    clearConfigCache();
 
     return NextResponse.json(config);
   } catch (error: any) {
