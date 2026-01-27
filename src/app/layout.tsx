@@ -3,6 +3,7 @@ import './globals.css';
 import InstallPrompt from '@/components/InstallPrompt';
 import LoadingScreen from '@/components/LoadingScreen';
 import { ToastProvider } from '@/hooks/useToast';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 export const metadata: Metadata = {
   title: 'Gestão de Ensaio',
@@ -71,6 +72,23 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              // Aplicar tema antes do primeiro render (prevenir FOUC)
+              (function() {
+                try {
+                  const savedTheme = localStorage.getItem('gestao-ensaio-theme');
+                  if (savedTheme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                  } else {
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    if (prefersDark) {
+                      document.documentElement.setAttribute('data-theme', 'dark');
+                    }
+                  }
+                } catch (e) {
+                  // Ignorar erros
+                }
+              })();
+              
               if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
                 let registration = null;
                 let isReloading = false;
@@ -157,11 +175,13 @@ export default function RootLayout({
             `,
           }}
         />
-        <ToastProvider>
-          <LoadingScreen />
-          {children}
-          <InstallPrompt />
-        </ToastProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <LoadingScreen />
+            {children}
+            <InstallPrompt />
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

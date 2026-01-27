@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { removerSessao, obterSessao } from '@/lib/session';
 import { useEffect, useState } from 'react';
 import { Usuario } from '@/types';
+import ThemeToggle from './ThemeToggle';
 
 export default function Header() {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function Header() {
           {usuario && (
             <span className="text-xs sm:text-sm text-white/80 hidden sm:inline">{usuario.email}</span>
           )}
+          <ThemeToggle />
           <button
             onClick={handleLogout}
             className="bg-red-500 px-3 sm:px-4 py-1.5 sm:py-2 rounded hover:bg-red-600 text-sm sm:text-base transition-colors w-full sm:w-auto"
