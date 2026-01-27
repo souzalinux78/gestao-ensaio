@@ -30,7 +30,7 @@ export function generateAccessToken(usuario: Usuario): string {
   const payload: AccessTokenPayload = {
     userId: usuario.id,
     tipo: usuario.tipo,
-    aprovado: usuario.aprovado,
+    aprovado: usuario.aprovado ?? false, // Garantir que seja boolean
   };
 
   return jwt.sign(payload, JWT_SECRET, {
