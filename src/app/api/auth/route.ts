@@ -3,6 +3,9 @@ import { verificarCredenciais } from '@/lib/auth';
 import { validateEmail, validatePassword } from '@/lib/validators';
 import { logger } from '@/lib/logger';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { generateAccessToken, generateRefreshToken } from '@/lib/jwt';
+import { prisma } from '@/lib/db';
+import { randomUUID } from 'crypto';
 
 export async function POST(request: NextRequest) {
   try {
@@ -89,15 +92,39 @@ export async function POST(request: NextRequest) {
 
     logger.info('Login realizado com sucesso', { userId: usuario.id, tipo: usuario.tipo });
     
-    // Adicionar headers de rate limit na resposta de sucesso
-    return NextResponse.json(
+    // Gerar tokens JWT
+    const accessToken = generateAccessToken(usuario);
+    
+    // Criar refresh token no banco
+    const tokenId = randomUUID();
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // 7 dias
+    
+    const refreshTokenValue = generateRefreshToken(usuario.id, tokenId);
+    
+    // Salvar refresh token no banco
+    await prisma.refreshToken.create({
+      data: {
+        id: tokenId,
+        token: refreshTokenValue,
+        userId: usuario.id,
+        expiresAt,
+      },
+    });
+    
+    // Criar resposta com tokens e dados do usuário
+    const response = NextResponse.json(
       {
+        // Dados do usuário (compatibilidade com sistema antigo)
         id: usuario.id,
         nome: usuario.nome,
         email: usuario.email,
         tipo: usuario.tipo,
         igreja: usuario.igreja,
         aprovado: usuario.aprovado,
+        // Tokens JWT (novo sistema)
+        accessToken,
+        refreshToken: refreshTokenValue, // Também no body para compatibilidade
       },
       {
         headers: {
@@ -107,6 +134,17 @@ export async function POST(request: NextRequest) {
         },
       }
     );
+    
+    // Adicionar refresh token em cookie httpOnly (mais seguro)
+    response.cookies.set('refreshToken', refreshTokenValue, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 24 * 7, // 7 dias em segundos
+      path: '/',
+    });
+    
+    return response;
   } catch (error: any) {
     logger.error('Erro no login', error);
     return NextResponse.json(

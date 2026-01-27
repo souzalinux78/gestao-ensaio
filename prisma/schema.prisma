@@ -20,6 +20,7 @@ model Usuario {
   ensaios   Ensaio[]
   contatos  Contato[]
   musicos   Musico[]
+  refreshTokens RefreshToken[]
 
   @@index([email])
   @@index([tipo])
@@ -135,4 +136,18 @@ model Contato {
 
   @@index([usuarioId])
   @@map("Contato")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique @db.VarChar(500)
+  userId    Int
+  usuario   Usuario  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now()) @map("createdAt")
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("RefreshToken")
 }
