@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
+import AdminLayout from '@/components/AdminLayout';
 import RelatorioTable from '@/components/RelatorioTable';
 import { Ensaio, Instrumento } from '@/types';
 import { gerarPDFEnsaio } from '@/lib/pdf';
@@ -90,25 +90,13 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg-secondary)]">
-      <Header />
-      <div className="container mx-auto p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Relatórios de Ensaios</h1>
-          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-            <button
-              onClick={() => router.push('/admin/usuarios')}
-              className="flex-1 sm:flex-none bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
-            >
-              👥 Usuários
-            </button>
-            <button
-              onClick={() => router.push('/admin/configuracoes')}
-              className="flex-1 sm:flex-none bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm sm:text-base"
-            >
-              ⚙️ Configurações
-            </button>
-          </div>
+    <AdminLayout>
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Dashboard</h1>
+          <p className="text-gray-600 dark:text-[var(--text-secondary)] mt-1">
+            Visão geral dos relatórios de ensaios
+          </p>
         </div>
 
         <div className="mb-6 bg-white dark:bg-[var(--bg-primary)] p-4 rounded-lg shadow-sm">
@@ -158,6 +146,6 @@ export default function AdminPage() {
           onEditar={handleEditar}
         />
       </div>
-    </div>
+    </AdminLayout>
   );
 }

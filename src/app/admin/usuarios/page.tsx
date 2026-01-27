@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
+import AdminLayout from '@/components/AdminLayout';
 import { Usuario } from '@/types';
 import { apiFetch } from '@/lib/api-client';
 
@@ -529,10 +529,10 @@ export default function UsuariosPage() {
                       Editar
                     </button>
                     <button
-                      onClick={() => setMostrarAlterarSenha(usuario.id)}
+                      onClick={() => router.push(`/admin/usuarios/reset-senha?usuarioId=${usuario.id}`)}
                       className="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-xs hover:bg-blue-700 transition-colors font-medium"
                     >
-                      Senha
+                      Reset Senha
                     </button>
                     <button
                       onClick={() => excluirUsuario(usuario.id)}
@@ -611,10 +611,10 @@ export default function UsuariosPage() {
                             Editar
                           </button>
                           <button
-                            onClick={() => setMostrarAlterarSenha(usuario.id)}
+                            onClick={() => router.push(`/admin/usuarios/reset-senha?usuarioId=${usuario.id}`)}
                             className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-700 transition-colors font-medium whitespace-nowrap"
                           >
-                            Senha
+                            Reset Senha
                           </button>
                           <button
                             onClick={() => excluirUsuario(usuario.id)}

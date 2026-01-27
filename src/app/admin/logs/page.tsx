@@ -1,0 +1,174 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import AdminLayout from '@/components/AdminLayout';
+import { apiFetch } from '@/lib/api-client';
+
+interface Log {
+  id: string;
+  tipo: string;
+  acao: string;
+  detalhes: string;
+  timestamp: string;
+  usuarioId?: number;
+  ensaioId?: number;
+}
+
+export default function LogsPage() {
+  const [logs, setLogs] = useState<Log[]>([]);
+  const [carregando, setCarregando] = useState(false);
+  const [filtroTipo, setFiltroTipo] = useState<string>('todos');
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    carregarLogs();
+  }, [filtroTipo, page]);
+
+  async function carregarLogs() {
+    setCarregando(true);
+    try {
+      const params = new URLSearchParams();
+      params.append('page', String(page));
+      params.append('limit', '50');
+      if (filtroTipo !== 'todos') {
+        params.append('tipo', filtroTipo);
+      }
+
+      const res = await apiFetch(`/api/admin/logs?${params.toString()}`);
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Erro ao carregar logs');
+      }
+      const data = await res.json();
+      setLogs(Array.isArray(data) ? data : data.data || []);
+      setTotal(data.pagination?.total || data.length || 0);
+    } catch (error: any) {
+      console.error('Erro ao carregar logs:', error);
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  function formatarData(data: string) {
+    return new Date(data).toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  function getTipoColor(tipo: string) {
+    switch (tipo) {
+      case 'criacao':
+        return 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300';
+      case 'atualizacao':
+        return 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300';
+      case 'login':
+        return 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300';
+      default:
+        return 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
+    }
+  }
+
+  return (
+    <AdminLayout>
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Logs do Sistema</h1>
+          <select
+            value={filtroTipo}
+            onChange={(e) => {
+              setFiltroTipo(e.target.value);
+              setPage(1);
+            }}
+            className="border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-primary"
+          >
+            <option value="todos">Todos os tipos</option>
+            <option value="criacao">Criações</option>
+            <option value="atualizacao">Atualizações</option>
+            <option value="login">Logins</option>
+          </select>
+        </div>
+
+        {carregando ? (
+          <div className="text-center py-8">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-[var(--text-secondary)]">Carregando logs...</p>
+          </div>
+        ) : logs.length === 0 ? (
+          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm p-8 text-center text-gray-500 dark:text-[var(--text-secondary)]">
+            Nenhum log encontrado.
+          </div>
+        ) : (
+          <>
+            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead className="bg-gray-50 dark:bg-[var(--bg-secondary)]">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">Data/Hora</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">Tipo</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">Ação</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">Detalhes</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-[var(--border-primary)]">
+                    {logs.map((log) => (
+                      <tr
+                        key={log.id}
+                        className="hover:bg-gray-50 dark:hover:bg-[var(--bg-secondary)] transition-colors"
+                      >
+                        <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">
+                          {formatarData(log.timestamp)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`inline-block px-2 py-1 rounded text-xs font-medium ${getTipoColor(
+                              log.tipo
+                            )}`}
+                          >
+                            {log.tipo}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-[var(--text-primary)] font-medium">
+                          {log.acao}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{log.detalhes}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Paginação */}
+            {total > 50 && (
+              <div className="flex justify-center items-center gap-4 mt-6">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-[var(--text-primary)] rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Anterior
+                </button>
+                <span className="text-[var(--text-primary)]">
+                  Página {page} de {Math.ceil(total / 50)}
+                </span>
+                <button
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={page >= Math.ceil(total / 50)}
+                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-[var(--text-primary)] rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Próxima
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </AdminLayout>
+  );
+}

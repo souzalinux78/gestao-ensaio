@@ -14,14 +14,8 @@ export default function ConfiguracoesPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg-secondary)]">
       <Header />
       <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={() => router.back()}
-            className="text-primary hover:text-primary-dark font-medium"
-          >
-            ← Voltar
-          </button>
-          <h1 className="text-xl sm:text-2xl font-bold text-primary">Configurações</h1>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Configurações</h1>
         </div>
 
         {/* Abas */}
@@ -58,10 +52,11 @@ export default function ConfiguracoesPage() {
               <strong>Nota:</strong> Os contatos agora são gerenciados individualmente por cada instrutor. 
               Cada instrutor pode gerenciar seus próprios contatos na área do instrutor (menu "Meus Contatos").
               Quando um relatório for gerado, os dados serão enviados apenas para os contatos daquele instrutor específico.
-            </p>
+          </p>
+                </div>
+              )}
+            </div>
           </div>
-        )}
-      </div>
-    </div>
+    </AdminLayout>
   );
 }
