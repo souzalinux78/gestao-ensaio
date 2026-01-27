@@ -7,10 +7,27 @@ import { NextRequest, NextResponse } from 'next/server';
 import { loggerWithContext } from './logger';
 import { getRequestId, addRequestIdToResponse } from './request-id';
 
-export interface ApiError extends Error {
-  statusCode?: number;
+/**
+ * Cria erros customizados com status code
+ */
+export class ApiError extends Error {
+  statusCode: number;
   code?: string;
   details?: any;
+
+  constructor(
+    message: string,
+    statusCode: number = 500,
+    code?: string,
+    details?: any
+  ) {
+    super(message);
+    this.name = 'ApiError';
+    this.statusCode = statusCode;
+    this.code = code;
+    this.details = details;
+    Error.captureStackTrace(this, this.constructor);
+  }
 }
 
 /**
@@ -87,29 +104,6 @@ export function createErrorResponse(
   }
   
   return response;
-}
-
-/**
- * Cria erros customizados com status code
- */
-export class ApiError extends Error implements ApiError {
-  statusCode: number;
-  code?: string;
-  details?: any;
-
-  constructor(
-    message: string,
-    statusCode: number = 500,
-    code?: string,
-    details?: any
-  ) {
-    super(message);
-    this.name = 'ApiError';
-    this.statusCode = statusCode;
-    this.code = code;
-    this.details = details;
-    Error.captureStackTrace(this, this.constructor);
-  }
 }
 
 /**
