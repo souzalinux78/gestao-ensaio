@@ -277,9 +277,65 @@ export default function UsuariosPage() {
           </div>
         )}
 
+        {/* Filtros - Sempre visíveis quando não estiver editando */}
+        {!mostrarForm && (
+          <div className="mb-6 bg-white rounded-lg shadow-md border border-gray-200 p-4 sm:p-6">
+            <div className="mb-4">
+              <h2 className="text-lg font-bold text-primary mb-1">🔍 Filtros de Busca</h2>
+              <p className="text-xs sm:text-sm text-gray-600">
+                Pesquise por nome, email, igreja ou filtre por status de aprovação
+              </p>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block mb-2 text-sm font-semibold text-gray-700">
+                  Pesquisar por nome, email ou igreja
+                </label>
+                <input
+                  type="text"
+                  value={filtroNome}
+                  onChange={(e) => setFiltroNome(e.target.value)}
+                  placeholder="Ex: João, email@exemplo.com, CCB..."
+                  className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base"
+                />
+              </div>
+              <div>
+                <label className="block mb-2 text-sm font-semibold text-gray-700">
+                  Filtrar por status de aprovação
+                </label>
+                <select
+                  value={filtroStatus}
+                  onChange={(e) => setFiltroStatus(e.target.value as 'todos' | 'aprovados' | 'pendentes')}
+                  className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base bg-white"
+                >
+                  <option value="todos">📋 Todos os usuários</option>
+                  <option value="aprovados">✅ Aprovados</option>
+                  <option value="pendentes">⏳ Pendentes de aprovação</option>
+                </select>
+              </div>
+            </div>
+            {(filtroNome || filtroStatus !== 'todos') && (
+              <div className="mt-4 pt-4 border-t-2 border-gray-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <span className="text-sm font-medium text-gray-700">
+                  📊 Mostrando <strong className="text-primary">{usuariosFiltrados.length}</strong> de <strong className="text-primary">{usuarios.length}</strong> usuário(s)
+                </span>
+                <button
+                  onClick={() => {
+                    setFiltroNome('');
+                    setFiltroStatus('todos');
+                  }}
+                  className="text-sm text-white bg-gray-500 hover:bg-gray-600 px-4 py-2 rounded-lg font-medium transition-colors"
+                >
+                  🗑️ Limpar filtros
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-            <p className="text-gray-600">
+            <p className="text-gray-600 text-sm sm:text-base">
               Gerencie usuários do sistema. Aprove novos cadastros para permitir acesso. Cada instrutor terá acesso apenas aos seus próprios ensaios.
             </p>
             {!mostrarForm && (
@@ -296,58 +352,10 @@ export default function UsuariosPage() {
                     aprovado: false, // Por padrão, não aprovar - admin decide se aprova na hora
                   });
                 }}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap"
+                className="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 whitespace-nowrap font-medium shadow-sm"
               >
                 + Novo Usuário
               </button>
-            )}
-          </div>
-
-          {/* Filtros */}
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                  🔍 Pesquisar por nome, email ou igreja
-                </label>
-                <input
-                  type="text"
-                  value={filtroNome}
-                  onChange={(e) => setFiltroNome(e.target.value)}
-                  placeholder="Digite para pesquisar..."
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                  📊 Filtrar por status
-                </label>
-                <select
-                  value={filtroStatus}
-                  onChange={(e) => setFiltroStatus(e.target.value as 'todos' | 'aprovados' | 'pendentes')}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
-                >
-                  <option value="todos">Todos</option>
-                  <option value="aprovados">Aprovados</option>
-                  <option value="pendentes">Pendentes</option>
-                </select>
-              </div>
-            </div>
-            {(filtroNome || filtroStatus !== 'todos') && (
-              <div className="mt-3 flex items-center gap-2">
-                <span className="text-sm text-gray-600">
-                  Mostrando {usuariosFiltrados.length} de {usuarios.length} usuário(s)
-                </span>
-                <button
-                  onClick={() => {
-                    setFiltroNome('');
-                    setFiltroStatus('todos');
-                  }}
-                  className="text-sm text-primary hover:text-primary-dark font-medium"
-                >
-                  Limpar filtros
-                </button>
-              </div>
             )}
           </div>
         </div>
