@@ -55,11 +55,15 @@ model Usuario {
 
 model Instrumento {
   id        Int      @id @default(autoincrement())
-  nome      String   @unique @db.VarChar(255)
+  nome      String   @db.VarChar(255)
+  tenantId  Int?     // Nullable: pode ser compartilhado ou por tenant
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id])
   createdAt DateTime @default(now()) @map("createdAt")
   ensaios   EnsaioInstrumento[]
 
+  @@unique([tenantId, nome]) // Nome único por tenant (ou global se tenantId for null)
   @@index([nome])
+  @@index([tenantId])
   @@map("Instrumento")
 }
 
@@ -68,6 +72,8 @@ model Ensaio {
   data        DateTime
   instrutorId Int
   instrutor   Usuario            @relation(fields: [instrutorId], references: [id])
+  tenantId    Int?               // Nullable inicialmente para migração gradual
+  tenant      Tenant?            @relation(fields: [tenantId], references: [id])
   instrumentos EnsaioInstrumento[]
   musicos     EnsaioMusico[]
   funcoes     EnsaioFuncoes?
@@ -79,7 +85,10 @@ model Ensaio {
 
   @@index([data])
   @@index([instrutorId])
+  @@index([tenantId])
   @@index([instrutorId, data(sort: Desc)]) // Índice composto para filtro comum
+  @@index([tenantId, data(sort: Desc)]) // Índice composto para filtro por tenant
+  @@index([tenantId, instrutorId]) // Índice composto para filtro por tenant e instrutor
   @@map("Ensaio")
 }
 
@@ -102,12 +111,16 @@ model Musico {
   nome       String   @db.VarChar(255)
   instrutorId Int
   instrutor  Usuario  @relation(fields: [instrutorId], references: [id], onDelete: Cascade)
+  tenantId   Int?     // Nullable inicialmente para migração gradual
+  tenant     Tenant?   @relation(fields: [tenantId], references: [id])
   createdAt  DateTime @default(now()) @map("createdAt")
   updatedAt  DateTime @updatedAt @map("updatedAt")
   ensaios    EnsaioMusico[]
 
-  @@unique([instrutorId, nome])
+  @@unique([tenantId, instrutorId, nome]) // Nome único por tenant e instrutor
   @@index([instrutorId])
+  @@index([tenantId])
+  @@index([tenantId, instrutorId]) // Índice composto para filtro por tenant e instrutor
   @@index([nome])
   @@map("Musico")
 }
@@ -144,9 +157,13 @@ model EnsaioFuncoes {
 model Configuracoes {
   id        Int      @id @default(autoincrement())
   webhook   String?  @db.VarChar(500)
+  tenantId  Int?     // Nullable inicialmente para migração gradual
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id])
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
+  @@unique([tenantId]) // Uma configuração por tenant
+  @@index([tenantId])
   @@map("Configuracoes")
 }
 
@@ -156,10 +173,14 @@ model Contato {
   telefone  String   @db.VarChar(20)
   usuarioId Int
   usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  tenantId  Int?     // Nullable inicialmente para migração gradual
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id])
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
   @@index([usuarioId])
+  @@index([tenantId])
+  @@index([tenantId, usuarioId]) // Índice composto para filtro por tenant e usuário
   @@map("Contato")
 }
 
