@@ -8,19 +8,20 @@ SET @tenant_padrao_id = (SELECT id FROM Tenant WHERE slug = 'sistema-padrao' LIM
 -- ETAPA 7: Migrar CONFIGURACOES (Corrigido)
 -- ============================================
 -- Verificar se já existe configuração com tenantId
--- Se já existe, não fazer nada (já está migrada)
--- Se não existe, atualizar a existente sem tenantId
+SET @has_config_with_tenant = (SELECT COUNT(*) FROM `Configuracoes` WHERE `tenantId` = @tenant_padrao_id);
 
+-- Se NÃO existe configuração com tenantId, atualizar a existente sem tenantId
 UPDATE `Configuracoes` 
 SET `tenantId` = @tenant_padrao_id 
 WHERE `tenantId` IS NULL
-  AND (SELECT COUNT(*) FROM `Configuracoes` WHERE `tenantId` = @tenant_padrao_id) = 0
+  AND @has_config_with_tenant = 0
 LIMIT 1;
 
 -- Se não havia configuração nenhuma, criar uma nova
+SET @total_configs = (SELECT COUNT(*) FROM `Configuracoes`);
 INSERT IGNORE INTO `Configuracoes` (`tenantId`, `webhook`, `createdAt`, `updatedAt`)
 SELECT @tenant_padrao_id, NULL, NOW(), NOW()
-WHERE (SELECT COUNT(*) FROM `Configuracoes`) = 0;
+WHERE @total_configs = 0;
 
 SELECT '✓ Configurações corrigidas' AS status;
 
