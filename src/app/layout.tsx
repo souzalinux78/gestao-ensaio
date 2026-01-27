@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import InstallPrompt from '@/components/InstallPrompt';
 import LoadingScreen from '@/components/LoadingScreen';
+import { ToastProvider } from '@/hooks/useToast';
 
 export const metadata: Metadata = {
   title: 'Gestão de Ensaio',
@@ -156,9 +157,11 @@ export default function RootLayout({
             `,
           }}
         />
-        <LoadingScreen />
-        {children}
-        <InstallPrompt />
+        <ToastProvider>
+          <LoadingScreen />
+          {children}
+          <InstallPrompt />
+        </ToastProvider>
       </body>
     </html>
   );

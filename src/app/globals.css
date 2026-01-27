@@ -70,6 +70,116 @@
   animation: bounce 1s infinite;
 }
 
+/* Animações modernas */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-down {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.3s ease-out;
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 0.3s ease-out;
+}
+
+.animate-slide-in-down {
+  animation: slide-in-down 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    #f0f0f0 0%,
+    #e0e0e0 20%,
+    #f0f0f0 40%,
+    #f0f0f0 100%
+  );
+  background-size: 1000px 100%;
+}
+
 /* Componentes utilitários */
 @layer components {
   /* Botão padrão */
@@ -103,18 +213,19 @@
   .input {
     @apply w-full border border-gray-300 rounded-lg px-4 py-2.5;
     @apply focus:ring-2 focus:ring-primary focus:border-primary;
-    @apply transition-colors duration-200;
+    @apply transition-all duration-200;
     @apply placeholder:text-gray-400;
+    @apply hover:border-gray-400;
   }
   
   /* Card padrão */
   .card {
     @apply bg-white rounded-card shadow-soft p-4 sm:p-6;
-    @apply transition-shadow duration-200;
+    @apply transition-all duration-200;
   }
   
   .card-hover {
-    @apply hover:shadow-medium;
+    @apply hover:shadow-medium hover:-translate-y-0.5;
   }
   
   /* Alert/Mensagem */
@@ -150,5 +261,16 @@
   
   .hover-lift:hover {
     @apply -translate-y-0.5;
+  }
+  
+  /* Skeleton loading */
+  .skeleton {
+    @apply animate-pulse bg-gray-200 rounded-lg;
+  }
+  
+  /* Toast notification */
+  .toast {
+    @apply fixed top-4 right-4 z-50 max-w-md w-full sm:w-auto;
+    @apply animate-slide-in-right;
   }
 }
