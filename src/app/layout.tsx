@@ -63,17 +63,71 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+                let registration = null;
+                
+                // Função para limpar cache e forçar atualização
+                function limparCacheEAtualizar() {
+                  console.log('🧹 Limpando cache e forçando atualização...');
+                  
+                  // Limpar todos os caches
+                  if ('caches' in window) {
+                    caches.keys().then(function(cacheNames) {
+                      return Promise.all(
+                        cacheNames.map(function(cacheName) {
+                          console.log('🗑️ Removendo cache:', cacheName);
+                          return caches.delete(cacheName);
+                        })
+                      );
+                    }).then(function() {
+                      console.log('✅ Cache limpo!');
+                    });
+                  }
+                  
+                  // Forçar atualização do service worker
+                  if (registration) {
+                    registration.update();
+                  }
+                }
+                
+                // Registrar Service Worker
                 window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                      console.log('✅ Service Worker registrado:', registration.scope);
-                      // Atualizar service worker quando houver nova versão
-                      registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
+                  navigator.serviceWorker.register('/sw.js?t=' + Date.now())
+                    .then(function(reg) {
+                      registration = reg;
+                      console.log('✅ Service Worker registrado:', reg.scope);
+                      
+                      // Verificar atualizações imediatamente
+                      reg.update();
+                      
+                      // Verificar atualizações a cada vez que a página ganha foco
+                      window.addEventListener('focus', function() {
+                        console.log('👁️ Página em foco - verificando atualizações...');
+                        reg.update();
+                        limparCacheEAtualizar();
+                      });
+                      
+                      // Verificar atualizações quando voltar para a página
+                      document.addEventListener('visibilitychange', function() {
+                        if (!document.hidden) {
+                          console.log('👁️ Página visível - verificando atualizações...');
+                          reg.update();
+                          limparCacheEAtualizar();
+                        }
+                      });
+                      
+                      // Detectar quando há nova versão disponível
+                      reg.addEventListener('updatefound', function() {
+                        const newWorker = reg.installing;
                         if (newWorker) {
-                          newWorker.addEventListener('statechange', () => {
+                          newWorker.addEventListener('statechange', function() {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                              console.log('🔄 Nova versão disponível!');
+                              console.log('🔄 Nova versão disponível! Atualizando...');
+                              // Forçar atualização imediata
+                              newWorker.postMessage({ type: 'SKIP_WAITING' });
+                              // Recarregar página após 1 segundo
+                              setTimeout(function() {
+                                window.location.reload();
+                              }, 1000);
                             }
                           });
                         }
@@ -84,14 +138,40 @@ export default function RootLayout({
                     });
                 });
                 
-                // Atualizar service worker quando voltar para a página
-                if (navigator.serviceWorker.controller) {
-                  navigator.serviceWorker.controller.addEventListener('statechange', () => {
-                    if (navigator.serviceWorker.controller?.state === 'redundant') {
-                      window.location.reload();
+                // Limpar cache ao entrar no app
+                window.addEventListener('pageshow', function(event) {
+                  if (event.persisted) {
+                    // Página foi carregada do cache (back/forward)
+                    console.log('📄 Página carregada do cache - limpando...');
+                    limparCacheEAtualizar();
+                  } else {
+                    // Página carregada normalmente
+                    console.log('📄 Página carregada - verificando atualizações...');
+                    if (registration) {
+                      registration.update();
+                    }
+                  }
+                });
+                
+                // Limpar cache ao iniciar o app
+                if ('caches' in window) {
+                  caches.keys().then(function(cacheNames) {
+                    console.log('🔍 Caches encontrados:', cacheNames.length);
+                    if (cacheNames.length > 0) {
+                      limparCacheEAtualizar();
                     }
                   });
                 }
+                
+                // Escutar mensagens do Service Worker
+                navigator.serviceWorker.addEventListener('message', function(event) {
+                  if (event.data && event.data.type === 'SW_ACTIVATED') {
+                    console.log('🔄 Service Worker ativado - recarregando página...');
+                    setTimeout(function() {
+                      window.location.reload();
+                    }, 500);
+                  }
+                });
               }
             `,
           }}

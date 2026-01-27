@@ -1,6 +1,8 @@
 // Service Worker para PWA
 // IMPORTANTE: Incrementar a versão a cada deploy para forçar atualização do cache
-const CACHE_NAME = 'gestao-ensaio-v3';
+// Versão atual: v4 - Sempre busca versão mais recente da rede primeiro
+const CACHE_NAME = 'gestao-ensaio-v4';
+const CACHE_VERSION = '4';
 const urlsToCache = [
   '/',
   '/login',
@@ -10,6 +12,9 @@ const urlsToCache = [
 // Instalar Service Worker
 self.addEventListener('install', (event) => {
   console.log('[SW] Instalando Service Worker...');
+  // Forçar ativação imediata - não esperar outras abas fecharem
+  self.skipWaiting();
+  
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -20,15 +25,14 @@ self.addEventListener('install', (event) => {
         console.error('[SW] Erro ao fazer cache:', error);
       })
   );
-  // Forçar ativação imediata
-  self.skipWaiting();
 });
 
 // Ativar Service Worker
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Ativando Service Worker...');
+  console.log('[SW] Ativando Service Worker - limpando cache antigo...');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
+      // Limpar TODOS os caches antigos
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
@@ -37,51 +41,62 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
+    }).then(() => {
+      // Limpar cache do navegador também
+      console.log('[SW] Limpando cache do navegador...');
+      return self.clients.claim();
     })
   );
-  // Tomar controle imediato de todas as páginas
-  return self.clients.claim();
+  
+  // Notificar todas as abas para recarregar
+  return self.clients.matchAll().then((clients) => {
+    clients.forEach((client) => {
+      client.postMessage({ type: 'SW_ACTIVATED', cacheName: CACHE_NAME });
+    });
+  });
 });
 
-// Interceptar requisições
+// Interceptar requisições - ESTRATÉGIA NETWORK FIRST (sempre buscar versão mais recente)
 self.addEventListener('fetch', (event) => {
-  // Não cachear requisições de API
-  if (event.request.url.includes('/api/')) {
+  const { request } = event;
+  
+  // Não cachear requisições de API - sempre buscar da rede
+  if (request.url.includes('/api/')) {
+    event.respondWith(
+      fetch(request).catch(() => {
+        // Se offline, retornar erro
+        return new Response('Offline', { status: 503 });
+      })
+    );
     return;
   }
 
+  // Para outros recursos, usar Network First (buscar da rede primeiro)
   event.respondWith(
-    caches.match(event.request)
+    fetch(request)
       .then((response) => {
-        // Retornar do cache se disponível
-        if (response) {
-          return response;
-        }
-
-        // Buscar da rede
-        return fetch(event.request)
-          .then((response) => {
-            // Verificar se resposta é válida
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Clonar resposta para cache
-            const responseToCache = response.clone();
-
-            // Adicionar ao cache
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-
-            return response;
-          })
-          .catch(() => {
-            // Se offline e for página HTML, retornar página offline
-            if (event.request.headers.get('accept').includes('text/html')) {
-              return caches.match('/');
-            }
+        // Se resposta é válida, atualizar cache
+        if (response && response.status === 200 && response.type === 'basic') {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, responseToCache);
           });
+        }
+        return response;
+      })
+      .catch(() => {
+        // Se offline, tentar buscar do cache
+        return caches.match(request).then((cachedResponse) => {
+          if (cachedResponse) {
+            console.log('[SW] Retornando do cache (offline):', request.url);
+            return cachedResponse;
+          }
+          // Se não tiver no cache e for HTML, retornar página inicial
+          if (request.headers.get('accept')?.includes('text/html')) {
+            return caches.match('/');
+          }
+          return new Response('Offline', { status: 503 });
+        });
       })
   );
 });
