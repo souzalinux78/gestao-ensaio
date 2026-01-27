@@ -75,20 +75,26 @@ SELECT CONCAT('✓ Instrumentos migrados: ', ROW_COUNT()) AS status;
 -- ETAPA 7: Migrar CONFIGURACOES
 -- ============================================
 -- Atribuir configurações ao tenant padrão
--- Se já existir configuração, atualizar; senão, criar
-INSERT INTO `Configuracoes` (`tenantId`, `webhook`, `createdAt`, `updatedAt`)
-SELECT @tenant_padrao_id, `webhook`, NOW(), NOW()
-FROM `Configuracoes`
-WHERE `tenantId` IS NULL
-LIMIT 1
-ON DUPLICATE KEY UPDATE `tenantId` = @tenant_padrao_id;
+-- Estratégia: Verificar antes e só atualizar/criar se necessário
 
--- Atualizar configurações existentes sem tenantId
+-- Verificar se já existe configuração com tenantId
+SET @has_config_with_tenant = (SELECT COUNT(*) FROM `Configuracoes` WHERE `tenantId` = @tenant_padrao_id);
+
+-- Se NÃO existe configuração com tenantId, atualizar a existente sem tenantId
+-- Usar variável para evitar subquery no WHERE
 UPDATE `Configuracoes` 
 SET `tenantId` = @tenant_padrao_id 
-WHERE `tenantId` IS NULL;
+WHERE `tenantId` IS NULL
+  AND @has_config_with_tenant = 0
+LIMIT 1;
 
-SELECT CONCAT('✓ Configurações migradas: ', ROW_COUNT()) AS status;
+-- Se não havia configuração nenhuma, criar uma nova
+-- Usar INSERT IGNORE para evitar erro de duplicata (caso já exista por algum motivo)
+INSERT IGNORE INTO `Configuracoes` (`tenantId`, `webhook`, `createdAt`, `updatedAt`)
+SELECT @tenant_padrao_id, NULL, NOW(), NOW()
+WHERE (SELECT COUNT(*) FROM `Configuracoes`) = 0;
+
+SELECT CONCAT('✓ Configurações migradas') AS status;
 
 -- ============================================
 -- ETAPA 8: Criar Foreign Keys
