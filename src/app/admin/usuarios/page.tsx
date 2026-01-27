@@ -336,8 +336,8 @@ export default function UsuariosPage() {
         )}
 
         <div className="mb-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-            <p className="text-gray-600 text-sm sm:text-base">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <p className="text-gray-600 text-sm sm:text-base flex-1">
               Gerencie usuários do sistema. Aprove novos cadastros para permitir acesso. Cada instrutor terá acesso apenas aos seus próprios ensaios.
             </p>
             {!mostrarForm && (
@@ -354,7 +354,7 @@ export default function UsuariosPage() {
                     aprovado: false, // Por padrão, não aprovar - admin decide se aprova na hora
                   });
                 }}
-                className="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 whitespace-nowrap font-medium shadow-sm"
+                className="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 whitespace-nowrap font-medium shadow-sm transition-colors"
               >
                 + Novo Usuário
               </button>
@@ -546,81 +546,89 @@ export default function UsuariosPage() {
             </div>
             
             {/* Versão desktop: tabela */}
-            <table className="hidden sm:table min-w-full">
-              <thead className="bg-primary text-white">
-                <tr>
-                  <th className="px-4 py-3 text-left font-semibold">Nome</th>
-                  <th className="px-4 py-3 text-left font-semibold">Email</th>
-                  <th className="px-4 py-3 text-left font-semibold">Tipo</th>
-                  <th className="px-4 py-3 text-left font-semibold">Igreja</th>
-                  <th className="px-4 py-3 text-left font-semibold">Status</th>
-                  <th className="px-4 py-3 text-center font-semibold">Ações</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {usuariosFiltrados.map((usuario) => (
-                  <tr key={usuario.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3">{usuario.nome}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{usuario.email}</td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        usuario.tipo === 'admin' ? 'bg-accent/20 text-accent-dark' : 'bg-primary/20 text-primary'
-                      }`}>
-                        {usuario.tipo === 'admin' ? 'Admin' : 'Instrutor'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{usuario.igreja || '-'}</td>
-                    <td className="px-4 py-3">
-                      {usuario.tipo !== 'admin' ? (
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          usuario.aprovado 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-yellow-100 text-yellow-700'
-                        }`}>
-                          {usuario.aprovado ? '✓ Aprovado' : '⏳ Aguardando'}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-gray-400">-</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-2 justify-center flex-wrap">
-                        {usuario.tipo !== 'admin' && (
-                          <button
-                            onClick={() => aprovarUsuario(usuario.id, !usuario.aprovado)}
-                            className={`text-white px-3 py-1.5 rounded-lg text-xs transition-colors font-medium ${
-                              usuario.aprovado
-                                ? 'bg-yellow-600 hover:bg-yellow-700'
-                                : 'bg-green-600 hover:bg-green-700'
-                            }`}
-                          >
-                            {usuario.aprovado ? 'Reprovar' : 'Aprovar'}
-                          </button>
-                        )}
-                        <button
-                          onClick={() => iniciarEdicao(usuario)}
-                          className="bg-primary text-white px-3 py-1.5 rounded-lg text-xs hover:bg-primary-dark transition-colors font-medium"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={() => setMostrarAlterarSenha(usuario.id)}
-                          className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-700 transition-colors font-medium"
-                        >
-                          Senha
-                        </button>
-                        <button
-                          onClick={() => excluirUsuario(usuario.id)}
-                          className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition-colors font-medium"
-                        >
-                          Excluir
-                        </button>
-                      </div>
-                    </td>
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="min-w-full table-fixed">
+                <thead className="bg-primary text-white">
+                  <tr>
+                    <th className="px-4 py-3 text-left font-semibold w-[20%]">Nome</th>
+                    <th className="px-4 py-3 text-left font-semibold w-[25%]">Email</th>
+                    <th className="px-4 py-3 text-left font-semibold w-[10%]">Tipo</th>
+                    <th className="px-4 py-3 text-left font-semibold w-[20%]">Igreja</th>
+                    <th className="px-4 py-3 text-left font-semibold w-[10%]">Status</th>
+                    <th className="px-4 py-3 text-center font-semibold w-[15%]">Ações</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {usuariosFiltrados.map((usuario) => (
+                    <tr key={usuario.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 align-middle">
+                        <span className="font-medium text-gray-900">{usuario.nome}</span>
+                      </td>
+                      <td className="px-4 py-3 align-middle">
+                        <span className="text-sm text-gray-600 break-words">{usuario.email}</span>
+                      </td>
+                      <td className="px-4 py-3 align-middle">
+                        <span className={`inline-block px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
+                          usuario.tipo === 'admin' ? 'bg-accent/20 text-accent-dark' : 'bg-primary/20 text-primary'
+                        }`}>
+                          {usuario.tipo === 'admin' ? 'Admin' : 'Instrutor'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 align-middle">
+                        <span className="text-sm text-gray-600 break-words">{usuario.igreja || '-'}</span>
+                      </td>
+                      <td className="px-4 py-3 align-middle">
+                        {usuario.tipo !== 'admin' ? (
+                          <span className={`inline-block px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
+                            usuario.aprovado 
+                              ? 'bg-green-100 text-green-700' 
+                              : 'bg-yellow-100 text-yellow-700'
+                          }`}>
+                            {usuario.aprovado ? '✓ Aprovado' : '⏳ Aguardando'}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-400">-</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 align-middle">
+                        <div className="flex gap-2 justify-center items-center flex-wrap">
+                          {usuario.tipo !== 'admin' && (
+                            <button
+                              onClick={() => aprovarUsuario(usuario.id, !usuario.aprovado)}
+                              className={`text-white px-3 py-1.5 rounded-lg text-xs transition-colors font-medium whitespace-nowrap ${
+                                usuario.aprovado
+                                  ? 'bg-yellow-600 hover:bg-yellow-700'
+                                  : 'bg-green-600 hover:bg-green-700'
+                              }`}
+                            >
+                              {usuario.aprovado ? 'Reprovar' : 'Aprovar'}
+                            </button>
+                          )}
+                          <button
+                            onClick={() => iniciarEdicao(usuario)}
+                            className="bg-primary text-white px-3 py-1.5 rounded-lg text-xs hover:bg-primary-dark transition-colors font-medium whitespace-nowrap"
+                          >
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => setMostrarAlterarSenha(usuario.id)}
+                            className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-700 transition-colors font-medium whitespace-nowrap"
+                          >
+                            Senha
+                          </button>
+                          <button
+                            onClick={() => excluirUsuario(usuario.id)}
+                            className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition-colors font-medium whitespace-nowrap"
+                          >
+                            Excluir
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
