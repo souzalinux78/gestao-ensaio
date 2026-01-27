@@ -254,17 +254,10 @@ export default function UsuariosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg-secondary)]">
-      <Header />
-      <div className="container mx-auto p-4 sm:p-6 max-w-6xl">
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={() => router.back()}
-            className="text-primary hover:text-primary-dark font-medium"
-          >
-            ← Voltar
-          </button>
-          <h1 className="text-xl sm:text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Gerenciar Usuários</h1>
+    <AdminLayout>
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Gerenciar Usuários</h1>
         </div>
 
         {mensagem && (
@@ -687,6 +680,6 @@ export default function UsuariosPage() {
           </div>
         )}
       </div>
-    </div>
+    </AdminLayout>
   );
 }
