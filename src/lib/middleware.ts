@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { obterUsuarioDaRequisicao } from './get-user-from-request';
 import { Usuario } from '@/types';
+import { verifyAccessToken } from './jwt';
+import { verifyAccessToken } from './jwt';
 
 /**
  * Middleware para verificar autenticação
@@ -73,4 +75,84 @@ export async function requireApproved(request: NextRequest): Promise<{ usuario: 
   }
 
   return authResult;
+}
+
+/**
+ * Extrai e valida o tenantId da requisição
+ * Prioridade:
+ * 1. Do JWT (tenantId no payload)
+ * 2. Do usuário autenticado (tenantId do banco)
+ * 3. Fallback para sistema antigo (null - será tratado como tenant padrão)
+ * 
+ * @param request Requisição Next.js
+ * @returns tenantId ou null se não encontrado
+ */
+export function getTenantFromRequest(request: NextRequest): number | null {
+  try {
+    // PRIORIDADE 1: Extrair do JWT
+    const authHeader = request.headers.get('authorization');
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '').trim();
+      const jwtPayload = verifyAccessToken(token);
+      
+      if (jwtPayload && jwtPayload.tenantId) {
+        return jwtPayload.tenantId;
+      }
+    }
+    
+    // PRIORIDADE 2: Fallback - será obtido do usuário autenticado
+    // (isso será feito nas queries usando obterUsuarioDaRequisicao)
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Resolve o tenantId da requisição de forma assíncrona
+ * Busca o tenantId do usuário autenticado se não estiver no JWT
+ * 
+ * @param request Requisição Next.js
+ * @returns tenantId ou null se não encontrado
+ */
+export async function resolveTenantFromRequest(request: NextRequest): Promise<number | null> {
+  // Tentar obter do JWT primeiro
+  const tenantFromJWT = getTenantFromRequest(request);
+  if (tenantFromJWT) {
+    return tenantFromJWT;
+  }
+  
+  // Se não estiver no JWT, obter do usuário autenticado
+  const usuario = await obterUsuarioDaRequisicao(request);
+  if (usuario && usuario.tenantId) {
+    return usuario.tenantId;
+  }
+  
+  // Fallback: retornar null (será tratado como tenant padrão nas queries)
+  return null;
+}
+
+/**
+ * Valida se o tenantId é válido e existe no banco
+ * Útil para garantir que o tenant ainda está ativo
+ * 
+ * @param tenantId ID do tenant
+ * @returns true se válido, false caso contrário
+ */
+export async function validateTenant(tenantId: number | null): Promise<boolean> {
+  if (!tenantId) {
+    return false;
+  }
+  
+  try {
+    const { prisma } = await import('./db');
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: { id: true, ativo: true },
+    });
+    
+    return tenant !== null && tenant.ativo === true;
+  } catch {
+    return false;
+  }
 }
