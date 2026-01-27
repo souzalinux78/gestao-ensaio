@@ -2,9 +2,9 @@ import jwt from 'jsonwebtoken';
 import { Usuario } from '@/types';
 
 // Configurações JWT
-const JWT_SECRET = process.env.JWT_SECRET || 'change-me-in-production-minimum-32-characters';
-const ACCESS_TOKEN_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN || '15m';
-const REFRESH_TOKEN_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+const JWT_SECRET: string = process.env.JWT_SECRET || 'change-me-in-production-minimum-32-characters';
+const ACCESS_TOKEN_EXPIRES_IN: string = process.env.JWT_ACCESS_EXPIRES_IN || '15m';
+const REFRESH_TOKEN_EXPIRES_IN: string = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 
 // Tipos para payload dos tokens
 export interface AccessTokenPayload {
