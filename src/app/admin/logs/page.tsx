@@ -76,15 +76,15 @@ export default function LogsPage() {
   return (
     <AdminLayout>
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Logs do Sistema</h1>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Logs do Sistema</h1>
           <select
             value={filtroTipo}
             onChange={(e) => {
               setFiltroTipo(e.target.value);
               setPage(1);
             }}
-            className="border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-primary"
+            className="w-full sm:w-auto border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-primary"
           >
             <option value="todos">Todos os tipos</option>
             <option value="criacao">Criações</option>
@@ -105,7 +105,45 @@ export default function LogsPage() {
         ) : (
           <>
             <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
+              {/* Versão Mobile: Cards */}
+              <div className="block sm:hidden divide-y divide-gray-200 dark:divide-[var(--border-primary)]">
+                {logs.map((log) => (
+                  <div key={log.id} className="p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 mt-0.5">
+                        <div
+                          className={`w-2 h-2 rounded-full ${
+                            log.tipo === 'criacao'
+                              ? 'bg-blue-500'
+                              : log.tipo === 'atualizacao'
+                              ? 'bg-yellow-500'
+                              : 'bg-green-500'
+                          }`}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span
+                            className={`inline-block px-2 py-1 rounded text-xs font-medium ${getTipoColor(
+                              log.tipo
+                            )}`}
+                          >
+                            {log.tipo}
+                          </span>
+                          <p className="text-xs text-[var(--text-tertiary)]">
+                            {formatarData(log.timestamp)}
+                          </p>
+                        </div>
+                        <p className="text-sm font-medium text-[var(--text-primary)] mb-1">{log.acao}</p>
+                        <p className="text-xs text-[var(--text-secondary)] line-clamp-2">{log.detalhes}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Versão Desktop: Tabela */}
+              <div className="hidden sm:block overflow-x-auto">
                 <table className="min-w-full">
                   <thead className="bg-gray-50 dark:bg-[var(--bg-secondary)]">
                     <tr>

@@ -204,16 +204,16 @@ export default function TenantsPage() {
                 </label>
               </div>
             </div>
-            <div className="flex gap-3 mt-4">
+            <div className="flex flex-col sm:flex-row gap-3 mt-4">
               <button
                 onClick={salvarTenant}
-                className="bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary-dark transition-colors font-medium"
+                className="w-full sm:w-auto bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary-dark transition-colors font-medium"
               >
                 Salvar
               </button>
               <button
                 onClick={cancelarEdicao}
-                className="bg-gray-400 text-white px-6 py-2.5 rounded-lg hover:bg-gray-500 transition-colors font-medium"
+                className="w-full sm:w-auto bg-gray-400 text-white px-6 py-2.5 rounded-lg hover:bg-gray-500 transition-colors font-medium"
               >
                 Cancelar
               </button>
@@ -231,7 +231,55 @@ export default function TenantsPage() {
           </div>
         ) : (
           <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Versão Mobile: Cards */}
+            <div className="block sm:hidden divide-y divide-gray-200 dark:divide-[var(--border-primary)]">
+              {tenants.map((tenant) => (
+                <div key={tenant.id} className="p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-primary dark:text-[var(--text-primary)] truncate">
+                        {tenant.nome}
+                      </p>
+                      <p className="text-xs text-[var(--text-secondary)] truncate">ID: {tenant.id}</p>
+                      <p className="text-xs text-[var(--text-tertiary)] truncate">{tenant.slug}</p>
+                      <div className="flex gap-2 mt-2 flex-wrap">
+                        <span
+                          className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                            tenant.ativo
+                              ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                          }`}
+                        >
+                          {tenant.ativo ? 'Ativo' : 'Inativo'}
+                        </span>
+                        <span className="text-xs text-[var(--text-secondary)]">
+                          👥 {tenant._count?.usuarios || 0} | 📊 {tenant._count?.ensaios || 0}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => iniciarEdicao(tenant)}
+                      className="flex-1 bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                    >
+                      Editar
+                    </button>
+                    {tenant.id !== 1 && (
+                      <button
+                        onClick={() => excluirTenant(tenant.id)}
+                        className="flex-1 bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
+                      >
+                        Excluir
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Versão Desktop: Tabela */}
+            <div className="hidden sm:block overflow-x-auto">
               <table className="min-w-full">
                 <thead className="bg-primary text-white">
                   <tr>

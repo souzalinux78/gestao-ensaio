@@ -89,12 +89,12 @@ export default function MetricasPage() {
   return (
     <AdminLayout>
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Métricas do Sistema</h1>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Métricas do Sistema</h1>
           <select
             value={periodo}
             onChange={(e) => setPeriodo(e.target.value)}
-            className="border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-primary"
+            className="w-full sm:w-auto border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-primary"
           >
             <option value="7">Últimos 7 dias</option>
             <option value="30">Últimos 30 dias</option>
@@ -174,8 +174,8 @@ export default function MetricasPage() {
           </div>
 
           {/* Outros */}
-          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">Outros</h2>
+          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold mb-4 text-[var(--text-primary)]">Outros</h2>
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-[var(--text-secondary)]">Músicos:</span>
@@ -190,34 +190,65 @@ export default function MetricasPage() {
         </div>
 
         {/* Ensaios por Mês */}
-        <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-6 mt-6">
-          <h2 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">Ensaios por Mês (Últimos 6 meses)</h2>
+        <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-4 sm:p-6 mt-6">
+          <h2 className="text-base sm:text-lg font-semibold mb-4 text-[var(--text-primary)]">Ensaios por Mês (Últimos 6 meses)</h2>
           <div className="space-y-2">
-            {metricas.ensaios.porMes.map((item, index) => (
-              <div key={index} className="flex items-center gap-4">
-                <span className="w-32 text-sm text-gray-600 dark:text-[var(--text-secondary)]">{item.mes}</span>
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 relative overflow-hidden">
-                  <div
-                    className="bg-primary h-full rounded-full flex items-center justify-end pr-2"
-                    style={{
-                      width: `${Math.min((item.total / Math.max(...metricas.ensaios.porMes.map((m) => m.total), 1)) * 100, 100)}%`,
-                    }}
-                  >
-                    {item.total > 0 && (
-                      <span className="text-xs text-white font-medium">{item.total}</span>
-                    )}
+            {metricas.ensaios.porMes.map((item, index) => {
+              const maxTotal = Math.max(...metricas.ensaios.porMes.map((m) => m.total), 1);
+              return (
+                <div key={index} className="flex items-center gap-2 sm:gap-4">
+                  <span className="w-20 sm:w-32 text-xs sm:text-sm text-gray-600 dark:text-[var(--text-secondary)] truncate">{item.mes}</span>
+                  <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 relative overflow-hidden min-w-0">
+                    <div
+                      className="bg-primary h-full rounded-full flex items-center justify-end pr-2"
+                      style={{
+                        width: `${Math.min((item.total / maxTotal) * 100, 100)}%`,
+                      }}
+                    >
+                      {item.total > 0 && (
+                        <span className="text-xs text-white font-medium">{item.total}</span>
+                      )}
+                    </div>
                   </div>
+                  <span className="w-10 sm:w-12 text-right font-medium text-[var(--text-primary)] text-sm">{item.total}</span>
                 </div>
-                <span className="w-12 text-right font-medium text-[var(--text-primary)]">{item.total}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         {/* Tenants */}
-        <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-6 mt-6">
-          <h2 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">Tenants</h2>
-          <div className="overflow-x-auto">
+        <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-4 sm:p-6 mt-6">
+          <h2 className="text-base sm:text-lg font-semibold mb-4 text-[var(--text-primary)]">Tenants</h2>
+          {/* Versão Mobile: Cards */}
+          <div className="block sm:hidden space-y-3">
+            {metricas.tenants.detalhes.map((tenant) => (
+              <div
+                key={tenant.id}
+                className="p-4 bg-gray-50 dark:bg-[var(--bg-secondary)] rounded-lg"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <p className="font-medium text-[var(--text-primary)] truncate flex-1">{tenant.nome}</p>
+                  <span
+                    className={`ml-2 inline-block px-2 py-1 rounded text-xs font-medium ${
+                      tenant.ativo
+                        ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                    }`}
+                  >
+                    {tenant.ativo ? 'Ativo' : 'Inativo'}
+                  </span>
+                </div>
+                <p className="text-xs text-[var(--text-secondary)] truncate mb-2">{tenant.slug}</p>
+                <div className="flex gap-4 text-sm text-[var(--text-secondary)]">
+                  <span>👥 {tenant._count.usuarios}</span>
+                  <span>📊 {tenant._count.ensaios}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Versão Desktop: Tabela */}
+          <div className="hidden sm:block overflow-x-auto">
             <table className="min-w-full">
               <thead className="bg-gray-50 dark:bg-[var(--bg-secondary)]">
                 <tr>

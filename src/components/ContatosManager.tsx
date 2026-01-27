@@ -176,17 +176,17 @@ export default function ContatosManager() {
               className="w-full border rounded px-3 py-2"
             />
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={salvarContato}
               disabled={salvando}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+              className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 transition-colors font-medium"
             >
               {salvando ? 'Salvando...' : 'Salvar'}
             </button>
             <button
               onClick={cancelarEdicao}
-              className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+              className="w-full sm:w-auto bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 transition-colors font-medium"
             >
               Cancelar
             </button>
@@ -203,7 +203,33 @@ export default function ContatosManager() {
       ) : (
         <div className="space-y-2">
           <h3 className="font-semibold mb-4">Contatos Cadastrados</h3>
-          <div className="overflow-x-auto">
+          {/* Versão Mobile: Cards */}
+          <div className="block sm:hidden space-y-3">
+            {contatos.map((contato) => (
+              <div key={contato.id} className="border rounded-lg p-4 bg-gray-50">
+                <div className="mb-3">
+                  <p className="font-medium text-gray-900 mb-1">{contato.nome}</p>
+                  <p className="text-sm text-gray-600">{contato.telefone}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => iniciarEdicao(contato)}
+                    className="flex-1 bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600 transition-colors font-medium"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => excluirContato(contato.id)}
+                    className="flex-1 bg-red-500 text-white px-3 py-2 rounded text-sm hover:bg-red-600 transition-colors font-medium"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Versão Desktop: Tabela */}
+          <div className="hidden sm:block overflow-x-auto">
             <table className="min-w-full border">
               <thead>
                 <tr className="bg-gray-100">
@@ -221,13 +247,13 @@ export default function ContatosManager() {
                       <div className="flex gap-2 justify-center">
                         <button
                           onClick={() => iniciarEdicao(contato)}
-                          className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
+                          className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors"
                         >
                           Editar
                         </button>
                         <button
                           onClick={() => excluirContato(contato.id)}
-                          className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+                          className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
                         >
                           Excluir
                         </button>

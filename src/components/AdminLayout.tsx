@@ -66,30 +66,30 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg-secondary)]">
       {/* Header */}
       <header className="bg-primary text-white p-3 sm:p-4 shadow-lg">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-4">
+        <div className="container mx-auto flex justify-between items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
             <button
               onClick={() => setMenuAberto(!menuAberto)}
-              className="lg:hidden p-2 hover:bg-primary-dark rounded-lg transition-colors"
+              className="lg:hidden p-2 hover:bg-primary-dark rounded-lg transition-colors flex-shrink-0"
               aria-label="Toggle menu"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <div>
-              <h1 className="text-lg sm:text-xl font-bold">Painel Admin</h1>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-base sm:text-lg lg:text-xl font-bold truncate">Painel Admin</h1>
               <p className="text-xs sm:text-sm text-white/80 truncate">
                 {usuario.nome} {usuario.igreja && `- ${usuario.igreja}`}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <ThemeToggle />
-            <span className="text-xs sm:text-sm text-white/80 hidden sm:inline">{usuario.email}</span>
+            <span className="text-xs sm:text-sm text-white/80 hidden md:inline truncate max-w-[120px] sm:max-w-none">{usuario.email}</span>
             <button
               onClick={handleLogout}
-              className="bg-red-500 px-3 sm:px-4 py-1.5 sm:py-2 rounded hover:bg-red-600 text-sm sm:text-base transition-colors"
+              className="bg-red-500 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded hover:bg-red-600 text-xs sm:text-sm md:text-base transition-colors whitespace-nowrap"
             >
               Sair
             </button>

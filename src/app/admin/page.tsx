@@ -169,62 +169,62 @@ export default function AdminPage() {
 
         {/* Cards KPI - Grid */}
         {metricas && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {/* Total Usuários */}
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-blue-500">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Total de Usuários</p>
-                  <p className="text-3xl font-bold text-[var(--text-primary)] mt-2">{metricas.usuarios.total}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Total de Usuários</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mt-2">{metricas.usuarios.total}</p>
                   <p className="text-xs text-gray-500 dark:text-[var(--text-tertiary)] mt-1">
                     +{metricas.usuarios.novosNoPeriodo} no período
                   </p>
                 </div>
-                <div className="text-4xl opacity-20">👥</div>
+                <div className="text-3xl sm:text-4xl opacity-20 flex-shrink-0 ml-2">👥</div>
               </div>
             </div>
 
             {/* Total Ensaios */}
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-6 border-l-4 border-green-500">
+            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-green-500">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Total de Ensaios</p>
-                  <p className="text-3xl font-bold text-[var(--text-primary)] mt-2">{metricas.ensaios.total}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Total de Ensaios</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mt-2">{metricas.ensaios.total}</p>
                   <p className="text-xs text-gray-500 dark:text-[var(--text-tertiary)] mt-1">
                     {metricas.ensaios.noPeriodo} no período
                   </p>
                 </div>
-                <div className="text-4xl opacity-20">📊</div>
+                <div className="text-3xl sm:text-4xl opacity-20 flex-shrink-0 ml-2">📊</div>
               </div>
             </div>
 
             {/* Usuários Pendentes */}
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-yellow-500">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Pendentes</p>
-                  <p className="text-3xl font-bold text-[var(--text-primary)] mt-2">{metricas.usuarios.pendentes}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Pendentes</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mt-2">{metricas.usuarios.pendentes}</p>
                   <p className="text-xs text-gray-500 dark:text-[var(--text-tertiary)] mt-1">
                     Aguardando aprovação
                   </p>
                 </div>
-                <div className="text-4xl opacity-20">⏳</div>
+                <div className="text-3xl sm:text-4xl opacity-20 flex-shrink-0 ml-2">⏳</div>
               </div>
             </div>
 
             {/* Tenants Ativos */}
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-purple-500">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Tenants Ativos</p>
-                  <p className="text-3xl font-bold text-[var(--text-primary)] mt-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Tenants Ativos</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mt-2">
                     {metricas.tenants.ativos}/{metricas.tenants.total}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-[var(--text-tertiary)] mt-1">
                     Total de tenants
                   </p>
                 </div>
-                <div className="text-4xl opacity-20">🏢</div>
+                <div className="text-3xl sm:text-4xl opacity-20 flex-shrink-0 ml-2">🏢</div>
               </div>
             </div>
           </div>
@@ -234,15 +234,15 @@ export default function AdminPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Gráfico de Ensaios por Mês */}
           {metricas && metricas.ensaios.porMes.length > 0 && (
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-6">
-              <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
+            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold text-[var(--text-primary)] mb-4">
                 Ensaios por Mês (Últimos 6 meses)
               </h2>
               <div className="space-y-3">
                 {metricas.ensaios.porMes.map((item, index) => (
-                  <div key={index} className="flex items-center gap-4">
-                    <span className="w-24 text-sm text-[var(--text-secondary)] truncate">{item.mes}</span>
-                    <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 relative overflow-hidden">
+                  <div key={index} className="flex items-center gap-2 sm:gap-4">
+                    <span className="w-20 sm:w-24 text-xs sm:text-sm text-[var(--text-secondary)] truncate">{item.mes}</span>
+                    <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 relative overflow-hidden min-w-0">
                       <div
                         className="bg-primary h-full rounded-full flex items-center justify-end pr-2 transition-all duration-500"
                         style={{
@@ -254,7 +254,7 @@ export default function AdminPage() {
                         )}
                       </div>
                     </div>
-                    <span className="w-12 text-right font-medium text-[var(--text-primary)]">{item.total}</span>
+                    <span className="w-10 sm:w-12 text-right font-medium text-[var(--text-primary)] text-sm">{item.total}</span>
                   </div>
                 ))}
               </div>
@@ -262,8 +262,8 @@ export default function AdminPage() {
           )}
 
           {/* Últimas Atividades */}
-          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
+          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold text-[var(--text-primary)] mb-4">
               Últimas Atividades
             </h2>
             {logs.length === 0 ? (
@@ -302,32 +302,32 @@ export default function AdminPage() {
 
         {/* Estatísticas Adicionais - Grid */}
         {metricas && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-6">
-              <p className="text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Instrutores</p>
-              <p className="text-2xl font-bold text-[var(--text-primary)] mt-2">{metricas.usuarios.instrutores}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Instrutores</p>
+              <p className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mt-2">{metricas.usuarios.instrutores}</p>
             </div>
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-6">
-              <p className="text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Músicos</p>
-              <p className="text-2xl font-bold text-[var(--text-primary)] mt-2">{metricas.outros.musicos}</p>
+            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Músicos</p>
+              <p className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mt-2">{metricas.outros.musicos}</p>
             </div>
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-6">
-              <p className="text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Contatos</p>
-              <p className="text-2xl font-bold text-[var(--text-primary)] mt-2">{metricas.outros.contatos}</p>
+            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Contatos</p>
+              <p className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mt-2">{metricas.outros.contatos}</p>
             </div>
           </div>
         )}
 
         {/* Relatórios de Ensaios */}
         <div>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <h2 className="text-xl font-bold text-primary dark:text-[var(--text-primary)]">
+          <div className="mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-primary dark:text-[var(--text-primary)]">
               Relatórios de Ensaios
             </h2>
           </div>
 
-          <div className="mb-6 bg-white dark:bg-[var(--bg-primary)] p-4 rounded-lg shadow-sm">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+          <div className="mb-6 bg-white dark:bg-[var(--bg-primary)] p-3 sm:p-4 rounded-lg shadow-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 items-end">
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">
                   Data Início
