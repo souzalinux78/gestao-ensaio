@@ -46,6 +46,7 @@ export async function verificarCredenciais(
         tipo: usuario.tipo as TipoUsuario,
         igreja: usuario.igreja,
         aprovado: usuario.aprovado,
+        tenantId: usuario.tenantId ?? null, // Incluir tenantId
       };
     }
     return null;
@@ -70,6 +71,7 @@ export async function verificarCredenciais(
     tipo: usuario.tipo as TipoUsuario,
     igreja: usuario.igreja,
     aprovado: usuario.aprovado,
+    tenantId: usuario.tenantId ?? null, // Incluir tenantId
   };
 }
 

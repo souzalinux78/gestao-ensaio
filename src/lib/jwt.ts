@@ -11,6 +11,7 @@ export interface AccessTokenPayload {
   userId: number;
   tipo: 'admin' | 'instrutor';
   aprovado: boolean;
+  tenantId?: number | null; // ID do tenant (multi-tenant) - opcional para compatibilidade retroativa
   iat?: number;
   exp?: number;
 }
@@ -25,12 +26,14 @@ export interface RefreshTokenPayload {
 /**
  * Gera um Access Token JWT
  * Expira em 15 minutos por padrão
+ * Inclui tenantId no payload para suporte multi-tenant
  */
 export function generateAccessToken(usuario: Usuario): string {
   const payload: AccessTokenPayload = {
     userId: usuario.id,
     tipo: usuario.tipo,
     aprovado: usuario.aprovado ?? false, // Garantir que seja boolean
+    tenantId: usuario.tenantId ?? null, // Incluir tenantId (pode ser null para compatibilidade)
   };
 
   return jwt.sign(payload, JWT_SECRET, {

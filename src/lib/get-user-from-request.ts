@@ -24,13 +24,18 @@ export async function obterUsuarioDaRequisicao(
             tipo: true,
             igreja: true,
             aprovado: true,
+            tenantId: true, // Incluir tenantId
           },
         });
         if (usuario) {
           // Verificar se dados do token ainda estão corretos
-          // (usuário pode ter sido desaprovado ou tipo mudado)
+          // (usuário pode ter sido desaprovado, tipo mudado ou tenant mudado)
           if (usuario.tipo !== jwtPayload.tipo || usuario.aprovado !== jwtPayload.aprovado) {
             // Token válido mas dados desatualizados - retornar null para forçar novo login
+            return null;
+          }
+          // Se token tem tenantId mas usuário não tem (ou vice-versa), forçar novo login
+          if (jwtPayload.tenantId !== undefined && usuario.tenantId !== jwtPayload.tenantId) {
             return null;
           }
           return {
@@ -40,6 +45,7 @@ export async function obterUsuarioDaRequisicao(
             tipo: usuario.tipo as 'admin' | 'instrutor',
             igreja: usuario.igreja,
             aprovado: usuario.aprovado,
+            tenantId: usuario.tenantId ?? null, // Incluir tenantId
           };
         }
       }
@@ -57,6 +63,7 @@ export async function obterUsuarioDaRequisicao(
             tipo: true,
             igreja: true,
             aprovado: true,
+            tenantId: true, // Incluir tenantId
           },
         });
         if (usuario) {
@@ -67,6 +74,7 @@ export async function obterUsuarioDaRequisicao(
             tipo: usuario.tipo as 'admin' | 'instrutor',
             igreja: usuario.igreja,
             aprovado: usuario.aprovado,
+            tenantId: usuario.tenantId ?? null, // Incluir tenantId
           };
         }
       }
@@ -85,6 +93,7 @@ export async function obterUsuarioDaRequisicao(
           tipo: true,
           igreja: true,
           aprovado: true,
+          tenantId: true, // Incluir tenantId
         },
       });
       if (usuario) {
@@ -95,6 +104,7 @@ export async function obterUsuarioDaRequisicao(
           tipo: usuario.tipo as 'admin' | 'instrutor',
           igreja: usuario.igreja,
           aprovado: usuario.aprovado,
+          tenantId: usuario.tenantId ?? null, // Incluir tenantId
         };
       }
     }

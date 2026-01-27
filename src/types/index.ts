@@ -7,6 +7,7 @@ export interface Usuario {
   tipo: TipoUsuario;
   igreja?: string | null;
   aprovado?: boolean;
+  tenantId?: number | null; // ID do tenant (multi-tenant)
 }
 
 export interface Instrumento {
