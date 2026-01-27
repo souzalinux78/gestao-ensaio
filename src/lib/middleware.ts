@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { obterUsuarioDaRequisicao } from './get-user-from-request';
 import { Usuario } from '@/types';
 import { verifyAccessToken } from './jwt';
-import { verifyAccessToken } from './jwt';
 
 /**
  * Middleware para verificar autenticação
