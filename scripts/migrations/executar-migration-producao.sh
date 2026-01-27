@@ -23,10 +23,15 @@ if [ ! -f "scripts/migrations/001-create-tenant-table.sql" ]; then
     exit 1
 fi
 
-# Carregar variáveis de ambiente
+# Carregar variáveis de ambiente de forma segura
 if [ -f .env ]; then
-    source .env
-    echo -e "${GREEN}✓ Variáveis de ambiente carregadas${NC}"
+    # Extrair DATABASE_URL do arquivo .env de forma segura
+    DATABASE_URL=$(grep "^DATABASE_URL=" .env | cut -d'=' -f2- | sed 's/^"//' | sed 's/"$//' | sed "s/^'//" | sed "s/'$//")
+    if [ -n "$DATABASE_URL" ]; then
+        echo -e "${GREEN}✓ DATABASE_URL carregada do .env${NC}"
+    else
+        echo -e "${YELLOW}⚠ DATABASE_URL não encontrada no .env${NC}"
+    fi
 else
     echo -e "${YELLOW}⚠ Arquivo .env não encontrado${NC}"
     echo "Certifique-se de que DATABASE_URL está configurada."
@@ -50,17 +55,37 @@ echo ""
 BACKUP_FILE="backup_pre_migration_001_$(date +%Y%m%d_%H%M%S).sql"
 echo "Criando backup: $BACKUP_FILE"
 
-# Extrair componentes do DATABASE_URL
-DB_URL=$(echo $DATABASE_URL | sed 's|mysql://||')
-DB_USER=$(echo $DB_URL | cut -d: -f1)
-DB_PASS=$(echo $DB_URL | cut -d: -f2 | cut -d@ -f1)
-DB_HOST=$(echo $DB_URL | cut -d@ -f2 | cut -d/ -f1 | cut -d: -f1)
-DB_PORT=$(echo $DB_URL | cut -d@ -f2 | cut -d/ -f1 | cut -d: -f2)
-DB_NAME=$(echo $DB_URL | cut -d/ -f2)
+# Extrair componentes do DATABASE_URL de forma mais robusta
+# Remove o prefixo mysql://
+DB_URL=$(echo "$DATABASE_URL" | sed 's|mysql://||')
+# Remove query string se existir (?schema=public)
+DB_URL=$(echo "$DB_URL" | cut -d'?' -f1)
+
+# Extrair usuário (antes do primeiro :)
+DB_USER=$(echo "$DB_URL" | cut -d: -f1)
+
+# Extrair senha (entre : e @)
+DB_PASS=$(echo "$DB_URL" | sed 's/^[^:]*://' | cut -d'@' -f1)
+
+# Extrair host e porta (entre @ e /)
+HOST_PORT=$(echo "$DB_URL" | sed 's/^[^@]*@//' | cut -d'/' -f1)
+DB_HOST=$(echo "$HOST_PORT" | cut -d: -f1)
+DB_PORT=$(echo "$HOST_PORT" | cut -d: -f2)
 
 # Se DB_PORT está vazio, usar porta padrão
 if [ -z "$DB_PORT" ]; then
     DB_PORT=3306
+fi
+
+# Extrair nome do banco (depois da última /)
+DB_NAME=$(echo "$DB_URL" | sed 's/^[^/]*\///')
+
+# Validar se conseguiu extrair os dados
+if [ -z "$DB_USER" ] || [ -z "$DB_PASS" ] || [ -z "$DB_HOST" ] || [ -z "$DB_NAME" ]; then
+    echo -e "${RED}ERRO: Não foi possível extrair informações do DATABASE_URL!${NC}"
+    echo "Formato esperado: mysql://usuario:senha@host:porta/database"
+    echo "DATABASE_URL atual: $DATABASE_URL"
+    exit 1
 fi
 
 echo "Host: $DB_HOST"
@@ -68,8 +93,8 @@ echo "Porta: $DB_PORT"
 echo "Database: $DB_NAME"
 echo ""
 
-# Criar backup
-mysqldump -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" > "$BACKUP_FILE" 2>/dev/null || {
+# Criar backup (usar --password= para evitar prompt interativo)
+mysqldump -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" --password="$DB_PASS" "$DB_NAME" > "$BACKUP_FILE" 2>/dev/null || {
     echo -e "${YELLOW}⚠ Aviso: Não foi possível criar backup automático${NC}"
     echo "Execute manualmente:"
     echo "mysqldump -h $DB_HOST -P $DB_PORT -u $DB_USER -p $DB_NAME > $BACKUP_FILE"
@@ -93,7 +118,7 @@ echo "=========================================="
 echo ""
 
 # Verificar se tabela Tenant já existe
-mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "SHOW TABLES LIKE 'Tenant';" 2>/dev/null | grep -q "Tenant" && {
+mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" --password="$DB_PASS" "$DB_NAME" -e "SHOW TABLES LIKE 'Tenant';" 2>/dev/null | grep -q "Tenant" && {
     echo -e "${YELLOW}⚠ Tabela 'Tenant' já existe!${NC}"
     echo "A migration pode ter sido executada anteriormente."
     read -p "Deseja continuar mesmo assim? (s/N): " -n 1 -r
@@ -114,7 +139,7 @@ echo ""
 
 # Executar migration
 echo "Executando migration 001-create-tenant-table.sql..."
-mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "scripts/migrations/001-create-tenant-table.sql" && {
+mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" --password="$DB_PASS" "$DB_NAME" < "scripts/migrations/001-create-tenant-table.sql" && {
     echo -e "${GREEN}✓ Migration executada com sucesso!${NC}"
 } || {
     echo -e "${RED}✗ ERRO ao executar migration!${NC}"
@@ -129,7 +154,7 @@ echo "=========================================="
 echo ""
 
 # Verificar se tabela foi criada
-mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "SHOW TABLES LIKE 'Tenant';" 2>/dev/null | grep -q "Tenant" && {
+mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" --password="$DB_PASS" "$DB_NAME" -e "SHOW TABLES LIKE 'Tenant';" 2>/dev/null | grep -q "Tenant" && {
     echo -e "${GREEN}✓ Tabela 'Tenant' criada com sucesso${NC}"
 } || {
     echo -e "${RED}✗ ERRO: Tabela 'Tenant' não foi criada!${NC}"
@@ -137,12 +162,12 @@ mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "SHOW
 }
 
 # Verificar se tenant padrão foi criado
-TENANT_COUNT=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -sN -e "SELECT COUNT(*) FROM Tenant WHERE slug = 'sistema-padrao';" 2>/dev/null)
+TENANT_COUNT=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" --password="$DB_PASS" "$DB_NAME" -sN -e "SELECT COUNT(*) FROM Tenant WHERE slug = 'sistema-padrao';" 2>/dev/null)
 if [ "$TENANT_COUNT" -eq "1" ]; then
     echo -e "${GREEN}✓ Tenant padrão 'Sistema Padrão' criado${NC}"
     
     # Mostrar ID do tenant padrão
-    TENANT_ID=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -sN -e "SELECT id FROM Tenant WHERE slug = 'sistema-padrao';" 2>/dev/null)
+    TENANT_ID=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" --password="$DB_PASS" "$DB_NAME" -sN -e "SELECT id FROM Tenant WHERE slug = 'sistema-padrao';" 2>/dev/null)
     echo "   ID do tenant padrão: $TENANT_ID"
 else
     echo -e "${YELLOW}⚠ Tenant padrão não encontrado ou múltiplos encontrados${NC}"
