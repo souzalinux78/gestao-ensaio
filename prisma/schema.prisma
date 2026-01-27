@@ -7,6 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Tenant {
+  id        Int      @id @default(autoincrement())
+  nome      String   @db.VarChar(255)
+  slug      String   @unique @db.VarChar(100)
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("createdAt")
+  updatedAt DateTime @updatedAt @map("updatedAt")
+  usuarios  Usuario[]
+  ensaios   Ensaio[]
+  musicos   Musico[]
+  contatos  Contato[]
+  instrumentos Instrumento[]
+  configuracoes Configuracoes[]
+
+  @@index([slug])
+  @@index([ativo])
+  @@map("Tenant")
+}
+
 model Usuario {
   id        Int      @id @default(autoincrement())
   nome      String   @db.VarChar(255)
