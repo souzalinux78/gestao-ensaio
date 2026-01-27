@@ -36,12 +36,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   const menuItems = [
-    { href: '/admin', label: '📊 Dashboard', icon: '📊' },
-    { href: '/admin/usuarios', label: '👥 Usuários', icon: '👥' },
-    { href: '/admin/tenants', label: '🏢 Tenants', icon: '🏢' },
-    { href: '/admin/metricas', label: '📈 Métricas', icon: '📈' },
-    { href: '/admin/logs', label: '📋 Logs', icon: '📋' },
-    { href: '/admin/configuracoes', label: '⚙️ Configurações', icon: '⚙️' },
+    { href: '/admin', label: 'Dashboard', icon: '📊' },
+    { href: '/admin/usuarios', label: 'Usuários', icon: '👥' },
+    { href: '/admin/tenants', label: 'Tenants', icon: '🏢' },
+    { href: '/admin/metricas', label: 'Métricas', icon: '📈' },
+    { href: '/admin/logs', label: 'Logs', icon: '📋' },
+    { href: '/admin/configuracoes', label: 'Configurações', icon: '⚙️' },
   ];
 
   const isActive = (href: string) => {
