@@ -57,6 +57,14 @@ export default function RootLayout({
         <meta name="application-name" content="Gestão de Ensaio" />
         <meta name="msapplication-TileColor" content="#1e3a5f" />
         <meta name="msapplication-tap-highlight" content="no" />
+        {/* Splash screen iOS */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="144x144" href="/icon-144.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png" />
+        {/* Splash screen Android */}
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#1e3a5f" />
       </head>
       <body>
         <script
