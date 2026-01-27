@@ -3,8 +3,8 @@ import { Usuario } from '@/types';
 
 // Configurações JWT
 const JWT_SECRET: string = process.env.JWT_SECRET || 'change-me-in-production-minimum-32-characters';
-const ACCESS_TOKEN_EXPIRES_IN = (process.env.JWT_ACCESS_EXPIRES_IN || '15m') as string;
-const REFRESH_TOKEN_EXPIRES_IN = (process.env.JWT_REFRESH_EXPIRES_IN || '7d') as string;
+const ACCESS_TOKEN_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN || '15m';
+const REFRESH_TOKEN_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 
 // Tipos para payload dos tokens
 export interface AccessTokenPayload {
@@ -33,13 +33,11 @@ export function generateAccessToken(usuario: Usuario): string {
     aprovado: usuario.aprovado ?? false, // Garantir que seja boolean
   };
 
-  const options: SignOptions = {
-    expiresIn: ACCESS_TOKEN_EXPIRES_IN as string | number,
+  return jwt.sign(payload, JWT_SECRET, {
+    expiresIn: ACCESS_TOKEN_EXPIRES_IN,
     issuer: 'gestao-ensaio',
     audience: 'gestao-ensaio-app',
-  };
-  
-  return jwt.sign(payload, JWT_SECRET, options);
+  } as any);
 }
 
 /**
@@ -53,13 +51,11 @@ export function generateRefreshToken(userId: number, tokenId: string): string {
     tokenId,
   };
 
-  const options: SignOptions = {
-    expiresIn: REFRESH_TOKEN_EXPIRES_IN as string | number,
+  return jwt.sign(payload, JWT_SECRET, {
+    expiresIn: REFRESH_TOKEN_EXPIRES_IN,
     issuer: 'gestao-ensaio',
     audience: 'gestao-ensaio-refresh',
-  };
-  
-  return jwt.sign(payload, JWT_SECRET, options);
+  } as any);
 }
 
 /**
