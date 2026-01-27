@@ -11,7 +11,7 @@ export default function ConfiguracoesPage() {
   const [abaAtiva, setAbaAtiva] = useState<'webhook' | 'contatos'>('webhook');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg-secondary)]">
       <Header />
       <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
         <div className="flex items-center gap-4 mb-6">
@@ -25,14 +25,14 @@ export default function ConfiguracoesPage() {
         </div>
 
         {/* Abas */}
-        <div className="border-b border-gray-200 mb-6 bg-white rounded-t-lg">
+        <div className="border-b border-gray-200 dark:border-[var(--border-primary)] mb-6 bg-white dark:bg-[var(--bg-primary)] rounded-t-lg">
           <div className="flex gap-2 sm:gap-4 overflow-x-auto">
             <button
               onClick={() => setAbaAtiva('webhook')}
               className={`px-4 py-3 font-semibold border-b-2 transition-colors whitespace-nowrap ${
                 abaAtiva === 'webhook'
                   ? 'border-primary text-primary'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
               Webhook
@@ -42,7 +42,7 @@ export default function ConfiguracoesPage() {
               className={`px-4 py-3 font-semibold border-b-2 transition-colors whitespace-nowrap ${
                 abaAtiva === 'contatos'
                   ? 'border-primary text-primary'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
               Contatos

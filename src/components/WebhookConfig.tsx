@@ -59,24 +59,24 @@ export default function WebhookConfig() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 space-y-6">
+    <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm p-4 sm:p-6 space-y-6">
       <div>
         <h2 className="text-lg sm:text-xl font-semibold mb-4 text-primary">Configuração de Webhook</h2>
-        <p className="text-sm sm:text-base text-gray-600 mb-6">
+        <p className="text-sm sm:text-base text-gray-600 dark:text-[var(--text-secondary)] mb-6">
           Configure a URL do webhook que receberá os dados quando um PDF for gerado.
         </p>
       </div>
 
       <div>
-        <label className="block mb-2 text-sm font-medium text-gray-700">Webhook URL</label>
+        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">Webhook URL</label>
         <input
           type="url"
           value={webhook}
           onChange={(e) => setWebhook(e.target.value)}
           placeholder="https://exemplo.com/webhook"
-          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+          className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
         />
-        <p className="text-xs sm:text-sm text-gray-500 mt-1">
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-[var(--text-tertiary)] mt-1">
           Exemplo: https://webhook.automatizeonline.com.br/webhook/ensaio
         </p>
       </div>

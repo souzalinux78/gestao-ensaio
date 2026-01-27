@@ -59,17 +59,21 @@ export function useTheme() {
     const root = document.documentElement;
     if (newTheme === 'dark') {
       root.setAttribute('data-theme', 'dark');
+      root.classList.add('dark'); // Adicionar classe dark também para compatibilidade
     } else {
       root.removeAttribute('data-theme');
+      root.classList.remove('dark');
     }
   };
 
   // Alternar tema
   const toggleTheme = () => {
     const newTheme: Theme = theme === 'light' ? 'dark' : 'light';
+    console.log('🔄 Alternando tema:', newTheme);
     setTheme(newTheme);
     applyTheme(newTheme);
     localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+    console.log('✅ Tema aplicado. data-theme:', document.documentElement.getAttribute('data-theme'));
   };
 
   // Definir tema específico
