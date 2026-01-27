@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
+import { safeParseInt } from '@/lib/validators';
 
 // GET - Buscar um ensaio específico
 export async function GET(
@@ -8,7 +9,22 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id);
+    const id = safeParseInt(params.id);
+    if (!id || id <= 0) {
+      return NextResponse.json(
+        { error: 'ID inválido' },
+        { status: 400 }
+      );
+    }
+
+    // Verificar autorização
+    const usuario = await obterUsuarioDaRequisicao(request);
+    if (!usuario) {
+      return NextResponse.json(
+        { error: 'Não autenticado' },
+        { status: 401 }
+      );
+    }
 
     const ensaio = await prisma.ensaio.findUnique({
       where: { id },
@@ -40,6 +56,14 @@ export async function GET(
       );
     }
 
+    // Verificar se usuário tem permissão (admin ou dono do ensaio)
+    if (usuario.tipo !== 'admin' && usuario.id !== ensaio.instrutorId) {
+      return NextResponse.json(
+        { error: 'Você não tem permissão para visualizar este ensaio' },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json(ensaio);
   } catch (error: any) {
     return NextResponse.json(
@@ -55,7 +79,13 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id);
+    const id = safeParseInt(params.id);
+    if (!id || id <= 0) {
+      return NextResponse.json(
+        { error: 'ID inválido' },
+        { status: 400 }
+      );
+    }
     const body = await request.json();
     const { data, instrumentos, funcoes, totalGeral, hinosEnsaidos, regencia, musicos } = body;
 

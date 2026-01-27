@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import { validatePassword } from '@/lib/validators';
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,6 +23,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Usuário não encontrado' },
         { status: 404 }
+      );
+    }
+
+    // Validar nova senha
+    const passwordValidation = validatePassword(novaSenha);
+    if (!passwordValidation.valid) {
+      return NextResponse.json(
+        { error: passwordValidation.error || 'Nova senha inválida' },
+        { status: 400 }
       );
     }
 

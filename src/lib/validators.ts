@@ -33,8 +33,19 @@ export function validatePassword(password: string): { valid: boolean; error?: st
 export function validateInteger(value: any, min = 0, max = Number.MAX_SAFE_INTEGER): number | null {
   if (value === null || value === undefined) return null;
   const num = typeof value === 'string' ? parseInt(value, 10) : Number(value);
-  if (isNaN(num)) return null;
+  if (isNaN(num) || !isFinite(num)) return null;
   if (num < min || num > max) return null;
+  return num;
+}
+
+/**
+ * Valida e converte string para inteiro seguro
+ * Retorna null se inválido
+ */
+export function safeParseInt(value: string | null | undefined, defaultValue: number | null = null): number | null {
+  if (!value) return defaultValue;
+  const num = parseInt(String(value).trim(), 10);
+  if (isNaN(num) || !isFinite(num)) return defaultValue;
   return num;
 }
 

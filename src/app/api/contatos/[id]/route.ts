@@ -1,18 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
+import { safeParseInt, sanitizeString } from '@/lib/validators';
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id);
+    const id = safeParseInt(params.id);
+    if (!id || id <= 0) {
+      return NextResponse.json(
+        { error: 'ID inválido' },
+        { status: 400 }
+      );
+    }
+
     const { nome, telefone } = await request.json();
 
-    if (!nome || !telefone) {
+    // Validar e sanitizar entrada
+    const nomeSanitizado = sanitizeString(nome, 255);
+    const telefoneSanitizado = sanitizeString(telefone, 20);
+
+    if (!nomeSanitizado || !telefoneSanitizado) {
       return NextResponse.json(
-        { error: 'Nome e telefone são obrigatórios' },
+        { error: 'Nome e telefone são obrigatórios e devem ser válidos' },
         { status: 400 }
       );
     }
@@ -41,8 +53,8 @@ export async function PUT(
     const contato = await prisma.contato.update({
       where: { id },
       data: {
-        nome: nome.trim(),
-        telefone: telefone.trim(),
+        nome: nomeSanitizado,
+        telefone: telefoneSanitizado,
       },
     });
 
@@ -66,7 +78,13 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id);
+    const id = safeParseInt(params.id);
+    if (!id || id <= 0) {
+      return NextResponse.json(
+        { error: 'ID inválido' },
+        { status: 400 }
+      );
+    }
 
     // Verificar se o contato existe e pertence ao usuário
     const contatoExistente = await prisma.contato.findUnique({

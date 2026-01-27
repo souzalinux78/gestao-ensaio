@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { Ensaio, Instrumento } from '@/types';
+import { safeParseInt } from '@/lib/validators';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,6 +10,14 @@ export async function POST(request: NextRequest) {
     if (!ensaioId) {
       return NextResponse.json(
         { error: 'ID do ensaio é obrigatório' },
+        { status: 400 }
+      );
+    }
+
+    const ensaioIdNum = safeParseInt(ensaioId);
+    if (!ensaioIdNum || ensaioIdNum <= 0) {
+      return NextResponse.json(
+        { error: 'ID do ensaio inválido' },
         { status: 400 }
       );
     }
@@ -25,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     // Buscar dados do ensaio
     const ensaio = await prisma.ensaio.findUnique({
-      where: { id: ensaioId },
+      where: { id: ensaioIdNum },
       include: {
         instrumentos: {
           include: {

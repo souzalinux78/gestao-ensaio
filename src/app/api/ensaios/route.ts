@@ -19,7 +19,14 @@ export async function GET(request: NextRequest) {
   if (usuario && usuario.tipo === 'instrutor' && !instrutorId) {
     where.instrutorId = usuario.id;
   } else if (instrutorId) {
-    where.instrutorId = parseInt(instrutorId);
+    const instrutorIdNum = parseInt(instrutorId);
+    if (isNaN(instrutorIdNum) || instrutorIdNum <= 0) {
+      return NextResponse.json(
+        { error: 'ID do instrutor inválido' },
+        { status: 400 }
+      );
+    }
+    where.instrutorId = instrutorIdNum;
   }
   
   if (dataInicio || dataFim) {

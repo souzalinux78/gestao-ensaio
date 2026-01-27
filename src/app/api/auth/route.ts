@@ -2,9 +2,35 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verificarCredenciais } from '@/lib/auth';
 import { validateEmail, validatePassword } from '@/lib/validators';
 import { logger } from '@/lib/logger';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting - 5 tentativas por IP a cada 15 minutos
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
+               request.headers.get('x-real-ip') || 
+               'unknown';
+    const rateLimit = checkRateLimit(`auth:${ip}`, 5, 15 * 60 * 1000);
+    
+    if (!rateLimit.allowed) {
+      logger.warn('Tentativa de login bloqueada por rate limit', { ip });
+      return NextResponse.json(
+        { 
+          error: 'Muitas tentativas de login. Aguarde 15 minutos antes de tentar novamente.',
+          resetTime: rateLimit.resetTime,
+        },
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': '900', // 15 minutos em segundos
+            'X-RateLimit-Limit': '5',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimit.resetTime.toString(),
+          },
+        }
+      );
+    }
+
     const { email, senha } = await request.json();
 
     if (!email || !senha) {
@@ -41,7 +67,14 @@ export async function POST(request: NextRequest) {
       logger.warn('Credenciais inválidas', { email: emailNormalizado });
       return NextResponse.json(
         { error: 'Credenciais inválidas. Verifique o email e senha.' },
-        { status: 401 }
+        { 
+          status: 401,
+          headers: {
+            'X-RateLimit-Limit': '5',
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+            'X-RateLimit-Reset': rateLimit.resetTime.toString(),
+          },
+        }
       );
     }
 
@@ -55,7 +88,25 @@ export async function POST(request: NextRequest) {
     }
 
     logger.info('Login realizado com sucesso', { userId: usuario.id, tipo: usuario.tipo });
-    return NextResponse.json(usuario);
+    
+    // Adicionar headers de rate limit na resposta de sucesso
+    return NextResponse.json(
+      {
+        id: usuario.id,
+        nome: usuario.nome,
+        email: usuario.email,
+        tipo: usuario.tipo,
+        igreja: usuario.igreja,
+        aprovado: usuario.aprovado,
+      },
+      {
+        headers: {
+          'X-RateLimit-Limit': '5',
+          'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+          'X-RateLimit-Reset': rateLimit.resetTime.toString(),
+        },
+      }
+    );
   } catch (error: any) {
     logger.error('Erro no login', error);
     return NextResponse.json(

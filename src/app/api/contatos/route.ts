@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
+import { safeParseInt, sanitizeString } from '@/lib/validators';
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,7 +10,13 @@ export async function GET(request: NextRequest) {
     let usuarioId: number | null = null;
 
     if (usuarioIdParam) {
-      usuarioId = parseInt(usuarioIdParam);
+      usuarioId = safeParseInt(usuarioIdParam);
+      if (!usuarioId || usuarioId <= 0) {
+        return NextResponse.json(
+          { error: 'ID do usuário inválido' },
+          { status: 400 }
+        );
+      }
     } else {
       // Tentar obter da requisição
       const usuario = await obterUsuarioDaRequisicao(request);
@@ -46,9 +53,13 @@ export async function POST(request: NextRequest) {
   try {
     const { nome, telefone, usuarioId } = await request.json();
 
-    if (!nome || !telefone) {
+    // Validar e sanitizar entrada
+    const nomeSanitizado = sanitizeString(nome, 255);
+    const telefoneSanitizado = sanitizeString(telefone, 20);
+
+    if (!nomeSanitizado || !telefoneSanitizado) {
       return NextResponse.json(
-        { error: 'Nome e telefone são obrigatórios' },
+        { error: 'Nome e telefone são obrigatórios e devem ser válidos' },
         { status: 400 }
       );
     }
@@ -71,8 +82,8 @@ export async function POST(request: NextRequest) {
 
     const contato = await prisma.contato.create({
       data: {
-        nome: nome.trim(),
-        telefone: telefone.trim(),
+        nome: nomeSanitizado,
+        telefone: telefoneSanitizado,
         usuarioId: usuarioIdFinal,
       },
     });

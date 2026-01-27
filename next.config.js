@@ -2,7 +2,43 @@
 const nextConfig = {
   // Configurações para PWA
   async headers() {
+    const securityHeaders = [
+      {
+        key: 'X-Frame-Options',
+        value: 'DENY',
+      },
+      {
+        key: 'X-Content-Type-Options',
+        value: 'nosniff',
+      },
+      {
+        key: 'X-XSS-Protection',
+        value: '1; mode=block',
+      },
+      {
+        key: 'Referrer-Policy',
+        value: 'strict-origin-when-cross-origin',
+      },
+      {
+        key: 'Permissions-Policy',
+        value: 'camera=(), microphone=(), geolocation=()',
+      },
+    ];
+
+    // Adicionar HSTS apenas em produção com HTTPS
+    if (process.env.NODE_ENV === 'production') {
+      securityHeaders.push({
+        key: 'Strict-Transport-Security',
+        value: 'max-age=31536000; includeSubDomains',
+      });
+    }
+
     return [
+      {
+        // Aplicar headers de segurança em todas as rotas
+        source: '/:path*',
+        headers: securityHeaders,
+      },
       {
         source: '/sw.js',
         headers: [
@@ -14,6 +50,7 @@ const nextConfig = {
             key: 'Service-Worker-Allowed',
             value: '/',
           },
+          ...securityHeaders,
         ],
       },
       {
@@ -23,6 +60,7 @@ const nextConfig = {
             key: 'Content-Type',
             value: 'application/manifest+json',
           },
+          ...securityHeaders,
         ],
       },
     ];

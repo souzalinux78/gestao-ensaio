@@ -2,31 +2,70 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { alterarSenha } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
+import { safeParseInt, sanitizeString, validateEmail, validatePassword } from '@/lib/validators';
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id);
+    const id = safeParseInt(params.id);
+    if (!id || id <= 0) {
+      return NextResponse.json(
+        { error: 'ID inválido' },
+        { status: 400 }
+      );
+    }
+
     const body = await request.json();
     const { nome, email, tipo, igreja, senha, aprovado } = body;
 
     const updateData: any = {};
-    if (nome) updateData.nome = nome.trim();
+    if (nome) {
+      const nomeSanitizado = sanitizeString(nome, 255);
+      if (!nomeSanitizado) {
+        return NextResponse.json(
+          { error: 'Nome inválido' },
+          { status: 400 }
+        );
+      }
+      updateData.nome = nomeSanitizado;
+    }
     if (email) {
+      if (!validateEmail(email)) {
+        return NextResponse.json(
+          { error: 'Email inválido' },
+          { status: 400 }
+        );
+      }
       // Normalizar email (trim e lowercase)
       updateData.email = email.trim().toLowerCase();
     }
     if (tipo) {
+      if (tipo !== 'admin' && tipo !== 'instrutor') {
+        return NextResponse.json(
+          { error: 'Tipo deve ser "admin" ou "instrutor"' },
+          { status: 400 }
+        );
+      }
       updateData.tipo = tipo;
       // Se mudar para admin, automaticamente aprovar
       if (tipo === 'admin') {
         updateData.aprovado = true;
       }
     }
-    if (igreja !== undefined) updateData.igreja = igreja ? igreja.trim() : null;
+    if (igreja !== undefined) {
+      updateData.igreja = igreja ? sanitizeString(igreja, 255) : null;
+    }
     if (senha) {
+      // Validar senha
+      const passwordValidation = validatePassword(senha);
+      if (!passwordValidation.valid) {
+        return NextResponse.json(
+          { error: passwordValidation.error || 'Senha inválida' },
+          { status: 400 }
+        );
+      }
       // Garantir que a senha seja hasheada corretamente
       const senhaTrimmed = senha.trim();
       if (senhaTrimmed.length > 0) {
@@ -80,7 +119,13 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id);
+    const id = safeParseInt(params.id);
+    if (!id || id <= 0) {
+      return NextResponse.json(
+        { error: 'ID inválido' },
+        { status: 400 }
+      );
+    }
 
     // Não permitir deletar a si mesmo
     const usuario = await prisma.usuario.findUnique({
