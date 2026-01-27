@@ -90,11 +90,11 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg-secondary)]">
       <Header />
       <div className="container mx-auto p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-primary">Relatórios de Ensaios</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Relatórios de Ensaios</h1>
           <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             <button
               onClick={() => router.push('/admin/usuarios')}
@@ -111,34 +111,34 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="mb-6 bg-white p-4 rounded-lg shadow-sm">
+        <div className="mb-6 bg-white dark:bg-[var(--bg-primary)] p-4 rounded-lg shadow-sm">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">Data Início</label>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">Data Início</label>
               <input
                 type="date"
                 value={dataInicio}
                 onChange={(e) => setDataInicio(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-3 py-2 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
               />
             </div>
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">Data Fim</label>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">Data Fim</label>
               <input
                 type="date"
                 value={dataFim}
                 onChange={(e) => setDataFim(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-3 py-2 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
               />
             </div>
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">Igreja</label>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">Igreja</label>
               <input
                 type="text"
                 value={igrejaFiltro}
                 onChange={(e) => setIgrejaFiltro(e.target.value)}
                 placeholder="Digite o nome da igreja"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-3 py-2 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] placeholder:text-gray-400 dark:placeholder:text-[var(--text-tertiary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
               />
             </div>
             <button

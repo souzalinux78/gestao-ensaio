@@ -254,7 +254,7 @@ export default function UsuariosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg-secondary)]">
       <Header />
       <div className="container mx-auto p-4 sm:p-6 max-w-6xl">
         <div className="flex items-center gap-4 mb-6">
@@ -264,15 +264,15 @@ export default function UsuariosPage() {
           >
             ← Voltar
           </button>
-          <h1 className="text-xl sm:text-2xl font-bold text-primary">Gerenciar Usuários</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Gerenciar Usuários</h1>
         </div>
 
         {mensagem && (
           <div
             className={`mb-4 p-4 rounded ${
               mensagem.tipo === 'sucesso'
-                ? 'bg-green-100 text-green-700'
-                : 'bg-red-100 text-red-700'
+                ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+                : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300'
             }`}
           >
             {mensagem.texto}
@@ -281,16 +281,16 @@ export default function UsuariosPage() {
 
         {/* Filtros - Sempre visíveis quando não estiver editando */}
         {!mostrarForm && (
-          <div className="mb-6 bg-white rounded-lg shadow-md border border-gray-200 p-4 sm:p-6">
+          <div className="mb-6 bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md border border-gray-200 dark:border-[var(--border-primary)] p-4 sm:p-6">
             <div className="mb-4">
-              <h2 className="text-lg font-bold text-primary mb-1">🔍 Filtros de Busca</h2>
-              <p className="text-xs sm:text-sm text-gray-600">
+              <h2 className="text-lg font-bold text-primary dark:text-[var(--text-primary)] mb-1">🔍 Filtros de Busca</h2>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-[var(--text-secondary)]">
                 Pesquise por nome, email, igreja ou filtre por status de aprovação
               </p>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block mb-2 text-sm font-semibold text-gray-700">
+                <label className="block mb-2 text-sm font-semibold text-gray-700 dark:text-[var(--text-primary)]">
                   Pesquisar por nome, email ou igreja
                 </label>
                 <input
@@ -298,17 +298,17 @@ export default function UsuariosPage() {
                   value={filtroNome}
                   onChange={(e) => setFiltroNome(e.target.value)}
                   placeholder="Ex: João, email@exemplo.com, CCB..."
-                  className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base"
+                  className="w-full border-2 border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-3 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] placeholder:text-gray-400 dark:placeholder:text-[var(--text-tertiary)] focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base"
                 />
               </div>
               <div>
-                <label className="block mb-2 text-sm font-semibold text-gray-700">
+                <label className="block mb-2 text-sm font-semibold text-gray-700 dark:text-[var(--text-primary)]">
                   Filtrar por status de aprovação
                 </label>
                 <select
                   value={filtroStatus}
                   onChange={(e) => setFiltroStatus(e.target.value as 'todos' | 'aprovados' | 'pendentes')}
-                  className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base bg-white"
+                  className="w-full border-2 border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-3 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-base"
                 >
                   <option value="todos">📋 Todos os usuários</option>
                   <option value="aprovados">✅ Aprovados</option>
@@ -317,8 +317,8 @@ export default function UsuariosPage() {
               </div>
             </div>
             {(filtroNome || filtroStatus !== 'todos') && (
-              <div className="mt-4 pt-4 border-t-2 border-gray-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <span className="text-sm font-medium text-gray-700">
+              <div className="mt-4 pt-4 border-t-2 border-gray-300 dark:border-[var(--border-primary)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <span className="text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">
                   📊 Mostrando <strong className="text-primary">{usuariosFiltrados.length}</strong> de <strong className="text-primary">{usuarios.length}</strong> usuário(s)
                 </span>
                 <button
@@ -337,7 +337,7 @@ export default function UsuariosPage() {
 
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <p className="text-gray-600 text-sm sm:text-base flex-1">
+            <p className="text-gray-600 dark:text-[var(--text-secondary)] text-sm sm:text-base flex-1">
               Gerencie usuários do sistema. Aprove novos cadastros para permitir acesso. Cada instrutor terá acesso apenas aos seus próprios ensaios.
             </p>
             {!mostrarForm && (
@@ -363,73 +363,73 @@ export default function UsuariosPage() {
         </div>
 
         {mostrarForm && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-xl font-semibold mb-4">
+          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-4 text-[var(--text-primary)]">
               {editandoId ? 'Editar Usuário' : 'Novo Usuário'}
             </h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">Nome</label>
+                <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">Nome</label>
                 <input
                   type="text"
                   value={formData.nome}
                   onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                   required
                 />
               </div>
               <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">Email</label>
+                <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">Email</label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                   required
                 />
               </div>
               <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">Tipo</label>
+                <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">Tipo</label>
                 <select
                   value={formData.tipo}
                   onChange={(e) => setFormData({ ...formData, tipo: e.target.value as 'admin' | 'instrutor' })}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 >
                   <option value="instrutor">Instrutor</option>
                   <option value="admin">Administrador</option>
                 </select>
               </div>
               <div>
-                <label className="block mb-2 text-sm font-medium text-gray-700">Igreja/Congregação</label>
+                <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">Igreja/Congregação</label>
                 <input
                   type="text"
                   value={formData.igreja}
                   onChange={(e) => setFormData({ ...formData, igreja: e.target.value })}
                   placeholder="Nome da igreja"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] placeholder:text-gray-400 dark:placeholder:text-[var(--text-tertiary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               {!editandoId && (
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-700">Senha</label>
+                  <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">Senha</label>
                   <input
                     type="password"
                     value={formData.senha}
                     onChange={(e) => setFormData({ ...formData, senha: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                    className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                     required={!editandoId}
                   />
                 </div>
               )}
               {editandoId && (
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-700">Nova Senha (opcional)</label>
+                  <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">Nova Senha (opcional)</label>
                   <input
                     type="password"
                     value={formData.senha}
                     onChange={(e) => setFormData({ ...formData, senha: e.target.value })}
                     placeholder="Deixe em branco para manter a atual"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                    className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] placeholder:text-gray-400 dark:placeholder:text-[var(--text-tertiary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                   />
                 </div>
               )}
@@ -442,11 +442,11 @@ export default function UsuariosPage() {
                       onChange={(e) => setFormData({ ...formData, aprovado: e.target.checked })}
                       className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-accent"
                     />
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">
                       Aprovar usuário automaticamente (permitir login imediato)
                     </span>
                   </label>
-                  <p className="text-xs text-gray-500 mt-1 ml-6">
+                  <p className="text-xs text-gray-500 dark:text-[var(--text-tertiary)] mt-1 ml-6">
                     Se desmarcado, o usuário precisará ser aprovado manualmente antes de poder fazer login.
                   </p>
                 </div>
@@ -471,38 +471,38 @@ export default function UsuariosPage() {
         )}
 
         {carregando && !mostrarForm ? (
-          <div className="text-center py-8 text-gray-500">Carregando usuários...</div>
+          <div className="text-center py-8 text-gray-500 dark:text-[var(--text-secondary)]">Carregando usuários...</div>
         ) : usuarios.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm p-8 text-center text-gray-500 dark:text-[var(--text-secondary)]">
             Nenhum usuário cadastrado.
           </div>
         ) : usuariosFiltrados.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm p-8 text-center text-gray-500 dark:text-[var(--text-secondary)]">
             Nenhum usuário encontrado com os filtros aplicados.
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm overflow-hidden">
             {/* Versão mobile: cards */}
-            <div className="block sm:hidden divide-y">
+            <div className="block sm:hidden divide-y divide-gray-200 dark:divide-[var(--border-primary)]">
               {usuariosFiltrados.map((usuario) => (
                 <div key={usuario.id} className="p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-primary truncate">{usuario.nome}</p>
-                      <p className="text-xs text-gray-600 truncate">{usuario.email}</p>
+                      <p className="font-semibold text-primary dark:text-[var(--text-primary)] truncate">{usuario.nome}</p>
+                      <p className="text-xs text-gray-600 dark:text-[var(--text-secondary)] truncate">{usuario.email}</p>
                       <span className={`inline-block mt-1 px-2 py-1 rounded text-xs ${
                         usuario.tipo === 'admin' ? 'bg-accent/20 text-accent-dark' : 'bg-primary/20 text-primary'
                       }`}>
                         {usuario.tipo === 'admin' ? 'Admin' : 'Instrutor'}
                       </span>
                       {usuario.igreja && (
-                        <p className="text-xs text-gray-500 mt-1">{usuario.igreja}</p>
+                        <p className="text-xs text-gray-500 dark:text-[var(--text-tertiary)] mt-1">{usuario.igreja}</p>
                       )}
                       {usuario.tipo !== 'admin' && (
                         <span className={`inline-block mt-1 px-2 py-1 rounded text-xs ${
                           usuario.aprovado 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-yellow-100 text-yellow-700'
+                            ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300' 
+                            : 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300'
                         }`}>
                           {usuario.aprovado ? '✓ Aprovado' : '⏳ Aguardando'}
                         </span>
@@ -558,14 +558,14 @@ export default function UsuariosPage() {
                     <th className="px-4 py-3 text-center font-semibold w-[15%]">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
+                <tbody className="divide-y divide-gray-200 dark:divide-[var(--border-primary)] bg-white dark:bg-[var(--bg-primary)]">
                   {usuariosFiltrados.map((usuario) => (
-                    <tr key={usuario.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={usuario.id} className="hover:bg-gray-50 dark:hover:bg-[var(--bg-secondary)] transition-colors">
                       <td className="px-4 py-3 align-middle">
-                        <span className="font-medium text-gray-900">{usuario.nome}</span>
+                        <span className="font-medium text-gray-900 dark:text-[var(--text-primary)]">{usuario.nome}</span>
                       </td>
                       <td className="px-4 py-3 align-middle">
-                        <span className="text-sm text-gray-600 break-words">{usuario.email}</span>
+                        <span className="text-sm text-gray-600 dark:text-[var(--text-secondary)] break-words">{usuario.email}</span>
                       </td>
                       <td className="px-4 py-3 align-middle">
                         <span className={`inline-block px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
@@ -575,19 +575,19 @@ export default function UsuariosPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 align-middle">
-                        <span className="text-sm text-gray-600 break-words">{usuario.igreja || '-'}</span>
+                        <span className="text-sm text-gray-600 dark:text-[var(--text-secondary)] break-words">{usuario.igreja || '-'}</span>
                       </td>
                       <td className="px-4 py-3 align-middle">
                         {usuario.tipo !== 'admin' ? (
                           <span className={`inline-block px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
                             usuario.aprovado 
-                              ? 'bg-green-100 text-green-700' 
-                              : 'bg-yellow-100 text-yellow-700'
+                              ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300' 
+                              : 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300'
                           }`}>
                             {usuario.aprovado ? '✓ Aprovado' : '⏳ Aguardando'}
                           </span>
                         ) : (
-                          <span className="text-xs text-gray-400">-</span>
+                          <span className="text-xs text-gray-400 dark:text-[var(--text-tertiary)]">-</span>
                         )}
                       </td>
                       <td className="px-4 py-3 align-middle">

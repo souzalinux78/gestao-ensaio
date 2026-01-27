@@ -20,27 +20,27 @@ export default function RelatorioTable({
   onEditar,
 }: RelatorioTableProps) {
   return (
-    <div className="overflow-x-auto bg-white rounded-lg shadow-sm">
+    <div className="overflow-x-auto bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm">
       <div className="block sm:hidden">
         {/* Versão mobile: cards */}
         {ensaios.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">Nenhum ensaio encontrado</div>
+          <div className="p-8 text-center text-gray-500 dark:text-[var(--text-secondary)]">Nenhum ensaio encontrado</div>
         ) : (
-          <div className="divide-y">
+          <div className="divide-y divide-gray-200 dark:divide-[var(--border-primary)]">
             {ensaios.map((ensaio) => (
               <div key={ensaio.id} className="p-4">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <p className="font-semibold text-primary">
+                    <p className="font-semibold text-primary dark:text-[var(--text-primary)]">
                       {format(new Date(ensaio.data), 'dd/MM/yyyy', { locale: ptBR })}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-[var(--text-secondary)]">
                       Instrutor: {ensaio.instrutor?.nome || 'N/A'}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-[var(--text-secondary)]">
                       Igreja: {ensaio.instrutor?.igreja || '-'}
                     </p>
-                    <p className="text-sm text-gray-600">Total: {ensaio.totalGeral}</p>
+                    <p className="text-sm text-gray-600 dark:text-[var(--text-secondary)]">Total: {ensaio.totalGeral}</p>
                   </div>
                   <div className="flex gap-2 items-center flex-wrap">
                     {onEditar ? (
@@ -85,26 +85,26 @@ export default function RelatorioTable({
             <th className="px-4 py-3 text-left font-semibold">Ações</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-gray-200 dark:divide-[var(--border-primary)]">
           {ensaios.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+              <td colSpan={5} className="px-4 py-8 text-center text-gray-500 dark:text-[var(--text-secondary)]">
                 Nenhum ensaio encontrado
               </td>
             </tr>
           ) : (
             ensaios.map((ensaio) => (
-              <tr key={ensaio.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-3">
+              <tr key={ensaio.id} className="hover:bg-gray-50 dark:hover:bg-[var(--bg-secondary)] transition-colors">
+                <td className="px-4 py-3 text-[var(--text-primary)]">
                   {format(new Date(ensaio.data), 'dd/MM/yyyy', { locale: ptBR })}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 text-[var(--text-primary)]">
                   {ensaio.instrutor?.nome || 'N/A'}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 text-[var(--text-primary)]">
                   {ensaio.instrutor?.igreja || '-'}
                 </td>
-                <td className="px-4 py-3 font-medium">{ensaio.totalGeral}</td>
+                <td className="px-4 py-3 font-medium text-[var(--text-primary)]">{ensaio.totalGeral}</td>
                 <td className="px-4 py-3">
                   <div className="flex gap-2 items-center flex-wrap">
                     {onEditar ? (

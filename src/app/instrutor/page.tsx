@@ -81,11 +81,11 @@ export default function InstrutorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg-secondary)]">
       <Header />
       <div className="container mx-auto p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-primary">Meus Ensaios</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Meus Ensaios</h1>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <button
               onClick={() => router.push('/instrutor/contatos')}

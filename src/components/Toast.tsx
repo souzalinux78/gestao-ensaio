@@ -28,7 +28,7 @@ export default function Toast({ tipo, texto, onClose, duracao = 5000 }: ToastPro
 
   return (
     <div className="animate-slide-in-right max-w-md w-full sm:w-auto">
-      <div className={`bg-white rounded-xl shadow-strong p-4 border-l-4 ${borderColors[tipo]} backdrop-blur-sm`}>
+      <div className={`bg-white dark:bg-[var(--bg-primary)] rounded-xl shadow-strong p-4 border-l-4 ${borderColors[tipo]} backdrop-blur-sm`}>
         <Alert tipo={tipo} texto={texto} onClose={onClose} />
       </div>
     </div>

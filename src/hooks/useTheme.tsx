@@ -69,11 +69,9 @@ export function useTheme() {
   // Alternar tema
   const toggleTheme = () => {
     const newTheme: Theme = theme === 'light' ? 'dark' : 'light';
-    console.log('🔄 Alternando tema:', newTheme);
     setTheme(newTheme);
     applyTheme(newTheme);
     localStorage.setItem(THEME_STORAGE_KEY, newTheme);
-    console.log('✅ Tema aplicado. data-theme:', document.documentElement.getAttribute('data-theme'));
   };
 
   // Definir tema específico
