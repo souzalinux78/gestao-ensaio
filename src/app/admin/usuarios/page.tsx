@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Usuario } from '@/types';
+import { apiFetch } from '@/lib/api-client';
 
 export default function UsuariosPage() {
   const router = useRouter();
@@ -37,13 +38,17 @@ export default function UsuariosPage() {
   async function carregarUsuarios() {
     setCarregando(true);
     try {
-      const res = await fetch('/api/usuarios');
+      const res = await apiFetch('/api/usuarios');
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Erro ao carregar usuários');
+      }
       const data = await res.json();
       setUsuarios(data);
       // Aplicar filtros com os dados carregados e os filtros atuais
       aplicarFiltros(data, filtroNome, filtroStatus);
-    } catch (error) {
-      setMensagem({ tipo: 'erro', texto: 'Erro ao carregar usuários' });
+    } catch (error: any) {
+      setMensagem({ tipo: 'erro', texto: error.message || 'Erro ao carregar usuários' });
     } finally {
       setCarregando(false);
     }
@@ -145,9 +150,8 @@ export default function UsuariosPage() {
         body.aprovado = formData.tipo === 'admin' ? true : (formData.aprovado ?? false);
       }
 
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
 
@@ -181,9 +185,8 @@ export default function UsuariosPage() {
     setMensagem(null);
 
     try {
-      const res = await fetch('/api/usuarios/alterar-senha', {
+      const res = await apiFetch('/api/usuarios/alterar-senha', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           usuarioId,
           senhaAtual: senhaForm.senhaAtual,
@@ -208,9 +211,8 @@ export default function UsuariosPage() {
 
   async function aprovarUsuario(id: number, aprovado: boolean) {
     try {
-      const res = await fetch(`/api/usuarios/${id}/aprovar`, {
+      const res = await apiFetch(`/api/usuarios/${id}/aprovar`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ aprovado }),
       });
 
@@ -235,7 +237,7 @@ export default function UsuariosPage() {
     }
 
     try {
-      const res = await fetch(`/api/usuarios/${id}`, {
+      const res = await apiFetch(`/api/usuarios/${id}`, {
         method: 'DELETE',
       });
 
