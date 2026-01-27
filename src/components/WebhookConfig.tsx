@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Configuracoes } from '@/types';
+import { apiFetch } from '@/lib/api-client';
 
 export default function WebhookConfig() {
   const [config, setConfig] = useState<Configuracoes | null>(null);
@@ -17,7 +18,7 @@ export default function WebhookConfig() {
   async function carregarConfiguracoes() {
     setCarregando(true);
     try {
-      const res = await fetch('/api/configuracoes');
+      const res = await apiFetch('/api/configuracoes');
       const data = await res.json();
       setConfig(data);
       setWebhook(data.webhook || '');
@@ -33,9 +34,8 @@ export default function WebhookConfig() {
     setMensagem(null);
 
     try {
-      const res = await fetch('/api/configuracoes', {
+      const res = await apiFetch('/api/configuracoes', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ webhook }),
       });
 

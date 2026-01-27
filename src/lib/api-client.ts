@@ -2,7 +2,7 @@ import { obterSessao } from './session';
 
 /**
  * Cliente HTTP que adiciona autenticação automaticamente
- * Usa o ID do usuário da sessão no header Authorization
+ * Prioriza accessToken (JWT) se disponível, senão usa ID (compatibilidade)
  */
 export async function apiFetch(
   url: string,
@@ -32,7 +32,12 @@ export async function apiFetch(
     }
   }
 
-  if (sessao?.id) {
+  // PRIORIDADE 1: Usar accessToken (JWT) se disponível
+  if (sessao && 'accessToken' in sessao && sessao.accessToken) {
+    headers['Authorization'] = `Bearer ${sessao.accessToken}`;
+  } 
+  // PRIORIDADE 2: Fallback para sistema antigo (compatibilidade)
+  else if (sessao?.id) {
     headers['Authorization'] = `Bearer ${sessao.id}`;
   }
 

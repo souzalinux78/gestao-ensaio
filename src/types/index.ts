@@ -8,6 +8,7 @@ export interface Usuario {
   igreja?: string | null;
   aprovado?: boolean;
   tenantId?: number | null; // ID do tenant (multi-tenant)
+  accessToken?: string; // JWT token (opcional, presente após login)
 }
 
 export interface Instrumento {
