@@ -146,7 +146,7 @@ export async function PUT(
     }
 
     // Deletar dados antigos em paralelo
-    const deletePromises = [
+    const deletePromises: Promise<any>[] = [
       prisma.ensaioInstrumento.deleteMany({ where: { ensaioId: id } }),
       prisma.ensaioMusico.deleteMany({ where: { ensaioId: id } }),
     ];
