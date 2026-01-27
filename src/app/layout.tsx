@@ -64,70 +64,59 @@ export default function RootLayout({
             __html: `
               if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
                 let registration = null;
+                let isReloading = false;
+                let lastUpdateCheck = 0;
+                const UPDATE_CHECK_INTERVAL = 60000; // 1 minuto entre verificações
                 
-                // Função para limpar cache e forçar atualização
-                function limparCacheEAtualizar() {
-                  console.log('🧹 Limpando cache e forçando atualização...');
-                  
-                  // Limpar todos os caches
-                  if ('caches' in window) {
-                    caches.keys().then(function(cacheNames) {
-                      return Promise.all(
-                        cacheNames.map(function(cacheName) {
-                          console.log('🗑️ Removendo cache:', cacheName);
-                          return caches.delete(cacheName);
-                        })
-                      );
-                    }).then(function() {
-                      console.log('✅ Cache limpo!');
-                    });
+                // Prevenir múltiplos reloads
+                function safeReload() {
+                  if (isReloading) return;
+                  isReloading = true;
+                  console.log('🔄 Recarregando página para aplicar atualização...');
+                  setTimeout(function() {
+                    window.location.reload();
+                  }, 1000);
+                }
+                
+                // Verificar atualizações de forma controlada
+                function verificarAtualizacoes() {
+                  const now = Date.now();
+                  // Evitar verificações muito frequentes
+                  if (now - lastUpdateCheck < UPDATE_CHECK_INTERVAL) {
+                    return;
                   }
+                  lastUpdateCheck = now;
                   
-                  // Forçar atualização do service worker
                   if (registration) {
-                    registration.update();
+                    registration.update().catch(function(err) {
+                      console.warn('Erro ao verificar atualizações:', err);
+                    });
                   }
                 }
                 
                 // Registrar Service Worker
                 window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js?t=' + Date.now())
+                  navigator.serviceWorker.register('/sw.js')
                     .then(function(reg) {
                       registration = reg;
                       console.log('✅ Service Worker registrado:', reg.scope);
                       
-                      // Verificar atualizações imediatamente
-                      reg.update();
+                      // Verificar atualizações apenas uma vez ao carregar
+                      verificarAtualizacoes();
                       
-                      // Verificar atualizações a cada vez que a página ganha foco
-                      window.addEventListener('focus', function() {
-                        console.log('👁️ Página em foco - verificando atualizações...');
-                        reg.update();
-                        limparCacheEAtualizar();
-                      });
-                      
-                      // Verificar atualizações quando voltar para a página
-                      document.addEventListener('visibilitychange', function() {
-                        if (!document.hidden) {
-                          console.log('👁️ Página visível - verificando atualizações...');
-                          reg.update();
-                          limparCacheEAtualizar();
-                        }
-                      });
-                      
-                      // Detectar quando há nova versão disponível
+                      // Detectar quando há nova versão disponível (apenas quando realmente houver)
                       reg.addEventListener('updatefound', function() {
                         const newWorker = reg.installing;
                         if (newWorker) {
                           newWorker.addEventListener('statechange', function() {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                              console.log('🔄 Nova versão disponível! Atualizando...');
-                              // Forçar atualização imediata
+                            // Só recarregar se realmente houver uma nova versão instalada
+                            // e já houver um service worker ativo (não é a primeira instalação)
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller && !isReloading) {
+                              console.log('🔄 Nova versão do Service Worker disponível');
+                              // Pedir para o novo worker ativar
                               newWorker.postMessage({ type: 'SKIP_WAITING' });
-                              // Recarregar página após 1 segundo
-                              setTimeout(function() {
-                                window.location.reload();
-                              }, 1000);
+                              // Recarregar apenas uma vez
+                              safeReload();
                             }
                           });
                         }
@@ -138,38 +127,21 @@ export default function RootLayout({
                     });
                 });
                 
-                // Limpar cache ao entrar no app
-                window.addEventListener('pageshow', function(event) {
-                  if (event.persisted) {
-                    // Página foi carregada do cache (back/forward)
-                    console.log('📄 Página carregada do cache - limpando...');
-                    limparCacheEAtualizar();
-                  } else {
-                    // Página carregada normalmente
-                    console.log('📄 Página carregada - verificando atualizações...');
-                    if (registration) {
-                      registration.update();
-                    }
+                // Verificar atualizações quando voltar para a página (com intervalo)
+                document.addEventListener('visibilitychange', function() {
+                  if (!document.hidden && !isReloading) {
+                    // Aguardar um pouco antes de verificar (evitar verificação imediata)
+                    setTimeout(function() {
+                      verificarAtualizacoes();
+                    }, 2000);
                   }
                 });
                 
-                // Limpar cache ao iniciar o app
-                if ('caches' in window) {
-                  caches.keys().then(function(cacheNames) {
-                    console.log('🔍 Caches encontrados:', cacheNames.length);
-                    if (cacheNames.length > 0) {
-                      limparCacheEAtualizar();
-                    }
-                  });
-                }
-                
-                // Escutar mensagens do Service Worker
+                // Escutar mensagens do Service Worker (apenas para reload quando necessário)
                 navigator.serviceWorker.addEventListener('message', function(event) {
-                  if (event.data && event.data.type === 'SW_ACTIVATED') {
-                    console.log('🔄 Service Worker ativado - recarregando página...');
-                    setTimeout(function() {
-                      window.location.reload();
-                    }, 500);
+                  if (event.data && event.data.type === 'SW_ACTIVATED' && !isReloading) {
+                    console.log('🔄 Service Worker ativado - aplicando atualização');
+                    safeReload();
                   }
                 });
               }

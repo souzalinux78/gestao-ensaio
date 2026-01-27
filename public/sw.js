@@ -43,17 +43,14 @@ self.addEventListener('activate', (event) => {
       );
     }).then(() => {
       // Limpar cache do navegador também
-      console.log('[SW] Limpando cache do navegador...');
+      console.log('[SW] Cache limpo, assumindo controle...');
       return self.clients.claim();
     })
   );
   
-  // Notificar todas as abas para recarregar
-  return self.clients.matchAll().then((clients) => {
-    clients.forEach((client) => {
-      client.postMessage({ type: 'SW_ACTIVATED', cacheName: CACHE_NAME });
-    });
-  });
+  // NÃO notificar para recarregar automaticamente
+  // Apenas assumir controle silenciosamente
+  // O reload só acontecerá quando realmente houver uma nova versão
 });
 
 // Interceptar requisições - ESTRATÉGIA NETWORK FIRST (sempre buscar versão mais recente)
