@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/AdminLayout';
 import WebhookConfig from '@/components/WebhookConfig';
 import ContatosManager from '@/components/ContatosManager';
+import PushNotificationButton from '@/components/PushNotificationButton';
 
 export default function ConfiguracoesPage() {
   const router = useRouter();
-  const [abaAtiva, setAbaAtiva] = useState<'webhook' | 'contatos'>('webhook');
+  const [abaAtiva, setAbaAtiva] = useState<'webhook' | 'contatos' | 'notificacoes'>('webhook');
 
   return (
     <AdminLayout>
@@ -40,6 +41,16 @@ export default function ConfiguracoesPage() {
             >
               Contatos
             </button>
+            <button
+              onClick={() => setAbaAtiva('notificacoes')}
+              className={`px-4 py-3 font-semibold border-b-2 transition-colors whitespace-nowrap ${
+                abaAtiva === 'notificacoes'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              Notificações Push
+            </button>
           </div>
         </div>
 
@@ -52,6 +63,17 @@ export default function ConfiguracoesPage() {
               Cada instrutor pode gerenciar seus próprios contatos na área do instrutor (menu "Meus Contatos").
               Quando um relatório for gerado, os dados serão enviados apenas para os contatos daquele instrutor específico.
             </p>
+          </div>
+        )}
+        {abaAtiva === 'notificacoes' && (
+          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm p-6">
+            <h2 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">
+              Notificações Push
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-[var(--text-secondary)] mb-4">
+              Ative as notificações push para receber alertas mesmo quando o aplicativo estiver fechado.
+            </p>
+            <PushNotificationButton />
           </div>
         )}
       </div>

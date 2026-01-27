@@ -152,3 +152,83 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
+
+// ============================================
+// PUSH NOTIFICATIONS
+// ============================================
+
+// Receber push notification
+self.addEventListener('push', (event) => {
+  console.log('[SW] Push notification recebida:', event);
+  
+  let notificationData = {
+    title: 'Gestão de Ensaio',
+    body: 'Você tem uma nova notificação',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    tag: 'gestao-ensaio-notification',
+  };
+
+  // Se houver dados no push, usar eles
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      notificationData = {
+        title: data.title || notificationData.title,
+        body: data.body || notificationData.body,
+        icon: data.icon || notificationData.icon,
+        badge: data.badge || notificationData.badge,
+        tag: data.tag || notificationData.tag,
+        data: data.data || {},
+      };
+    } catch (error) {
+      console.error('[SW] Erro ao parsear dados do push:', error);
+      // Usar texto simples se não for JSON
+      notificationData.body = event.data.text() || notificationData.body;
+    }
+  }
+
+  const promiseChain = self.registration.showNotification(notificationData.title, {
+    body: notificationData.body,
+    icon: notificationData.icon,
+    badge: notificationData.badge,
+    tag: notificationData.tag,
+    data: notificationData.data,
+    requireInteraction: false,
+    vibrate: [200, 100, 200],
+  });
+
+  event.waitUntil(promiseChain);
+});
+
+// Clique na notificação
+self.addEventListener('notificationclick', (event) => {
+  console.log('[SW] Notificação clicada:', event);
+  
+  event.notification.close();
+
+  // Abrir ou focar na aplicação
+  const promiseChain = clients.matchAll({
+    type: 'window',
+    includeUncontrolled: true,
+  }).then((windowClients) => {
+    // Se já houver uma janela aberta, focar nela
+    for (let i = 0; i < windowClients.length; i++) {
+      const client = windowClients[i];
+      if (client.url === '/' && 'focus' in client) {
+        return client.focus();
+      }
+    }
+    // Se não houver, abrir nova janela
+    if (clients.openWindow) {
+      return clients.openWindow('/');
+    }
+  });
+
+  event.waitUntil(promiseChain);
+});
+
+// Fechar notificação
+self.addEventListener('notificationclose', (event) => {
+  console.log('[SW] Notificação fechada:', event);
+});
