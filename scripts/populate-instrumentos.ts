@@ -47,11 +47,30 @@ const INSTRUMENTOS_PADRAO = [
 async function popularInstrumentos() {
   console.log('Populando instrumentos padrão...');
   
+  // Obter tenant padrão (sistema-padrao)
+  const tenantPadrao = await prisma.tenant.findUnique({
+    where: { slug: 'sistema-padrao' },
+  });
+  
+  if (!tenantPadrao) {
+    throw new Error('Tenant padrão não encontrado! Execute as migrations primeiro.');
+  }
+  
+  console.log(`Usando tenant: ${tenantPadrao.nome} (ID: ${tenantPadrao.id})`);
+  
   for (const nome of INSTRUMENTOS_PADRAO) {
     await prisma.instrumento.upsert({
-      where: { nome },
+      where: {
+        tenantId_nome: {
+          tenantId: tenantPadrao.id,
+          nome: nome,
+        },
+      },
       update: {},
-      create: { nome },
+      create: {
+        nome,
+        tenantId: tenantPadrao.id,
+      },
     });
     console.log(`✓ ${nome}`);
   }
