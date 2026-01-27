@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
+import { resolveTenantFromRequest } from '@/lib/middleware';
 import { validateEmail, validatePassword, sanitizeString } from '@/lib/validators';
 import bcrypt from 'bcryptjs';
 
@@ -22,9 +23,16 @@ export async function GET(request: NextRequest) {
     const limit = limitParam ? Math.min(parseInt(limitParam), 100) : 50; // Max 100, default 50
     const skip = (page - 1) * limit;
 
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
     // Buscar usuários e total em paralelo
     const [usuarios, total] = await Promise.all([
       prisma.usuario.findMany({
+        where: {
+          tenantId: tenantIdFinal, // ISOLAMENTO: admin vê apenas usuários do seu tenant
+        },
         orderBy: {
           nome: 'asc',
         },
@@ -40,7 +48,11 @@ export async function GET(request: NextRequest) {
         skip,
         take: limit,
       }),
-      prisma.usuario.count(),
+      prisma.usuario.count({
+        where: {
+          tenantId: tenantIdFinal, // ISOLAMENTO: contar apenas usuários do tenant
+        },
+      }),
     ]);
 
   // Se não há parâmetros de paginação, retornar formato antigo (compatibilidade)
@@ -123,6 +135,10 @@ export async function POST(request: NextRequest) {
     // Se for admin criando, usar o valor de aprovado fornecido (ou true para admin)
     const usuarioAprovado = aprovado !== undefined ? aprovado : (tipoFinal === 'admin' ? true : false);
 
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
     // Criar usuário diretamente com aprovado (evita query duplicada)
     const senhaHash = await bcrypt.hash(senha, 10);
     const usuario = await prisma.usuario.create({
@@ -133,6 +149,7 @@ export async function POST(request: NextRequest) {
         tipo: tipoFinal,
         igreja: igrejaSanitizada,
         aprovado: usuarioAprovado,
+        tenantId: tenantIdFinal, // ISOLAMENTO: associar ao tenant
       },
       select: {
         id: true,

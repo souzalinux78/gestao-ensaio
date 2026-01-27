@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
+import { resolveTenantFromRequest } from '@/lib/middleware';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -11,8 +12,14 @@ export async function GET(request: NextRequest) {
 
   // Obter usuário da requisição para verificar se é admin
   const usuario = await obterUsuarioDaRequisicao(request);
+  
+  // Obter tenantId para isolamento de dados
+  const tenantId = await resolveTenantFromRequest(request);
+  const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
 
-  const where: any = {};
+  const where: any = {
+    tenantId: tenantIdFinal, // ISOLAMENTO: filtrar por tenant
+  };
   
   // Se for instrutor (não admin), filtrar apenas seus ensaios
   // Admin pode ver todos os ensaios (a menos que especifique instrutorId)
@@ -134,6 +141,10 @@ export async function POST(request: NextRequest) {
 
     const musicosSelecionados = Array.isArray(musicos) ? musicos : [];
     
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+    
     // Validar instrutor e musicos em paralelo
     const [instrutor, totalMusicos] = await Promise.all([
       prisma.usuario.findUnique({
@@ -144,12 +155,21 @@ export async function POST(request: NextRequest) {
             where: {
               id: { in: musicosSelecionados.map((item: any) => item.musicoId) },
               instrutorId: instrutorIdFinal,
+              tenantId: tenantIdFinal, // ISOLAMENTO: garantir que músicos são do mesmo tenant
             },
           })
         : Promise.resolve(0),
     ]);
 
     if (!instrutor) {
+      return NextResponse.json(
+        { error: 'Instrutor não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // ISOLAMENTO: Verificar se instrutor pertence ao mesmo tenant
+    if (instrutor.tenantId !== tenantIdFinal) {
       return NextResponse.json(
         { error: 'Instrutor não encontrado' },
         { status: 404 }
@@ -167,6 +187,7 @@ export async function POST(request: NextRequest) {
       data: {
         data: new Date(data),
         instrutorId: instrutorIdFinal,
+        tenantId: tenantIdFinal, // ISOLAMENTO: associar ao tenant
         totalGeral,
         hinosEnsaidos: hinosEnsaidos || null,
         regencia: regencia || null,

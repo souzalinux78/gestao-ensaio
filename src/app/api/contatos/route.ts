@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
+import { resolveTenantFromRequest } from '@/lib/middleware';
 import { safeParseInt, sanitizeString } from '@/lib/validators';
 
 export async function GET(request: NextRequest) {
@@ -32,9 +33,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
     const contatos = await prisma.contato.findMany({
       where: {
         usuarioId: usuarioId,
+        tenantId: tenantIdFinal, // ISOLAMENTO: filtrar por tenant
       },
       orderBy: {
         nome: 'asc',
@@ -80,11 +86,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
+    // Validar se usuário pertence ao mesmo tenant
+    const usuarioExistente = await prisma.usuario.findUnique({
+      where: { id: usuarioIdFinal },
+      select: { id: true, tenantId: true },
+    });
+
+    if (!usuarioExistente) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // ISOLAMENTO: Verificar se usuário pertence ao mesmo tenant
+    if (usuarioExistente.tenantId !== tenantIdFinal) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      );
+    }
+
     const contato = await prisma.contato.create({
       data: {
         nome: nomeSanitizado,
         telefone: telefoneSanitizado,
         usuarioId: usuarioIdFinal,
+        tenantId: tenantIdFinal, // ISOLAMENTO: associar ao tenant
       },
     });
 

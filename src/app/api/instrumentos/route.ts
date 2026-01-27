@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { resolveTenantFromRequest } from '@/lib/middleware';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Obter tenantId para isolamento
+  const tenantId = await resolveTenantFromRequest(request);
+  const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
   const instrumentos = await prisma.instrumento.findMany({
+    where: {
+      tenantId: tenantIdFinal, // ISOLAMENTO: filtrar por tenant (ou null para instrumentos globais)
+    },
     orderBy: {
       nome: 'asc',
     },
@@ -21,8 +29,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
     const instrumento = await prisma.instrumento.create({
-      data: { nome: nome.trim() },
+      data: { 
+        nome: nome.trim(),
+        tenantId: tenantIdFinal, // ISOLAMENTO: associar ao tenant
+      },
     });
 
     return NextResponse.json(instrumento);

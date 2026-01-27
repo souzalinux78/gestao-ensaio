@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
+import { resolveTenantFromRequest } from '@/lib/middleware';
 import { getConfig, clearConfigCache } from '@/lib/config-cache';
 
 export async function GET(request: NextRequest) {
@@ -22,8 +23,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
     // Buscar configuração com cache
-    const config = await getConfig();
+    const config = await getConfig(tenantIdFinal);
 
     return NextResponse.json(config);
   } catch (error: any) {
@@ -102,8 +107,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
     // Buscar configuração existente ou criar nova
-    let config = await prisma.configuracoes.findFirst();
+    let config = await prisma.configuracoes.findUnique({
+      where: { tenantId: tenantIdFinal }, // ISOLAMENTO: buscar por tenant
+    });
 
     if (config) {
       // Atualizar configuração existente
@@ -118,6 +129,7 @@ export async function POST(request: NextRequest) {
       config = await prisma.configuracoes.create({
         data: {
           webhook: webhook || null,
+          tenantId: tenantIdFinal, // ISOLAMENTO: associar ao tenant
         },
       });
     }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
+import { resolveTenantFromRequest } from '@/lib/middleware';
 import { safeParseInt, sanitizeString } from '@/lib/validators';
 
 export async function PUT(
@@ -35,6 +36,18 @@ export async function PUT(
     });
 
     if (!contatoExistente) {
+      return NextResponse.json(
+        { error: 'Contato não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
+    // ISOLAMENTO: Verificar se contato pertence ao mesmo tenant
+    if (contatoExistente.tenantId !== tenantIdFinal) {
       return NextResponse.json(
         { error: 'Contato não encontrado' },
         { status: 404 }
@@ -92,6 +105,18 @@ export async function DELETE(
     });
 
     if (!contatoExistente) {
+      return NextResponse.json(
+        { error: 'Contato não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
+    // ISOLAMENTO: Verificar se contato pertence ao mesmo tenant
+    if (contatoExistente.tenantId !== tenantIdFinal) {
       return NextResponse.json(
         { error: 'Contato não encontrado' },
         { status: 404 }

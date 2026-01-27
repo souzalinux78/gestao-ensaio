@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
+import { resolveTenantFromRequest } from '@/lib/middleware';
 
 export async function GET(request: NextRequest) {
   try {
@@ -37,9 +38,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
     const musicos = await prisma.musico.findMany({
       where: {
         instrutorId,
+        tenantId: tenantIdFinal, // ISOLAMENTO: filtrar por tenant
       },
       orderBy: {
         nome: 'asc',
@@ -87,9 +93,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
     const instrutorExistente = await prisma.usuario.findUnique({
       where: { id: instrutorIdFinal },
-      select: { id: true, tipo: true },
+      select: { id: true, tipo: true, tenantId: true },
     });
 
     if (!instrutorExistente) {
@@ -99,10 +109,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // ISOLAMENTO: Verificar se instrutor pertence ao mesmo tenant
+    if (instrutorExistente.tenantId !== tenantIdFinal) {
+      return NextResponse.json(
+        { error: 'Instrutor não encontrado' },
+        { status: 404 }
+      );
+    }
+
     const musico = await prisma.musico.create({
       data: {
         nome: nome.trim(),
         instrutorId: instrutorIdFinal,
+        tenantId: tenantIdFinal, // ISOLAMENTO: associar ao tenant
       },
     });
 

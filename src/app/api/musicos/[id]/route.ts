@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
+import { resolveTenantFromRequest } from '@/lib/middleware';
 
 export async function PUT(
   request: NextRequest,
@@ -22,6 +23,18 @@ export async function PUT(
     });
 
     if (!musicoExistente) {
+      return NextResponse.json(
+        { error: 'Músico não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
+    // ISOLAMENTO: Verificar se músico pertence ao mesmo tenant
+    if (musicoExistente.tenantId !== tenantIdFinal) {
       return NextResponse.json(
         { error: 'Músico não encontrado' },
         { status: 404 }
@@ -77,6 +90,18 @@ export async function DELETE(
     });
 
     if (!musicoExistente) {
+      return NextResponse.json(
+        { error: 'Músico não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
+    // ISOLAMENTO: Verificar se músico pertence ao mesmo tenant
+    if (musicoExistente.tenantId !== tenantIdFinal) {
       return NextResponse.json(
         { error: 'Músico não encontrado' },
         { status: 404 }

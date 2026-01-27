@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
+import { resolveTenantFromRequest } from '@/lib/middleware';
 import { safeParseInt } from '@/lib/validators';
 
 // GET - Buscar um ensaio específico
@@ -26,6 +27,10 @@ export async function GET(
       );
     }
 
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
     const ensaio = await prisma.ensaio.findUnique({
       where: { id },
       include: {
@@ -50,6 +55,14 @@ export async function GET(
     });
 
     if (!ensaio) {
+      return NextResponse.json(
+        { error: 'Ensaio não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // ISOLAMENTO: Verificar se ensaio pertence ao mesmo tenant
+    if (ensaio.tenantId !== tenantIdFinal) {
       return NextResponse.json(
         { error: 'Ensaio não encontrado' },
         { status: 404 }
@@ -89,6 +102,10 @@ export async function PUT(
     const body = await request.json();
     const { data, instrumentos, funcoes, totalGeral, hinosEnsaidos, regencia, musicos } = body;
 
+    // Obter tenantId para isolamento
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+
     // Verificar se o ensaio existe
     const ensaioExistente = await prisma.ensaio.findUnique({
       where: { id },
@@ -103,6 +120,14 @@ export async function PUT(
     });
 
     if (!ensaioExistente) {
+      return NextResponse.json(
+        { error: 'Ensaio não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // ISOLAMENTO: Verificar se ensaio pertence ao mesmo tenant
+    if (ensaioExistente.tenantId !== tenantIdFinal) {
       return NextResponse.json(
         { error: 'Ensaio não encontrado' },
         { status: 404 }
@@ -135,6 +160,7 @@ export async function PUT(
         where: {
           id: { in: ids },
           instrutorId: ensaioExistente.instrutorId,
+          tenantId: tenantIdFinal, // ISOLAMENTO: garantir que músicos são do mesmo tenant
         },
       });
       if (totalMusicos !== ids.length) {
