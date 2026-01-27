@@ -20,3 +20,4 @@ Todas as alterações importantes do projeto.
 
 ## v1.0.6 - 2026-01-27
 - release: v1.0.5
+## v1.0.7 - 2026-01-27
