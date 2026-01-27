@@ -1,6 +1,6 @@
 {
   "name": "gestao-ensaio",
-  "version": "2.0.28",
+  "version": "2.0.29",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -26,7 +26,8 @@
     "jspdf": "^2.5.1",
     "date-fns": "^2.30.0",
     "zod": "^3.22.4",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "winston": "^3.19.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
