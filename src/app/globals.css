@@ -6,11 +6,15 @@
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
   }
   
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Safe area para iOS */
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
   }
   
   input, textarea, select {
@@ -20,6 +24,12 @@
   @media (max-width: 640px) {
     input, textarea, select {
       font-size: 16px; /* Mantém tamanho para evitar zoom */
+    }
+    
+    /* Touch targets mínimos para mobile */
+    button, a[role="button"] {
+      min-height: 44px;
+      min-width: 44px;
     }
   }
 }
@@ -58,4 +68,87 @@
 
 .animate-bounce {
   animation: bounce 1s infinite;
+}
+
+/* Componentes utilitários */
+@layer components {
+  /* Botão padrão */
+  .btn {
+    @apply px-4 py-2.5 rounded-button font-medium transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-dark focus:ring-primary;
+    @apply shadow-md hover:shadow-lg active:scale-[0.98];
+  }
+  
+  .btn-success {
+    @apply bg-success text-white hover:bg-success-dark focus:ring-success;
+    @apply shadow-md hover:shadow-lg active:scale-[0.98];
+  }
+  
+  .btn-error {
+    @apply bg-error text-white hover:bg-error-dark focus:ring-error;
+    @apply shadow-md hover:shadow-lg active:scale-[0.98];
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-500 text-white hover:bg-gray-600 focus:ring-gray-500;
+    @apply shadow-md hover:shadow-lg active:scale-[0.98];
+  }
+  
+  /* Input padrão */
+  .input {
+    @apply w-full border border-gray-300 rounded-lg px-4 py-2.5;
+    @apply focus:ring-2 focus:ring-primary focus:border-primary;
+    @apply transition-colors duration-200;
+    @apply placeholder:text-gray-400;
+  }
+  
+  /* Card padrão */
+  .card {
+    @apply bg-white rounded-card shadow-soft p-4 sm:p-6;
+    @apply transition-shadow duration-200;
+  }
+  
+  .card-hover {
+    @apply hover:shadow-medium;
+  }
+  
+  /* Alert/Mensagem */
+  .alert {
+    @apply p-4 rounded-lg border;
+  }
+  
+  .alert-success {
+    @apply bg-green-50 border-green-200 text-green-800;
+  }
+  
+  .alert-error {
+    @apply bg-red-50 border-red-200 text-red-800;
+  }
+  
+  .alert-warning {
+    @apply bg-yellow-50 border-yellow-200 text-yellow-800;
+  }
+  
+  .alert-info {
+    @apply bg-blue-50 border-blue-200 text-blue-800;
+  }
+  
+  /* Transições padrão */
+  .transition-default {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  /* Hover lift effect */
+  .hover-lift {
+    @apply transition-transform duration-200;
+  }
+  
+  .hover-lift:hover {
+    @apply -translate-y-0.5;
+  }
 }
