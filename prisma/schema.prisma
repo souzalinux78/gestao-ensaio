@@ -34,6 +34,8 @@ model Usuario {
   tipo      String   @db.VarChar(20)
   igreja    String?  @db.VarChar(255)
   aprovado  Boolean  @default(false)
+  tenantId  Int?     // Nullable inicialmente para migração gradual
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id])
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
   ensaios   Ensaio[]
@@ -45,7 +47,9 @@ model Usuario {
   @@index([tipo])
   @@index([igreja])
   @@index([aprovado])
+  @@index([tenantId])
   @@index([tipo, aprovado]) // Índice composto para filtro de usuários
+  @@index([tenantId, tipo]) // Índice composto para filtro por tenant e tipo
   @@map("Usuario")
 }
 
