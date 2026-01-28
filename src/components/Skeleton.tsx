@@ -40,7 +40,7 @@ export default function Skeleton({
         {Array.from({ length: lines }).map((_, index) => (
           <div
             key={index}
-            className={`${baseClasses} ${shimmerClasses} ${variantClasses.text} ${
+            className={`${baseClasses} ${variantClasses.text} ${
               index === lines - 1 ? 'w-3/4' : 'w-full'
             }`}
             style={index === 0 ? style : undefined}
@@ -52,11 +52,11 @@ export default function Skeleton({
 
   if (variant === 'card') {
     return (
-      <div className={`${baseClasses} ${shimmerClasses} ${variantClasses.card} ${className}`} style={style}>
+      <div className={`${baseClasses} ${variantClasses.card} ${className}`} style={style}>
         <div className="space-y-3">
-          <div className={`${baseClasses} ${shimmerClasses} h-4 w-3/4 rounded`} />
-          <div className={`${baseClasses} ${shimmerClasses} h-4 w-full rounded`} />
-          <div className={`${baseClasses} ${shimmerClasses} h-4 w-5/6 rounded`} />
+          <div className={`${baseClasses} h-4 w-3/4 rounded`} />
+          <div className={`${baseClasses} h-4 w-full rounded`} />
+          <div className={`${baseClasses} h-4 w-5/6 rounded`} />
         </div>
       </div>
     );
@@ -64,12 +64,12 @@ export default function Skeleton({
 
   if (variant === 'table') {
     return (
-      <div className={`${baseClasses} ${shimmerClasses} ${variantClasses.table} ${className}`} style={style}>
+      <div className={`${baseClasses} ${variantClasses.table} ${className}`} style={style}>
         <div className="flex items-center space-x-4 h-full px-4">
-          <div className={`${baseClasses} ${shimmerClasses} h-4 w-1/4 rounded`} />
-          <div className={`${baseClasses} ${shimmerClasses} h-4 w-1/4 rounded`} />
-          <div className={`${baseClasses} ${shimmerClasses} h-4 w-1/4 rounded`} />
-          <div className={`${baseClasses} ${shimmerClasses} h-4 w-1/4 rounded`} />
+          <div className={`${baseClasses} h-4 w-1/4 rounded`} />
+          <div className={`${baseClasses} h-4 w-1/4 rounded`} />
+          <div className={`${baseClasses} h-4 w-1/4 rounded`} />
+          <div className={`${baseClasses} h-4 w-1/4 rounded`} />
         </div>
       </div>
     );
@@ -77,7 +77,7 @@ export default function Skeleton({
 
   return (
     <div
-      className={`${baseClasses} ${shimmerClasses} ${variantClasses[variant]} ${className}`}
+      className={`${baseClasses} ${variantClasses[variant]} ${className}`}
       style={style}
     />
   );
