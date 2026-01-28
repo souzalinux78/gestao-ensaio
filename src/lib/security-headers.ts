@@ -114,7 +114,7 @@ export function applySecurityHeaders(
   );
 
   // Strict-Transport-Security (HSTS) - apenas em produção com HTTPS
-  if (config.hsts !== false && process.env.NODE_ENV === 'production') {
+  if (config.hsts && process.env.NODE_ENV === 'production') {
     const hstsConfig = config.hsts || DEFAULT_CONFIG.hsts!;
     let hstsValue = `max-age=${hstsConfig.maxAge || 31536000}`;
     
