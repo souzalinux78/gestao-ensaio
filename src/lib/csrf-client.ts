@@ -27,22 +27,25 @@ export async function getCSRFToken(): Promise<string> {
     return cookieToken;
   }
 
-  // Se não encontrou no cookie, buscar da API
-  tokenPromise = fetch('/api/csrf-token')
-    .then(async (response) => {
-      if (!response.ok) {
-        throw new Error('Erro ao obter token CSRF');
-      }
+// Se não encontrou no cookie, buscar da API
+tokenPromise = fetch('/api/csrf-token')
+  .then(async (response): Promise<string> => {
+    if (!response.ok) {
+      throw new Error('Erro ao obter token CSRF');
+    }
 
-      const data = await response.json();
-      csrfToken = data.token;
-      tokenPromise = null;
-      return csrfToken;
-    })
-    .catch((error) => {
-      tokenPromise = null;
-      throw error;
-    });
+    const data = await response.json();
+    const token = data.token as string;
+
+    csrfToken = token;
+    tokenPromise = null;
+
+    return token;
+  })
+  .catch((error) => {
+    tokenPromise = null;
+    throw error;
+  });
 
   return tokenPromise;
 }
