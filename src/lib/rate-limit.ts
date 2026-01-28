@@ -7,10 +7,14 @@ interface RateLimitStore {
   [key: string]: {
     count: number;
     resetTime: number;
+    firstRequest: number;
   };
 }
 
 const store: RateLimitStore = {};
+
+// Limitar tamanho do store para evitar vazamento de memória
+const MAX_STORE_SIZE = 10000;
 
 /**
  * Verifica se o IP excedeu o limite de requisições
@@ -29,9 +33,15 @@ export function checkRateLimit(
 
   // Se não existe registro ou expirou, criar novo
   if (!record || now > record.resetTime) {
+    // Limpar store se muito grande
+    if (Object.keys(store).length >= MAX_STORE_SIZE) {
+      cleanupExpired();
+    }
+
     store[identifier] = {
       count: 1,
       resetTime: now + windowMs,
+      firstRequest: now,
     };
     return {
       allowed: true,
