@@ -56,8 +56,9 @@ export function applySecurityHeaders(
   config: SecurityHeadersConfig = DEFAULT_CONFIG
 ): NextResponse {
   // X-Frame-Options (Frameguard)
-  if (config.frameguard !== false) {
-    const action = config.frameguard?.action || 'deny';
+  // Se frameguard estiver definido (e não explicitamente desabilitado via undefined/null), aplica header
+  if (config.frameguard) {
+    const action = config.frameguard.action || 'deny';
     response.headers.set('X-Frame-Options', action === 'deny' ? 'DENY' : 'SAMEORIGIN');
   }
 
