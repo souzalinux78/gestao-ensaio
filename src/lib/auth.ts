@@ -10,6 +10,11 @@ export async function verificarCredenciais(
   // Normalizar email (trim e lowercase)
   const emailNormalizado = email.trim().toLowerCase();
   
+  logger.info('Iniciando verificação de credenciais', { 
+    email: emailNormalizado,
+    senhaLength: senha?.length || 0
+  });
+  
   const usuario = await prisma.usuario.findUnique({
     where: { email: emailNormalizado },
     select: {
@@ -31,12 +36,13 @@ export async function verificarCredenciais(
     return null;
   }
 
-  logger.debug('Usuário encontrado', { 
+  logger.info('Usuário encontrado no banco', { 
     userId: usuario.id, 
     email: emailNormalizado,
     tipo: usuario.tipo,
     aprovado: usuario.aprovado,
-    createdAt: usuario.createdAt
+    createdAt: usuario.createdAt,
+    temTelefone: !!usuario.telefone
   });
 
   // Verificar se a senha está hasheada (começa com $2a$ ou $2b$)
@@ -53,7 +59,26 @@ export async function verificarCredenciais(
         data: { senha: senhaHash },
       });
       logger.info('Senha migrada com sucesso', { userId: usuario.id });
-      // Verificar se o usuário está aprovado (admin sempre aprovado)
+      
+      // ADMIN SEMPRE APROVADO - não precisa verificar aprovação
+      if (usuario.tipo === 'admin') {
+        logger.info('Admin detectado - login permitido sem verificação de aprovação (senha migrada)', {
+          userId: usuario.id,
+          tipo: usuario.tipo,
+          aprovado: usuario.aprovado
+        });
+        return {
+          id: usuario.id,
+          nome: usuario.nome,
+          email: usuario.email,
+          tipo: usuario.tipo as TipoUsuario,
+          igreja: usuario.igreja,
+          aprovado: true, // Admin sempre aprovado
+          tenantId: usuario.tenantId ?? null,
+        };
+      }
+
+      // Verificar se o usuário está aprovado (não-admin)
       // COMPATIBILIDADE RETROATIVA: 
       // - Se aprovado for null/undefined, tratar como true
       // - Se aprovado for false mas usuário foi criado há mais de 30 dias, tratar como true (usuário antigo)
@@ -74,7 +99,7 @@ export async function verificarCredenciais(
         
         if (isUsuarioAntigo) {
           // Usuário antigo - tratar como aprovado para compatibilidade retroativa
-          logger.info('Usuário antigo detectado - permitindo login', { 
+          logger.info('Usuário antigo detectado - permitindo login (senha migrada)', { 
             userId: usuario.id, 
             createdAt: usuario.createdAt,
             temTelefone: !!usuario.telefone,
@@ -84,10 +109,24 @@ export async function verificarCredenciais(
         }
       }
       
-      if (usuario.tipo !== 'admin' && aprovadoFinal === false) {
-        logger.warn('Usuário não aprovado bloqueado', { userId: usuario.id, tipo: usuario.tipo });
+      // Se ainda não está aprovado, bloquear
+      if (aprovadoFinal === false) {
+        logger.warn('Usuário não aprovado bloqueado (senha não hasheada)', { 
+          userId: usuario.id, 
+          tipo: usuario.tipo,
+          aprovado: usuario.aprovado,
+          createdAt: usuario.createdAt,
+          temTelefone: !!usuario.telefone
+        });
         return null;
       }
+
+      logger.info('Login permitido - senha migrada e usuário aprovado', {
+        userId: usuario.id,
+        tipo: usuario.tipo,
+        aprovadoFinal,
+        isUsuarioAntigo: aprovadoFinal === true && usuario.aprovado === false
+      });
 
       return {
         id: usuario.id,
@@ -110,7 +149,25 @@ export async function verificarCredenciais(
 
   logger.debug('Senha válida', { userId: usuario.id });
 
-  // Verificar se o usuário está aprovado (admin sempre aprovado)
+  // ADMIN SEMPRE APROVADO - não precisa verificar aprovação
+  if (usuario.tipo === 'admin') {
+    logger.info('Admin detectado - login permitido sem verificação de aprovação', {
+      userId: usuario.id,
+      tipo: usuario.tipo,
+      aprovado: usuario.aprovado
+    });
+    return {
+      id: usuario.id,
+      nome: usuario.nome,
+      email: usuario.email,
+      tipo: usuario.tipo as TipoUsuario,
+      igreja: usuario.igreja,
+      aprovado: true, // Admin sempre aprovado
+      tenantId: usuario.tenantId ?? null,
+    };
+  }
+
+  // Verificar se o usuário está aprovado (não-admin)
   // COMPATIBILIDADE RETROATIVA: 
   // - Se aprovado for null/undefined, tratar como true
   // - Se aprovado for false mas usuário foi criado há mais de 30 dias, tratar como true (usuário antigo)
@@ -142,10 +199,25 @@ export async function verificarCredenciais(
     }
   }
   
-  if (usuario.tipo !== 'admin' && aprovadoFinal === false) {
-    logger.warn('Usuário não aprovado bloqueado', { userId: usuario.id, tipo: usuario.tipo });
+  // Se ainda não está aprovado, bloquear
+  if (aprovadoFinal === false) {
+    logger.warn('Usuário não aprovado bloqueado', { 
+      userId: usuario.id, 
+      tipo: usuario.tipo,
+      aprovado: usuario.aprovado,
+      createdAt: usuario.createdAt,
+      temTelefone: !!usuario.telefone
+    });
     return null;
   }
+
+  logger.info('Login permitido - credenciais válidas e usuário aprovado', {
+    userId: usuario.id,
+    tipo: usuario.tipo,
+    aprovadoFinal,
+    isAdmin: usuario.tipo === 'admin',
+    isUsuarioAntigo: aprovadoFinal === true && usuario.aprovado === false
+  });
 
   return {
     id: usuario.id,

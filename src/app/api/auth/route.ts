@@ -43,18 +43,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validar entrada
+    // Validar entrada básica
     if (!validateEmail(email)) {
+      logger.warn('Email inválido no login', { email });
       return NextResponse.json(
         { error: 'Email inválido' },
         { status: 400 }
       );
     }
 
-    const passwordValidation = validatePassword(senha);
-    if (!passwordValidation.valid) {
+    // Validação básica de senha (não vazia)
+    // Não bloquear por critérios de complexidade - pode ser senha antiga
+    // A validação completa será feita em verificarCredenciais
+    if (!senha || senha.trim().length === 0) {
+      logger.warn('Senha vazia no login', { email: email.trim().toLowerCase() });
       return NextResponse.json(
-        { error: passwordValidation.error || 'Senha inválida' },
+        { error: 'Senha é obrigatória' },
         { status: 400 }
       );
     }
@@ -81,24 +85,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Se o usuário não estiver aprovado (e não for admin), retornar erro
-    // COMPATIBILIDADE RETROATIVA: Se aprovado for null/undefined, tratar como true
-    // Isso permite que usuários antigos (criados antes do campo aprovado) possam logar
-    const aprovadoFinal = usuario.aprovado ?? true;
-    if (usuario.tipo !== 'admin' && aprovadoFinal === false) {
-      logger.warn('Usuário não aprovado tentou fazer login', { userId: usuario.id });
-      return NextResponse.json(
-        { error: 'Sua conta ainda não foi aprovada pelo administrador. Aguarde a aprovação.' },
-        { 
-          status: 403,
-          headers: {
-            'X-RateLimit-Limit': '5',
-            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
-            'X-RateLimit-Reset': rateLimit.resetTime.toString(),
-          },
-        }
-      );
-    }
+    // A validação de aprovação já foi feita em verificarCredenciais
+    // Admin sempre aprovado, usuários antigos são tratados como aprovados
+    // Se chegou aqui, o usuário está aprovado ou é admin
+    logger.debug('Validação de aprovação passou', { 
+      userId: usuario.id, 
+      tipo: usuario.tipo, 
+      aprovado: usuario.aprovado 
+    });
 
     logger.info('Login realizado com sucesso', { userId: usuario.id, tipo: usuario.tipo });
     
