@@ -161,8 +161,8 @@ export default function AdminPage() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Dashboard</h1>
-          <p className="text-gray-600 dark:text-[var(--text-secondary)] mt-1">
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Dashboard</h1>
+          <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>
             Visão geral do sistema
           </p>
         </div>
@@ -171,7 +171,7 @@ export default function AdminPage() {
         {metricas && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {/* Total Usuários */}
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-blue-500">
+            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderLeft: '4px solid var(--accent-primary)' }}>
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Total de Usuários</p>
@@ -185,7 +185,7 @@ export default function AdminPage() {
             </div>
 
             {/* Total Ensaios */}
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-green-500">
+            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderLeft: '4px solid var(--accent-primary)' }}>
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Total de Ensaios</p>
@@ -199,7 +199,7 @@ export default function AdminPage() {
             </div>
 
             {/* Usuários Pendentes */}
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-yellow-500">
+            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderLeft: '4px solid var(--accent-primary)' }}>
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Pendentes</p>
@@ -213,7 +213,7 @@ export default function AdminPage() {
             </div>
 
             {/* Tenants Ativos */}
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-purple-500">
+            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderLeft: '4px solid var(--accent-primary)' }}>
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Tenants Ativos</p>
@@ -234,27 +234,28 @@ export default function AdminPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Gráfico de Ensaios por Mês */}
           {metricas && metricas.ensaios.porMes.length > 0 && (
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6">
-              <h2 className="text-base sm:text-lg font-semibold text-[var(--text-primary)] mb-4">
+            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
+              <h2 className="text-base sm:text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
                 Ensaios por Mês (Últimos 6 meses)
               </h2>
               <div className="space-y-3">
                 {metricas.ensaios.porMes.map((item, index) => (
                   <div key={index} className="flex items-center gap-2 sm:gap-4">
-                    <span className="w-20 sm:w-24 text-xs sm:text-sm text-[var(--text-secondary)] truncate">{item.mes}</span>
-                    <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 relative overflow-hidden min-w-0">
+                    <span className="w-20 sm:w-24 text-xs sm:text-sm truncate" style={{ color: 'var(--text-secondary)' }}>{item.mes}</span>
+                    <div className="flex-1 rounded-full h-6 relative overflow-hidden min-w-0" style={{ backgroundColor: 'var(--bg-muted)' }}>
                       <div
-                        className="bg-primary h-full rounded-full flex items-center justify-end pr-2 transition-all duration-500"
+                        className="h-full rounded-full flex items-center justify-end pr-2 transition-all duration-500"
                         style={{
                           width: `${Math.min((item.total / maxEnsaios) * 100, 100)}%`,
+                          backgroundColor: 'var(--accent-primary)'
                         }}
                       >
                         {item.total > 0 && (
-                          <span className="text-xs text-white font-medium">{item.total}</span>
+                          <span className="text-xs font-medium" style={{ color: 'var(--dark-primary)' }}>{item.total}</span>
                         )}
                       </div>
                     </div>
-                    <span className="w-10 sm:w-12 text-right font-medium text-[var(--text-primary)] text-sm">{item.total}</span>
+                    <span className="w-10 sm:w-12 text-right font-medium text-sm" style={{ color: 'var(--text-primary)' }}>{item.total}</span>
                   </div>
                 ))}
               </div>
@@ -262,28 +263,26 @@ export default function AdminPage() {
           )}
 
           {/* Últimas Atividades */}
-          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6">
-            <h2 className="text-base sm:text-lg font-semibold text-[var(--text-primary)] mb-4">
+          <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
+            <h2 className="text-base sm:text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
               Últimas Atividades
             </h2>
             {logs.length === 0 ? (
-              <p className="text-gray-500 dark:text-[var(--text-secondary)] text-sm">Nenhuma atividade recente</p>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Nenhuma atividade recente</p>
             ) : (
               <div className="space-y-3">
                 {logs.map((log) => (
                   <div
                     key={log.id}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-[var(--bg-secondary)] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    className="flex items-start gap-3 p-3 rounded-lg transition-colors"
+                    style={{ backgroundColor: 'var(--bg-muted)' }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-soft)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
                   >
                     <div className="flex-shrink-0 mt-0.5">
                       <div
-                        className={`w-2 h-2 rounded-full ${
-                          log.tipo === 'criacao'
-                            ? 'bg-blue-500'
-                            : log.tipo === 'atualizacao'
-                            ? 'bg-yellow-500'
-                            : 'bg-green-500'
-                        }`}
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: 'var(--accent-primary)' }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -303,17 +302,17 @@ export default function AdminPage() {
         {/* Estatísticas Adicionais - Grid */}
         {metricas && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6">
-              <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Instrutores</p>
-              <p className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mt-2">{metricas.usuarios.instrutores}</p>
+            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
+              <p className="text-xs sm:text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Instrutores</p>
+              <p className="text-xl sm:text-2xl font-bold mt-2" style={{ color: 'var(--text-primary)' }}>{metricas.usuarios.instrutores}</p>
             </div>
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6">
-              <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Músicos</p>
-              <p className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mt-2">{metricas.outros.musicos}</p>
+            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
+              <p className="text-xs sm:text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Músicos</p>
+              <p className="text-xl sm:text-2xl font-bold mt-2" style={{ color: 'var(--text-primary)' }}>{metricas.outros.musicos}</p>
             </div>
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-md p-4 sm:p-6">
-              <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Contatos</p>
-              <p className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mt-2">{metricas.outros.contatos}</p>
+            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
+              <p className="text-xs sm:text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Contatos</p>
+              <p className="text-xl sm:text-2xl font-bold mt-2" style={{ color: 'var(--text-primary)' }}>{metricas.outros.contatos}</p>
             </div>
           </div>
         )}
@@ -321,12 +320,12 @@ export default function AdminPage() {
         {/* Relatórios de Ensaios */}
         <div>
           <div className="mb-4 sm:mb-6">
-            <h2 className="text-lg sm:text-xl font-bold text-primary dark:text-[var(--text-primary)]">
+            <h2 className="text-lg sm:text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
               Relatórios de Ensaios
             </h2>
           </div>
 
-          <div className="mb-6 bg-white dark:bg-[var(--bg-primary)] p-3 sm:p-4 rounded-lg shadow-sm">
+          <div className="mb-6 p-3 sm:p-4 rounded-lg shadow-sm" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 items-end">
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">
@@ -364,7 +363,13 @@ export default function AdminPage() {
               </div>
               <button
                 onClick={handleFiltrar}
-                className="w-full sm:w-auto bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-colors font-medium"
+                className="w-full sm:w-auto px-6 py-2 rounded-lg transition-colors font-medium"
+                style={{
+                  backgroundColor: 'var(--accent-primary)',
+                  color: 'var(--dark-primary)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
               >
                 Filtrar
               </button>

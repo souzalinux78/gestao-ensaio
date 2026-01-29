@@ -14,9 +14,10 @@
   --text-secondary: #6b7280;
   --text-inverse: #ffffff;
   
-  /* Destaque */
+  /* Identidade Premium */
   --accent-primary: #d4af37;
   --accent-secondary: #c9a24d;
+  --accent-soft: rgba(212, 175, 55, 0.15);
   
   /* Neutros escuros (para menus) */
   --dark-primary: #0b0b0b;
@@ -73,9 +74,10 @@
   --text-secondary: #9ca3af;
   --text-inverse: #ffffff;
   
-  /* Destaque (mantém dourado) */
+  /* Identidade Premium (mantém dourado) */
   --accent-primary: #d4af37;
   --accent-secondary: #c9a24d;
+  --accent-soft: rgba(212, 175, 55, 0.15);
   
   /* Neutros escuros (para menus) */
   --dark-primary: #0b0b0b;

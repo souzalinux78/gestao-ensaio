@@ -71,25 +71,36 @@ export default function CadastroPage() {
 
   if (sucesso) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-dark via-primary to-primary-light p-4">
-        <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
+      <div 
+        className="min-h-screen flex items-center justify-center p-4"
+        style={{
+          background: 'linear-gradient(180deg, var(--dark-primary), var(--dark-secondary))'
+        }}
+      >
+        <div className="rounded-lg shadow-xl p-8 max-w-md w-full text-center" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
           <div className="mb-4">
-            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mx-auto w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--accent-soft)' }}>
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--accent-primary)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-primary mb-4">Cadastro Realizado!</h2>
-          <p className="text-gray-600 mb-4">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--accent-primary)' }}>Cadastro Realizado!</h2>
+          <p className="mb-4" style={{ color: 'var(--text-primary)' }}>
             Seu cadastro foi enviado com sucesso. Aguarde a aprovação do administrador para acessar o sistema.
           </p>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
             Você receberá uma notificação quando sua conta for aprovada e poderá fazer login.
           </p>
           <a
             href="/login"
-            className="inline-block bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary-dark transition-colors font-medium"
+            className="inline-block px-6 py-2.5 rounded-lg transition-colors font-medium"
+            style={{
+              backgroundColor: 'var(--accent-primary)',
+              color: 'var(--dark-primary)'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
           >
             Ir para Login
           </a>
@@ -99,8 +110,13 @@ export default function CadastroPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-dark via-primary to-primary-light p-4">
-      <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{
+        background: 'linear-gradient(180deg, var(--dark-primary), var(--dark-secondary))'
+      }}
+    >
+      <div className="rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
         <div className="text-center mb-6">
           <div className="flex justify-center mb-4">
             <Image
@@ -111,8 +127,8 @@ export default function CadastroPage() {
               className="object-contain"
             />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-2">Criar Conta de Instrutor</h1>
-          <p className="text-gray-600 text-sm mb-2">Preencha os dados para se cadastrar como instrutor</p>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Criar Conta de Instrutor</h1>
+          <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Preencha os dados para se cadastrar como instrutor</p>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-xs text-yellow-800">
             ⚠️ Sua conta precisará ser aprovada por um administrador antes de poder fazer login.
           </div>
@@ -126,59 +142,124 @@ export default function CadastroPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Nome Completo</label>
+            <label className="block mb-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Nome Completo</label>
             <input
               type="text"
               value={formData.nome}
               onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              className="w-full border rounded-lg px-4 py-2.5 transition-all duration-200"
+              style={{
+                borderColor: 'var(--border-default)',
+                backgroundColor: 'var(--bg-surface)',
+                color: 'var(--text-primary)'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-secondary)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-default)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
               required
             />
           </div>
 
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Email</label>
+            <label className="block mb-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Email</label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              className="w-full border rounded-lg px-4 py-2.5 transition-all duration-200"
+              style={{
+                borderColor: 'var(--border-default)',
+                backgroundColor: 'var(--bg-surface)',
+                color: 'var(--text-primary)'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-secondary)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-default)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
               required
             />
           </div>
 
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Igreja/Congregação</label>
+            <label className="block mb-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Igreja/Congregação</label>
             <input
               type="text"
               value={formData.igreja}
               onChange={(e) => setFormData({ ...formData, igreja: e.target.value })}
               placeholder="Ex: CCB Teste"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              className="w-full border rounded-lg px-4 py-2.5 transition-all duration-200"
+              style={{
+                borderColor: 'var(--border-default)',
+                backgroundColor: 'var(--bg-surface)',
+                color: 'var(--text-primary)'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-secondary)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-default)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
               required
             />
           </div>
 
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Senha</label>
+            <label className="block mb-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Senha</label>
             <input
               type="password"
               value={formData.senha}
               onChange={(e) => setFormData({ ...formData, senha: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              className="w-full border rounded-lg px-4 py-2.5 transition-all duration-200"
+              style={{
+                borderColor: 'var(--border-default)',
+                backgroundColor: 'var(--bg-surface)',
+                color: 'var(--text-primary)'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-secondary)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-default)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
               required
               minLength={6}
             />
-            <p className="mt-1 text-xs text-gray-500">Mínimo de 6 caracteres</p>
+            <p className="mt-1 text-xs" style={{ color: 'var(--text-secondary)' }}>Mínimo de 6 caracteres</p>
           </div>
 
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Confirmar Senha</label>
+            <label className="block mb-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Confirmar Senha</label>
             <input
               type="password"
               value={formData.confirmarSenha}
               onChange={(e) => setFormData({ ...formData, confirmarSenha: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              className="w-full border rounded-lg px-4 py-2.5 transition-all duration-200"
+              style={{
+                borderColor: 'var(--border-default)',
+                backgroundColor: 'var(--bg-surface)',
+                color: 'var(--text-primary)'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-secondary)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-default)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
               required
               minLength={6}
             />
@@ -187,16 +268,36 @@ export default function CadastroPage() {
           <button
             type="submit"
             disabled={carregando}
-            className="w-full bg-primary text-white py-2.5 rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-lg"
+            className="w-full py-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-lg"
+            style={{
+              backgroundColor: 'var(--accent-primary)',
+              color: 'var(--dark-primary)'
+            }}
+            onMouseEnter={(e) => {
+              if (!e.currentTarget.disabled) {
+                e.currentTarget.style.backgroundColor = 'var(--accent-secondary)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!e.currentTarget.disabled) {
+                e.currentTarget.style.backgroundColor = 'var(--accent-primary)';
+              }
+            }}
           >
             {carregando ? 'Criando conta...' : 'Criar Conta'}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             Já tem uma conta?{' '}
-            <a href="/login" className="text-primary hover:text-primary-dark font-medium">
+            <a 
+              href="/login" 
+              className="font-medium transition-colors"
+              style={{ color: 'var(--accent-primary)' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-secondary)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--accent-primary)'}
+            >
               Fazer login
             </a>
           </p>

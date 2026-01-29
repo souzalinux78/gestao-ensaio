@@ -69,7 +69,7 @@ export default function MetricasPage() {
     return (
       <AdminLayout>
         <div className="text-center py-8">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-12 h-12 border-4 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--accent-primary)', borderTopColor: 'transparent' }}></div>
           <p className="text-gray-600 dark:text-[var(--text-secondary)]">Carregando métricas...</p>
         </div>
       </AdminLayout>
@@ -90,7 +90,7 @@ export default function MetricasPage() {
     <AdminLayout>
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Métricas do Sistema</h1>
+          <h1 className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Métricas do Sistema</h1>
           <select
             value={periodo}
             onChange={(e) => setPeriodo(e.target.value)}
@@ -203,27 +203,28 @@ export default function MetricasPage() {
         </div>
 
         {/* Ensaios por Mês */}
-        <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-4 sm:p-6 mt-6">
-          <h2 className="text-base sm:text-lg font-semibold mb-4 text-[var(--text-primary)]">Ensaios por Mês (Últimos 6 meses)</h2>
+        <div className="rounded-lg shadow p-4 sm:p-6 mt-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
+          <h2 className="text-base sm:text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Ensaios por Mês (Últimos 6 meses)</h2>
           <div className="space-y-2">
             {metricas.ensaios.porMes.map((item, index) => {
               const maxTotal = Math.max(...metricas.ensaios.porMes.map((m) => m.total), 1);
               return (
                 <div key={index} className="flex items-center gap-2 sm:gap-4">
-                  <span className="w-20 sm:w-32 text-xs sm:text-sm text-gray-600 dark:text-[var(--text-secondary)] truncate">{item.mes}</span>
-                  <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 relative overflow-hidden min-w-0">
+                  <span className="w-20 sm:w-32 text-xs sm:text-sm truncate" style={{ color: 'var(--text-secondary)' }}>{item.mes}</span>
+                  <div className="flex-1 rounded-full h-6 relative overflow-hidden min-w-0" style={{ backgroundColor: 'var(--bg-muted)' }}>
                     <div
-                      className="bg-primary h-full rounded-full flex items-center justify-end pr-2"
+                      className="h-full rounded-full flex items-center justify-end pr-2"
                       style={{
                         width: `${Math.min((item.total / maxTotal) * 100, 100)}%`,
+                        backgroundColor: 'var(--accent-primary)'
                       }}
                     >
                       {item.total > 0 && (
-                        <span className="text-xs text-white font-medium">{item.total}</span>
+                        <span className="text-xs font-medium" style={{ color: 'var(--dark-primary)' }}>{item.total}</span>
                       )}
                     </div>
                   </div>
-                  <span className="w-10 sm:w-12 text-right font-medium text-[var(--text-primary)] text-sm">{item.total}</span>
+                  <span className="w-10 sm:w-12 text-right font-medium text-sm" style={{ color: 'var(--text-primary)' }}>{item.total}</span>
                 </div>
               );
             })}

@@ -347,7 +347,13 @@ export default function UsuariosPage() {
                     aprovado: false, // Por padrão, não aprovar - admin decide se aprova na hora
                   });
                 }}
-                className="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 whitespace-nowrap font-medium shadow-sm transition-colors"
+                className="px-4 py-2.5 rounded-lg whitespace-nowrap font-medium shadow-sm transition-colors"
+                style={{
+                  backgroundColor: 'var(--accent-primary)',
+                  color: 'var(--dark-primary)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
               >
                 + Novo Usuário
               </button>

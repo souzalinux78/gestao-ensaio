@@ -51,8 +51,13 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-dark via-primary to-primary-light p-4">
-      <div className="bg-white p-6 sm:p-8 rounded-lg shadow-2xl w-full max-w-md">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{
+        background: 'linear-gradient(180deg, var(--dark-primary), var(--dark-secondary))'
+      }}
+    >
+      <div className="p-6 sm:p-8 rounded-lg shadow-2xl w-full max-w-md" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <div className="relative w-24 h-24 sm:w-32 sm:h-32">
@@ -76,30 +81,56 @@ export default function LoginPage() {
         
         <div className="text-center mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">
-            <span className="text-gray-700">Gestão de</span>{' '}
-            <span className="text-accent">Ensaio</span>
+            <span style={{ color: 'var(--text-primary)' }}>Gestão de</span>{' '}
+            <span style={{ color: 'var(--accent-primary)' }}>Ensaio</span>
           </h1>
-          <p className="text-sm text-gray-600">Sistema de gestão de ensaios musicais</p>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Sistema de gestão de ensaios musicais</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Email</label>
+            <label className="block mb-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+              className="w-full border rounded-lg px-4 py-2.5 transition-all duration-200"
+              style={{
+                borderColor: 'var(--border-default)',
+                backgroundColor: 'var(--bg-surface)',
+                color: 'var(--text-primary)'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-secondary)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-default)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
               placeholder="seu@email.com"
               required
             />
           </div>
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Senha</label>
+            <label className="block mb-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Senha</label>
             <input
               type="password"
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+              className="w-full border rounded-lg px-4 py-2.5 transition-all duration-200"
+              style={{
+                borderColor: 'var(--border-default)',
+                backgroundColor: 'var(--bg-surface)',
+                color: 'var(--text-primary)'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-secondary)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-default)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
               placeholder="••••••••"
               required
             />
@@ -112,15 +143,35 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={carregando}
-            className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors shadow-md hover:shadow-lg"
+            className="w-full py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors shadow-md hover:shadow-lg"
+            style={{
+              backgroundColor: 'var(--accent-primary)',
+              color: 'var(--dark-primary)'
+            }}
+            onMouseEnter={(e) => {
+              if (!e.currentTarget.disabled) {
+                e.currentTarget.style.backgroundColor = 'var(--accent-secondary)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!e.currentTarget.disabled) {
+                e.currentTarget.style.backgroundColor = 'var(--accent-primary)';
+              }
+            }}
           >
             {carregando ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             Não tem uma conta?{' '}
-            <a href="/cadastro" className="text-primary hover:text-primary-dark font-medium">
+            <a 
+              href="/cadastro" 
+              className="font-medium transition-colors"
+              style={{ color: 'var(--accent-primary)' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-secondary)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--accent-primary)'}
+            >
               Criar conta
             </a>
           </p>
