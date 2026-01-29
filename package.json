@@ -1,6 +1,6 @@
 {
   "name": "gestao-ensaio",
-  "version": "2.1.14",
+  "version": "2.1.15",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -16,7 +16,9 @@
     "db:seed": "ts-node --project tsconfig.scripts.json scripts/populate-instrumentos.ts",
     "db:verificar-usuario": "ts-node --project tsconfig.scripts.json scripts/verificar-usuario.ts",
     "db:resetar-senha": "ts-node --project tsconfig.scripts.json scripts/resetar-senha-usuario.ts",
-    "db:listar-usuarios": "ts-node --project tsconfig.scripts.json scripts/listar-usuarios.ts"
+    "db:listar-usuarios": "ts-node --project tsconfig.scripts.json scripts/listar-usuarios.ts",
+    "db:diagnostico": "ts-node --project tsconfig.scripts.json scripts/diagnosticar-banco.ts",
+    "db:criar-admin": "ts-node --project tsconfig.scripts.json scripts/criar-admin-inicial.ts"
   },
   "dependencies": {
     "next": "^14.0.0",
