@@ -41,8 +41,27 @@ export async function apiFetch(
     headers['Authorization'] = `Bearer ${sessao.id}`;
   }
 
-  return fetch(url, {
+  // Fazer requisição com cache: 'no-store' para evitar cache de respostas 401
+  const response = await fetch(url, {
     ...options,
     headers,
+    cache: 'no-store', // Sempre buscar versão fresca, nunca usar cache
+    credentials: 'same-origin', // Incluir cookies se necessário
   });
+
+  // Se receber 401, limpar sessão e redirecionar para login
+  if (response.status === 401) {
+    // Limpar sessão local
+    if (typeof window !== 'undefined') {
+      const { removerSessao } = await import('./session');
+      removerSessao();
+      
+      // Redirecionar para login apenas se não estiver já na página de login
+      if (!window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
+      }
+    }
+  }
+
+  return response;
 }

@@ -65,9 +65,29 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   
   // Não cachear requisições de API - sempre buscar da rede
+  // IMPORTANTE: Preservar todos os headers, especialmente Authorization
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
-      fetch(request)
+      // Criar nova requisição preservando todos os headers originais
+      fetch(request.clone(), {
+        // Preservar credenciais (cookies, etc)
+        credentials: 'same-origin',
+        // Preservar cache mode
+        cache: 'no-store',
+        // Preservar redirect mode
+        redirect: 'follow',
+      })
+        .then((response) => {
+          // NUNCA cachear respostas 401 (não autorizado)
+          // Isso evita que respostas de erro sejam servidas do cache
+          if (response.status === 401) {
+            // Limpar qualquer cache relacionado a esta requisição
+            caches.delete(request.url).catch(() => {});
+            // Retornar resposta fresca (não cacheada)
+            return response;
+          }
+          return response;
+        })
         .catch(() => {
           // Se offline, retornar resposta JSON de erro
           return new Response(
