@@ -15,7 +15,8 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "ts-node --project tsconfig.scripts.json scripts/populate-instrumentos.ts",
     "db:verificar-usuario": "ts-node --project tsconfig.scripts.json scripts/verificar-usuario.ts",
-    "db:resetar-senha": "ts-node --project tsconfig.scripts.json scripts/resetar-senha-usuario.ts"
+    "db:resetar-senha": "ts-node --project tsconfig.scripts.json scripts/resetar-senha-usuario.ts",
+    "db:listar-usuarios": "ts-node --project tsconfig.scripts.json scripts/listar-usuarios.ts"
   },
   "dependencies": {
     "next": "^14.0.0",

@@ -22,6 +22,41 @@ async function resetarSenha() {
 
     if (!usuario) {
       console.log('❌ Usuário não encontrado!');
+      console.log('\n📋 Listando todos os usuários cadastrados:\n');
+      
+      const todosUsuarios = await prisma.usuario.findMany({
+        select: {
+          id: true,
+          nome: true,
+          email: true,
+          tipo: true,
+          aprovado: true,
+        },
+        orderBy: {
+          id: 'asc',
+        },
+      });
+      
+      if (todosUsuarios.length === 0) {
+        console.log('⚠️  Nenhum usuário encontrado no banco de dados!\n');
+        return;
+      }
+      
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('ID  | Nome                    | Email                          | Tipo      | Aprovado');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      
+      todosUsuarios.forEach((u) => {
+        const id = String(u.id).padEnd(3);
+        const nome = (u.nome || '').substring(0, 22).padEnd(22);
+        const email = (u.email || '').substring(0, 28).padEnd(28);
+        const tipo = (u.tipo || '').padEnd(9);
+        const aprovado = u.aprovado ? '✅ Sim' : '❌ Não';
+        console.log(`${id} | ${nome} | ${email} | ${tipo} | ${aprovado}`);
+      });
+      
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+      console.log('💡 Dica: Use o email exato mostrado acima para resetar a senha.\n');
       return;
     }
 
