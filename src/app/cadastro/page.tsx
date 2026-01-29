@@ -9,8 +9,10 @@ export default function CadastroPage() {
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
+    telefone: '',
     senha: '',
     confirmarSenha: '',
+    tipo: 'instrutor' as 'instrutor' | 'encarregado' | 'secretario',
     igreja: '',
   });
   const [erro, setErro] = useState('');
@@ -22,7 +24,7 @@ export default function CadastroPage() {
     setCarregando(true);
     setErro('');
 
-    if (!formData.nome || !formData.email || !formData.senha || !formData.igreja) {
+    if (!formData.nome || !formData.email || !formData.telefone || !formData.senha || !formData.igreja) {
       setErro('Todos os campos são obrigatórios');
       setCarregando(false);
       return;
@@ -47,8 +49,9 @@ export default function CadastroPage() {
         body: JSON.stringify({
           nome: formData.nome,
           email: formData.email,
+          telefone: formData.telefone,
           senha: formData.senha,
-          tipo: 'instrutor',
+          tipo: formData.tipo,
           igreja: formData.igreja,
           aprovado: false, // Sempre criar como não aprovado
         }),
@@ -87,10 +90,9 @@ export default function CadastroPage() {
           </div>
           <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--pe-gold-main)' }}>Cadastro Realizado!</h2>
           <p className="mb-4" style={{ color: 'var(--text-primary)' }}>
-            Seu cadastro foi enviado com sucesso. Aguarde a aprovação do administrador para acessar o sistema.
-          </p>
-          <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
-            Você receberá uma notificação quando sua conta for aprovada e poderá fazer login.
+            Sua conta foi criada com sucesso.
+            O administrador já foi notificado e irá aprovar
+            seu cadastro no sistema Gestão de Ensaio.
           </p>
           <a
             href="/login"
@@ -127,8 +129,8 @@ export default function CadastroPage() {
               className="object-contain"
             />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Criar Conta de Instrutor</h1>
-          <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Preencha os dados para se cadastrar como instrutor</p>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: 'var(--pe-gold-main)' }}>Cadastro Gestão de Ensaio</h1>
+          <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Preencha os dados para se cadastrar</p>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-xs text-yellow-800">
             ⚠️ Sua conta precisará ser aprovada por um administrador antes de poder fazer login.
           </div>
@@ -187,6 +189,58 @@ export default function CadastroPage() {
               }}
               required
             />
+          </div>
+
+          <div>
+            <label className="block mb-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Telefone Celular <span style={{ color: 'var(--color-error)' }}>*</span></label>
+            <input
+              type="tel"
+              value={formData.telefone}
+              onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
+              placeholder="(00) 00000-0000"
+              className="w-full border rounded-lg px-4 py-2.5 transition-all duration-200"
+              style={{
+                borderColor: 'var(--border-default)',
+                backgroundColor: 'var(--bg-surface)',
+                color: 'var(--text-primary)'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--pe-gold-strong)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.3)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-default)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block mb-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Tipo de Cadastro <span style={{ color: 'var(--color-error)' }}>*</span></label>
+            <select
+              value={formData.tipo}
+              onChange={(e) => setFormData({ ...formData, tipo: e.target.value as 'instrutor' | 'encarregado' | 'secretario' })}
+              className="w-full border rounded-lg px-4 py-2.5 transition-all duration-200"
+              style={{
+                borderColor: 'var(--border-default)',
+                backgroundColor: 'var(--bg-surface)',
+                color: 'var(--text-primary)'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--pe-gold-strong)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.3)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-default)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+              required
+            >
+              <option value="instrutor">Instrutor</option>
+              <option value="encarregado">Encarregado</option>
+              <option value="secretario">Secretário</option>
+            </select>
           </div>
 
           <div>

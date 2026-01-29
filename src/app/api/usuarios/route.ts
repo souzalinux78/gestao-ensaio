@@ -82,12 +82,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { nome, email, senha, tipo, igreja, aprovado } = await request.json();
+    const { nome, email, telefone, senha, tipo, igreja, aprovado } = await request.json();
 
     // Validar entrada
-    if (!nome || !email || !senha || !tipo) {
+    if (!nome || !email || !telefone || !senha || !tipo) {
       return NextResponse.json(
-        { error: 'Nome, email, senha e tipo são obrigatórios' },
+        { error: 'Nome, email, telefone, senha e tipo são obrigatórios' },
         { status: 400 }
       );
     }
@@ -110,15 +110,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Validar tipo
-    if (tipo !== 'admin' && tipo !== 'instrutor') {
+    const tiposValidos = ['admin', 'instrutor', 'encarregado', 'secretario'];
+    if (!tiposValidos.includes(tipo)) {
       return NextResponse.json(
-        { error: 'Tipo deve ser "admin" ou "instrutor"' },
+        { error: `Tipo deve ser um dos seguintes: ${tiposValidos.join(', ')}` },
         { status: 400 }
       );
     }
 
     // Sanitizar strings
     const nomeSanitizado = sanitizeString(nome, 255);
+    const telefoneSanitizado = sanitizeString(telefone, 20);
     const igrejaSanitizada = igreja ? sanitizeString(igreja, 255) : null;
 
     if (!nomeSanitizado) {
@@ -128,8 +130,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Garantir que cadastros públicos sejam sempre instrutores
-    const tipoFinal = tipo === 'admin' ? tipo : 'instrutor';
+    if (!telefoneSanitizado) {
+      return NextResponse.json(
+        { error: 'Telefone inválido' },
+        { status: 400 }
+      );
+    }
+
+    // Garantir que cadastros públicos não sejam admin
+    // Admin só pode ser criado por outro admin
+    const tipoFinal = tipo === 'admin' ? 'instrutor' : tipo;
     
     // Se for cadastro público (sem aprovado definido), criar como não aprovado
     // Se for admin criando, usar o valor de aprovado fornecido (ou true para admin)
@@ -153,6 +163,7 @@ export async function POST(request: NextRequest) {
       data: {
         nome: nomeSanitizado,
         email: email.trim().toLowerCase(),
+        telefone: telefoneSanitizado,
         senha: senhaHash,
         tipo: tipoFinal,
         igreja: igrejaSanitizada,
@@ -163,11 +174,26 @@ export async function POST(request: NextRequest) {
         id: true,
         nome: true,
         email: true,
+        telefone: true,
         tipo: true,
         igreja: true,
         aprovado: true,
       },
     });
+
+    // Enviar notificação ao admin se for cadastro público (não aprovado)
+    if (!usuarioAprovado) {
+      const { notificarNovoCadastro } = await import('@/lib/webhook-notifications');
+      await notificarNovoCadastro(
+        {
+          nome: usuario.nome,
+          email: usuario.email,
+          telefone: usuario.telefone,
+          tipo: usuario.tipo,
+        },
+        tenantIdFinal
+      );
+    }
 
     return NextResponse.json(usuario);
   } catch (error: any) {

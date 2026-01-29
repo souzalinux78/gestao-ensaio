@@ -31,6 +31,7 @@ model Usuario {
   nome      String   @db.VarChar(255)
   email     String   @unique @db.VarChar(255)
   senha     String   @db.VarChar(255)
+  telefone  String?  @db.VarChar(20)
   tipo      String   @db.VarChar(20)
   igreja    String?  @db.VarChar(255)
   aprovado  Boolean  @default(false)

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { resolveTenantFromRequest } from '@/lib/middleware';
 import { safeParseInt } from '@/lib/validators';
+import { notificarAprovacao } from '@/lib/webhook-notifications';
 
 export async function PUT(
   request: NextRequest,
@@ -50,6 +51,28 @@ export async function PUT(
       );
     }
 
+    // Buscar dados completos antes de atualizar para notificação
+    const usuarioAntes = await prisma.usuario.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        telefone: true,
+        tipo: true,
+        igreja: true,
+        aprovado: true,
+        tenantId: true,
+      },
+    });
+
+    if (!usuarioAntes) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      );
+    }
+
     const usuario = await prisma.usuario.update({
       where: { id },
       data: { aprovado },
@@ -57,11 +80,24 @@ export async function PUT(
         id: true,
         nome: true,
         email: true,
+        telefone: true,
         tipo: true,
         igreja: true,
         aprovado: true,
       },
     });
+
+    // Enviar notificação ao usuário se foi aprovado (mudou de false para true)
+    if (aprovado && !usuarioAntes.aprovado) {
+      await notificarAprovacao(
+        {
+          nome: usuario.nome,
+          email: usuario.email,
+          telefone: usuario.telefone,
+        },
+        usuarioAntes.tenantId
+      );
+    }
 
     return NextResponse.json(usuario);
   } catch (error: any) {

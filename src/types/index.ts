@@ -1,9 +1,10 @@
-export type TipoUsuario = 'admin' | 'instrutor';
+export type TipoUsuario = 'admin' | 'instrutor' | 'encarregado' | 'secretario';
 
 export interface Usuario {
   id: number;
   nome: string;
   email: string;
+  telefone?: string | null;
   tipo: TipoUsuario;
   igreja?: string | null;
   aprovado?: boolean;
