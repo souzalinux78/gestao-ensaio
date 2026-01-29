@@ -30,6 +30,28 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     setUsuario(sessao);
   }, [router]);
 
+  // Bloquear scroll do body quando menu mobile estiver aberto
+  useEffect(() => {
+    if (menuAberto) {
+      // Bloquear scroll do body
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      // Liberar scroll do body
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+    
+    // Cleanup ao desmontar
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [menuAberto]);
+
   const handleLogout = () => {
     removerSessao();
     router.push('/login');
@@ -158,7 +180,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </nav>
         </aside>
 
-        {/* Sidebar - Mobile (Overlay) */}
+        {/* Sidebar - Mobile (Drawer) */}
         {menuAberto && (
           <>
             <div
@@ -166,14 +188,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               onClick={() => setMenuAberto(false)}
             />
             <aside 
-              className="fixed left-0 w-64 shadow-xl z-50 lg:hidden overflow-y-auto relative"
+              className="fixed left-0 top-0 w-64 shadow-xl z-50 lg:hidden overflow-y-auto"
               style={{
                 background: 'linear-gradient(90deg, #0b0b0b 0%, #1a1a1a 50%, #3a2f0f 100%)',
-                top: '80px',
-                bottom: '0',
-                height: 'auto',
-                minHeight: 'calc(100dvh - 80px)',
-                paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)'
+                height: '100dvh',
+                paddingTop: '80px',
+                paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
+                WebkitOverflowScrolling: 'touch' // Scroll suave no iOS
               }}
             >
               {/* Faixa dourada lateral visível */}

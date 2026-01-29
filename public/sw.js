@@ -1,13 +1,12 @@
 // Service Worker para PWA
 // IMPORTANTE: Incrementar a versão a cada deploy para forçar atualização do cache
-// Versão atual: v6 - Manifest corrigido (ícones válidos)
-const CACHE_NAME = 'gestao-ensaio-v6';
-const CACHE_VERSION = '6';
+// Versão atual: v7 - Cache seguro com try/catch individual
+const CACHE_NAME = 'gestao-ensaio-v7';
+const CACHE_VERSION = '7';
 
-// URLs críticas para cache inicial
+// URLs críticas para cache inicial - APENAS arquivos estáticos válidos
+// NÃO incluir rotas protegidas, APIs ou páginas que podem retornar 401/403/404
 const urlsToCache = [
-  '/',
-  '/login',
   '/manifest.json',
   '/offline.html',
   '/logo.png',
@@ -23,12 +22,39 @@ self.addEventListener('install', (event) => {
   
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('[SW] Cache aberto');
-        return cache.addAll(urlsToCache);
+      .then(async (cache) => {
+        console.log('[SW] Cache aberto, adicionando arquivos estáticos...');
+        
+        // Adicionar arquivos individualmente com try/catch
+        // Isso evita que um único erro quebre toda a instalação
+        const results = await Promise.allSettled(
+          urlsToCache.map(async (url) => {
+            try {
+              const response = await fetch(url);
+              // Só cachear se resposta for válida (200-299)
+              if (response.ok) {
+                await cache.put(url, response);
+                console.log(`[SW] ✅ Cacheado: ${url}`);
+                return { url, success: true };
+              } else {
+                console.warn(`[SW] ⚠️ Ignorado (${response.status}): ${url}`);
+                return { url, success: false, status: response.status };
+              }
+            } catch (error) {
+              console.warn(`[SW] ⚠️ Erro ao cachear ${url}:`, error);
+              return { url, success: false, error: error.message };
+            }
+          })
+        );
+        
+        const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
+        console.log(`[SW] Cache concluído: ${successCount}/${urlsToCache.length} arquivos`);
+        
+        return cache;
       })
       .catch((error) => {
-        console.error('[SW] Erro ao fazer cache:', error);
+        console.error('[SW] Erro crítico ao abrir cache:', error);
+        // Não bloquear instalação mesmo se houver erro
       })
   );
 });
