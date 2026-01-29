@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyRefreshToken, generateAccessToken } from '@/lib/jwt';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { TipoUsuario } from '@/types';
 
 /**
  * Endpoint para renovar Access Token usando Refresh Token
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest) {
       id: usuario.id,
       nome: usuario.nome,
       email: usuario.email,
-      tipo: usuario.tipo,
+      tipo: usuario.tipo as TipoUsuario,
       igreja: usuario.igreja,
       aprovado: usuario.aprovado,
       tenantId: usuario.tenantId ?? null, // ISOLAMENTO: incluir tenantId
