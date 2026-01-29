@@ -34,7 +34,9 @@ export async function verificarCredenciais(
       });
       logger.info('Senha migrada com sucesso', { userId: usuario.id });
       // Verificar se o usuário está aprovado (admin sempre aprovado)
-      if (usuario.tipo !== 'admin' && !usuario.aprovado) {
+      // COMPATIBILIDADE RETROATIVA: Se aprovado for null/undefined, tratar como true
+      const aprovadoFinal = usuario.aprovado ?? true;
+      if (usuario.tipo !== 'admin' && aprovadoFinal === false) {
         logger.debug('Usuário não aprovado', { userId: usuario.id });
         return null;
       }
@@ -45,7 +47,7 @@ export async function verificarCredenciais(
         email: usuario.email,
         tipo: usuario.tipo as TipoUsuario,
         igreja: usuario.igreja,
-        aprovado: usuario.aprovado,
+        aprovado: aprovadoFinal,
         tenantId: usuario.tenantId ?? null, // Incluir tenantId
       };
     }
@@ -59,7 +61,10 @@ export async function verificarCredenciais(
   }
 
   // Verificar se o usuário está aprovado (admin sempre aprovado)
-  if (usuario.tipo !== 'admin' && !usuario.aprovado) {
+  // COMPATIBILIDADE RETROATIVA: Se aprovado for null/undefined, tratar como true
+  // Isso permite que usuários antigos (criados antes do campo aprovado) possam logar
+  const aprovadoFinal = usuario.aprovado ?? true;
+  if (usuario.tipo !== 'admin' && aprovadoFinal === false) {
     logger.debug('Usuário não aprovado', { userId: usuario.id });
     return null;
   }
@@ -70,7 +75,7 @@ export async function verificarCredenciais(
     email: usuario.email,
     tipo: usuario.tipo as TipoUsuario,
     igreja: usuario.igreja,
-    aprovado: usuario.aprovado,
+    aprovado: aprovadoFinal,
     tenantId: usuario.tenantId ?? null, // Incluir tenantId
   };
 }

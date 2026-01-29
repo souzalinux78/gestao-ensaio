@@ -63,7 +63,10 @@ export async function requireApproved(request: NextRequest): Promise<{ usuario: 
     return authResult;
   }
 
-  if (!usuario.aprovado) {
+  // COMPATIBILIDADE RETROATIVA: Se aprovado for null/undefined, tratar como true
+  // Isso permite que usuários antigos (criados antes do campo aprovado) possam acessar
+  const aprovadoFinal = usuario.aprovado ?? true;
+  if (aprovadoFinal === false) {
     return {
       usuario: null,
       error: NextResponse.json(

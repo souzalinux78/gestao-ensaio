@@ -30,7 +30,10 @@ export async function obterUsuarioDaRequisicao(
         if (usuario) {
           // Verificar se dados do token ainda estão corretos
           // (usuário pode ter sido desaprovado, tipo mudado ou tenant mudado)
-          if (usuario.tipo !== jwtPayload.tipo || usuario.aprovado !== jwtPayload.aprovado) {
+          // COMPATIBILIDADE RETROATIVA: Tratar null/undefined como true para comparação
+          const aprovadoUsuario = usuario.aprovado ?? true;
+          const aprovadoToken = jwtPayload.aprovado ?? true;
+          if (usuario.tipo !== jwtPayload.tipo || aprovadoUsuario !== aprovadoToken) {
             // Token válido mas dados desatualizados - retornar null para forçar novo login
             return null;
           }

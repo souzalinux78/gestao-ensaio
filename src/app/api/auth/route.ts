@@ -82,11 +82,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Se o usuário não estiver aprovado (e não for admin), retornar erro
-    if (usuario.tipo !== 'admin' && !usuario.aprovado) {
+    // COMPATIBILIDADE RETROATIVA: Se aprovado for null/undefined, tratar como true
+    // Isso permite que usuários antigos (criados antes do campo aprovado) possam logar
+    const aprovadoFinal = usuario.aprovado ?? true;
+    if (usuario.tipo !== 'admin' && aprovadoFinal === false) {
       logger.warn('Usuário não aprovado tentou fazer login', { userId: usuario.id });
       return NextResponse.json(
         { error: 'Sua conta ainda não foi aprovada pelo administrador. Aguarde a aprovação.' },
-        { status: 403 }
+        { 
+          status: 403,
+          headers: {
+            'X-RateLimit-Limit': '5',
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+            'X-RateLimit-Reset': rateLimit.resetTime.toString(),
+          },
+        }
       );
     }
 
@@ -121,7 +131,7 @@ export async function POST(request: NextRequest) {
         email: usuario.email,
         tipo: usuario.tipo,
         igreja: usuario.igreja,
-        aprovado: usuario.aprovado,
+        aprovado: usuario.aprovado ?? true, // Compatibilidade retroativa
         // Tokens JWT (novo sistema)
         accessToken,
         refreshToken: refreshTokenValue, // Também no body para compatibilidade

@@ -69,7 +69,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Se for instrutor, verificar se ainda está aprovado
-    if (usuario.tipo !== 'admin' && !usuario.aprovado) {
+    // COMPATIBILIDADE RETROATIVA: Se aprovado for null/undefined, tratar como true
+    const aprovadoFinal = usuario.aprovado ?? true;
+    if (usuario.tipo !== 'admin' && aprovadoFinal === false) {
       return NextResponse.json(
         { error: 'Usuário não aprovado' },
         { status: 403 }
