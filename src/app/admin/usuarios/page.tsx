@@ -349,11 +349,11 @@ export default function UsuariosPage() {
                 }}
                 className="px-4 py-2.5 rounded-lg whitespace-nowrap font-medium shadow-sm transition-colors"
                 style={{
-                  backgroundColor: 'var(--accent-primary)',
-                  color: 'var(--dark-primary)'
+                  backgroundColor: 'var(--pe-gold)',
+                  color: 'var(--pe-black)'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c9a24d'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold)'}
               >
                 + Novo Usuário
               </button>
@@ -457,17 +457,17 @@ export default function UsuariosPage() {
                 disabled={carregando}
                 className="flex-1 sm:flex-none px-6 py-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                 style={{
-                  backgroundColor: 'var(--accent-primary)',
-                  color: 'var(--dark-primary)'
+                  backgroundColor: 'var(--pe-gold)',
+                  color: 'var(--pe-black)'
                 }}
                 onMouseEnter={(e) => {
                   if (!e.currentTarget.disabled) {
-                    e.currentTarget.style.backgroundColor = 'var(--accent-secondary)';
+                    e.currentTarget.style.backgroundColor = '#c9a24d';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!e.currentTarget.disabled) {
-                    e.currentTarget.style.backgroundColor = 'var(--accent-primary)';
+                    e.currentTarget.style.backgroundColor = 'var(--pe-gold)';
                   }
                 }}
               >
@@ -545,11 +545,11 @@ export default function UsuariosPage() {
                       onClick={() => iniciarEdicao(usuario)}
                       className="flex-1 px-3 py-2 rounded-lg text-xs transition-colors font-medium"
                       style={{
-                        backgroundColor: 'var(--accent-primary)',
-                        color: 'var(--dark-primary)'
+                        backgroundColor: 'var(--pe-gold)',
+                        color: 'var(--pe-black)'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c9a24d'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold)'}
                     >
                       Editar
                     </button>
@@ -591,7 +591,7 @@ export default function UsuariosPage() {
                       style={{ 
                         backgroundColor: index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.08)'}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-soft)'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'}
                     >
                       <td className="px-4 py-3 align-middle">

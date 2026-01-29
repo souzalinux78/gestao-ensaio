@@ -232,14 +232,14 @@
   }
   
   .btn-primary {
-    background-color: var(--accent-primary);
-    color: var(--dark-primary);
+    background-color: var(--pe-gold);
+    color: var(--pe-black);
     @apply shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98];
     @apply hover:-translate-y-0.5;
   }
   
   .btn-primary:hover {
-    background-color: var(--accent-secondary);
+    background-color: #c9a24d;
   }
   
   .btn-success {

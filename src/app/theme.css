@@ -2,26 +2,39 @@
    SISTEMA DE TEMA DARK/LIGHT - DESIGN TOKENS GLOBAIS
    ============================================ */
 
-/* DESIGN TOKENS BASE - LIGHT MODE */
+/* ============================================
+   IDENTIDADE VISUAL PARTIU ENSAIO
+   ============================================ */
+
+/* CORES OFICIAIS PARTIU ENSAIO */
 :root {
-  /* Fundos */
+  /* Base Partiu Ensaio */
+  --pe-black: #0b0b0b;
+  --pe-black-soft: #1a1a1a;
+  --pe-gold: #d4af37;
+  --pe-gold-soft: rgba(212, 175, 55, 0.15);
+  --pe-white: #ffffff;
+  --pe-gray-text: #cbd5e1;
+  --pe-gray-muted: #9ca3af;
+  
+  /* Fundos (Light Mode) */
   --bg-page: #f8fafc;
   --bg-surface: #ffffff;
   --bg-muted: #f1f5f9;
   
-  /* Texto */
+  /* Texto (Light Mode) */
   --text-primary: #1f2937;
   --text-secondary: #6b7280;
-  --text-inverse: #ffffff;
+  --text-inverse: var(--pe-white);
   
-  /* Identidade Premium */
-  --accent-primary: #d4af37;
+  /* Identidade Premium (usando cores Partiu Ensaio) */
+  --accent-primary: var(--pe-gold);
   --accent-secondary: #c9a24d;
-  --accent-soft: rgba(212, 175, 55, 0.15);
+  --accent-soft: var(--pe-gold-soft);
   
-  /* Neutros escuros (para menus) */
-  --dark-primary: #0b0b0b;
-  --dark-secondary: #1a1a1a;
+  /* Neutros escuros (usando cores Partiu Ensaio) */
+  --dark-primary: var(--pe-black);
+  --dark-secondary: var(--pe-black-soft);
   
   /* Bordas */
   --border-default: #e5e7eb;
@@ -62,26 +75,26 @@
   --scrollbar-thumb-hover: #0f1f35;
 }
 
-/* DESIGN TOKENS - DARK MODE */
+/* DARK MODE - PARTIU ENSAIO */
 [data-theme="dark"] {
   /* Fundos */
   --bg-page: #020617;
   --bg-surface: #0f172a;
   --bg-muted: #020617;
   
-  /* Texto */
-  --text-primary: #e5e7eb;
-  --text-secondary: #9ca3af;
-  --text-inverse: #ffffff;
+  /* Texto (usando cores Partiu Ensaio) */
+  --text-primary: var(--pe-gray-text);
+  --text-secondary: var(--pe-gray-muted);
+  --text-inverse: var(--pe-white);
   
-  /* Identidade Premium (mantém dourado) */
-  --accent-primary: #d4af37;
+  /* Identidade Premium (mantém cores Partiu Ensaio) */
+  --accent-primary: var(--pe-gold);
   --accent-secondary: #c9a24d;
-  --accent-soft: rgba(212, 175, 55, 0.15);
+  --accent-soft: var(--pe-gold-soft);
   
-  /* Neutros escuros (para menus) */
-  --dark-primary: #0b0b0b;
-  --dark-secondary: #1a1a1a;
+  /* Neutros escuros (usando cores Partiu Ensaio) */
+  --dark-primary: var(--pe-black);
+  --dark-secondary: var(--pe-black-soft);
   
   /* Bordas */
   --border-default: #1f2937;

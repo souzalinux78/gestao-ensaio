@@ -66,9 +66,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg-secondary)]">
       {/* Header */}
       <header 
-        className="text-[var(--text-inverse)] p-3 sm:p-4 shadow-lg"
+        className="text-[var(--pe-white)] p-3 sm:p-4 shadow-lg"
         style={{
-          background: 'linear-gradient(180deg, var(--dark-primary), var(--dark-secondary))'
+          background: 'linear-gradient(90deg, #0b0b0b 0%, #1a1a1a 60%, #2a2208 100%)'
         }}
       >
         <div className="container mx-auto flex justify-between items-center gap-2">
@@ -77,11 +77,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               onClick={() => setMenuAberto(!menuAberto)}
               className="lg:hidden p-2 rounded-lg transition-colors flex-shrink-0"
               style={{ 
-                color: 'var(--text-inverse)',
-                backgroundColor: 'rgba(255, 255, 255, 0.06)'
+                color: 'var(--pe-white)',
+                backgroundColor: 'transparent'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.06)'}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-soft)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               aria-label="Toggle menu"
             >
               <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,14 +90,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </button>
             <div className="min-w-0 flex-1">
               <h1 className="text-base sm:text-lg lg:text-xl font-bold truncate" style={{ color: 'var(--text-inverse)' }}>Painel Admin</h1>
-              <p className="text-xs sm:text-sm truncate" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-xs sm:text-sm truncate" style={{ color: 'var(--pe-gray-muted)' }}>
                 {usuario.nome} {usuario.igreja && `- ${usuario.igreja}`}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <ThemeToggle />
-            <span className="text-xs sm:text-sm hidden md:inline truncate max-w-[120px] sm:max-w-none" style={{ color: 'var(--text-secondary)' }}>{usuario.email}</span>
+            <span className="text-xs sm:text-sm hidden md:inline truncate max-w-[120px] sm:max-w-none" style={{ color: 'var(--pe-gray-muted)' }}>{usuario.email}</span>
             <button
               onClick={handleLogout}
               className="px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded text-xs sm:text-sm md:text-base transition-colors whitespace-nowrap"
@@ -119,7 +119,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <aside 
           className="hidden lg:block w-64 shadow-lg min-h-[calc(100vh-80px)]"
           style={{
-            background: 'linear-gradient(180deg, var(--dark-primary), var(--dark-secondary))'
+            background: 'linear-gradient(90deg, #0b0b0b 0%, #1a1a1a 60%, #2a2208 100%)'
           }}
         >
           <nav className="p-4 space-y-2">
@@ -131,13 +131,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   href={item.href}
                   className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200"
                   style={{
-                    color: active ? 'var(--text-inverse)' : 'var(--text-secondary)',
-                    backgroundColor: active ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
-                    borderLeft: active ? '4px solid var(--accent-primary)' : '4px solid transparent',
+                    color: active ? 'var(--pe-white)' : 'var(--pe-gray-muted)',
+                    backgroundColor: active ? 'var(--pe-gold-soft)' : 'transparent',
+                    borderLeft: active ? '4px solid var(--pe-gold)' : '4px solid transparent',
                   }}
                   onMouseEnter={(e) => {
                     if (!active) {
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.06)';
+                      e.currentTarget.style.backgroundColor = 'var(--pe-gold-soft)';
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -146,7 +146,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     }
                   }}
                 >
-                  <span className="text-xl" style={{ color: active ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+                  <span className="text-xl" style={{ color: active ? 'var(--pe-gold)' : 'var(--pe-gray-muted)' }}>
                     {item.icon}
                   </span>
                   <span className="font-medium">{item.label}</span>
@@ -166,7 +166,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <aside 
               className="fixed left-0 top-[80px] w-64 shadow-xl h-[calc(100vh-80px)] z-50 lg:hidden overflow-y-auto"
               style={{
-                background: 'linear-gradient(180deg, var(--dark-primary), var(--dark-secondary))'
+                background: 'linear-gradient(90deg, #0b0b0b 0%, #1a1a1a 60%, #2a2208 100%)'
               }}
             >
               <nav className="p-4 space-y-2">

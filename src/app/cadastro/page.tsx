@@ -74,18 +74,18 @@ export default function CadastroPage() {
       <div 
         className="min-h-screen flex items-center justify-center p-4"
         style={{
-          background: 'linear-gradient(180deg, var(--dark-primary), var(--dark-secondary))'
+          background: 'linear-gradient(90deg, #0b0b0b 0%, #1a1a1a 60%, #2a2208 100%)'
         }}
       >
         <div className="rounded-lg shadow-xl p-8 max-w-md w-full text-center" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
           <div className="mb-4">
-            <div className="mx-auto w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--accent-soft)' }}>
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--accent-primary)' }}>
+            <div className="mx-auto w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--pe-gold-soft)' }}>
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--pe-gold)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
           </div>
-          <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--accent-primary)' }}>Cadastro Realizado!</h2>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--pe-gold)' }}>Cadastro Realizado!</h2>
           <p className="mb-4" style={{ color: 'var(--text-primary)' }}>
             Seu cadastro foi enviado com sucesso. Aguarde a aprovação do administrador para acessar o sistema.
           </p>
@@ -96,11 +96,11 @@ export default function CadastroPage() {
             href="/login"
             className="inline-block px-6 py-2.5 rounded-lg transition-colors font-medium"
             style={{
-              backgroundColor: 'var(--accent-primary)',
-              color: 'var(--dark-primary)'
+              backgroundColor: 'var(--pe-gold)',
+              color: 'var(--pe-black)'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c9a24d'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold)'}
           >
             Ir para Login
           </a>
@@ -154,7 +154,7 @@ export default function CadastroPage() {
                 color: 'var(--text-primary)'
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--accent-secondary)';
+                e.currentTarget.style.borderColor = 'var(--pe-gold)';
                 e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
               }}
               onBlur={(e) => {
@@ -178,7 +178,7 @@ export default function CadastroPage() {
                 color: 'var(--text-primary)'
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--accent-secondary)';
+                e.currentTarget.style.borderColor = 'var(--pe-gold)';
                 e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
               }}
               onBlur={(e) => {
@@ -203,7 +203,7 @@ export default function CadastroPage() {
                 color: 'var(--text-primary)'
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--accent-secondary)';
+                e.currentTarget.style.borderColor = 'var(--pe-gold)';
                 e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
               }}
               onBlur={(e) => {
@@ -227,7 +227,7 @@ export default function CadastroPage() {
                 color: 'var(--text-primary)'
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--accent-secondary)';
+                e.currentTarget.style.borderColor = 'var(--pe-gold)';
                 e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
               }}
               onBlur={(e) => {
@@ -253,7 +253,7 @@ export default function CadastroPage() {
                 color: 'var(--text-primary)'
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--accent-secondary)';
+                e.currentTarget.style.borderColor = 'var(--pe-gold)';
                 e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
               }}
               onBlur={(e) => {
@@ -294,9 +294,9 @@ export default function CadastroPage() {
             <a 
               href="/login" 
               className="font-medium transition-colors"
-              style={{ color: 'var(--accent-primary)' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-secondary)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--accent-primary)'}
+              style={{ color: 'var(--pe-gold)' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#c9a24d'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--pe-gold)'}
             >
               Fazer login
             </a>

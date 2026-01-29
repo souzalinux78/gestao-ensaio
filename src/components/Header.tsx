@@ -25,22 +25,22 @@ export default function Header() {
     <header 
       className="p-3 sm:p-4 shadow-lg"
       style={{
-        background: 'linear-gradient(180deg, var(--dark-primary), var(--dark-secondary))',
-        color: 'var(--text-inverse)'
+        background: 'linear-gradient(90deg, #0b0b0b 0%, #1a1a1a 60%, #2a2208 100%)',
+        color: 'var(--pe-white)'
       }}
     >
       <div className="container mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
         <div className="flex-1 min-w-0">
-          <h1 className="text-lg sm:text-xl font-bold" style={{ color: 'var(--text-inverse)' }}>Gestão de Ensaio</h1>
+          <h1 className="text-lg sm:text-xl font-bold" style={{ color: 'var(--pe-white)' }}>Gestão de Ensaio</h1>
           {usuario && (
-            <p className="text-xs sm:text-sm truncate" style={{ color: 'var(--text-secondary)' }}>
+            <p className="text-xs sm:text-sm truncate" style={{ color: 'var(--pe-gray-muted)' }}>
               {usuario.nome} {usuario.igreja && `- ${usuario.igreja}`}
             </p>
           )}
         </div>
         <nav className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-end sm:items-center w-full sm:w-auto">
           {usuario && (
-            <span className="text-xs sm:text-sm hidden sm:inline" style={{ color: 'var(--text-secondary)' }}>{usuario.email}</span>
+            <span className="text-xs sm:text-sm hidden sm:inline" style={{ color: 'var(--pe-gray-muted)' }}>{usuario.email}</span>
           )}
           <ThemeToggle />
           <button

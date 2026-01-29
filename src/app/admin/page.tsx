@@ -171,7 +171,7 @@ export default function AdminPage() {
         {metricas && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {/* Total Usuários */}
-            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderLeft: '4px solid var(--accent-primary)' }}>
+            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--pe-white)', border: '1px solid var(--border-default)', borderLeft: '4px solid var(--pe-gold)' }}>
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Total de Usuários</p>
@@ -185,7 +185,7 @@ export default function AdminPage() {
             </div>
 
             {/* Total Ensaios */}
-            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderLeft: '4px solid var(--accent-primary)' }}>
+            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--pe-white)', border: '1px solid var(--border-default)', borderLeft: '4px solid var(--pe-gold)' }}>
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Total de Ensaios</p>
@@ -199,7 +199,7 @@ export default function AdminPage() {
             </div>
 
             {/* Usuários Pendentes */}
-            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderLeft: '4px solid var(--accent-primary)' }}>
+            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--pe-white)', border: '1px solid var(--border-default)', borderLeft: '4px solid var(--pe-gold)' }}>
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Pendentes</p>
@@ -213,7 +213,7 @@ export default function AdminPage() {
             </div>
 
             {/* Tenants Ativos */}
-            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderLeft: '4px solid var(--accent-primary)' }}>
+            <div className="rounded-lg shadow-md p-4 sm:p-6" style={{ backgroundColor: 'var(--pe-white)', border: '1px solid var(--border-default)', borderLeft: '4px solid var(--pe-gold)' }}>
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[var(--text-secondary)]">Tenants Ativos</p>
@@ -247,11 +247,11 @@ export default function AdminPage() {
                         className="h-full rounded-full flex items-center justify-end pr-2 transition-all duration-500"
                         style={{
                           width: `${Math.min((item.total / maxEnsaios) * 100, 100)}%`,
-                          backgroundColor: 'var(--accent-primary)'
+                          backgroundColor: 'var(--pe-gold)'
                         }}
                       >
                         {item.total > 0 && (
-                          <span className="text-xs font-medium" style={{ color: 'var(--dark-primary)' }}>{item.total}</span>
+                          <span className="text-xs font-medium" style={{ color: 'var(--pe-black)' }}>{item.total}</span>
                         )}
                       </div>
                     </div>
@@ -276,13 +276,13 @@ export default function AdminPage() {
                     key={log.id}
                     className="flex items-start gap-3 p-3 rounded-lg transition-colors"
                     style={{ backgroundColor: 'var(--bg-muted)' }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-soft)'}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-soft)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
                   >
                     <div className="flex-shrink-0 mt-0.5">
                       <div
                         className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: 'var(--accent-primary)' }}
+                        style={{ backgroundColor: 'var(--pe-gold)' }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -365,11 +365,11 @@ export default function AdminPage() {
                 onClick={handleFiltrar}
                 className="w-full sm:w-auto px-6 py-2 rounded-lg transition-colors font-medium"
                 style={{
-                  backgroundColor: 'var(--accent-primary)',
-                  color: 'var(--dark-primary)'
+                  backgroundColor: 'var(--pe-gold)',
+                  color: 'var(--pe-black)'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c9a24d'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold)'}
               >
                 Filtrar
               </button>

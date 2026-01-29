@@ -54,7 +54,7 @@ export default function LoginPage() {
     <div 
       className="min-h-screen flex items-center justify-center p-4"
       style={{
-        background: 'linear-gradient(180deg, var(--dark-primary), var(--dark-secondary))'
+        background: 'linear-gradient(90deg, #0b0b0b 0%, #1a1a1a 60%, #2a2208 100%)'
       }}
     >
       <div className="p-6 sm:p-8 rounded-lg shadow-2xl w-full max-w-md" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
@@ -81,10 +81,10 @@ export default function LoginPage() {
         
         <div className="text-center mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">
-            <span style={{ color: 'var(--text-primary)' }}>Gestão de</span>{' '}
-            <span style={{ color: 'var(--accent-primary)' }}>Ensaio</span>
+            <span style={{ color: 'var(--pe-white)' }}>Gestão de</span>{' '}
+            <span style={{ color: 'var(--pe-gold)' }}>Ensaio</span>
           </h1>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Sistema de gestão de ensaios musicais</p>
+          <p className="text-sm" style={{ color: 'var(--pe-gray-text)' }}>Sistema de gestão de ensaios musicais</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -100,7 +100,7 @@ export default function LoginPage() {
                 color: 'var(--text-primary)'
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--accent-secondary)';
+                e.currentTarget.style.borderColor = 'var(--pe-gold)';
                 e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
               }}
               onBlur={(e) => {
@@ -124,7 +124,7 @@ export default function LoginPage() {
                 color: 'var(--text-primary)'
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--accent-secondary)';
+                e.currentTarget.style.borderColor = 'var(--pe-gold)';
                 e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
               }}
               onBlur={(e) => {
@@ -145,17 +145,17 @@ export default function LoginPage() {
             disabled={carregando}
             className="w-full py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors shadow-md hover:shadow-lg"
             style={{
-              backgroundColor: 'var(--accent-primary)',
-              color: 'var(--dark-primary)'
+              backgroundColor: 'var(--pe-gold)',
+              color: 'var(--pe-black)'
             }}
             onMouseEnter={(e) => {
               if (!e.currentTarget.disabled) {
-                e.currentTarget.style.backgroundColor = 'var(--accent-secondary)';
+                e.currentTarget.style.backgroundColor = '#c9a24d';
               }
             }}
             onMouseLeave={(e) => {
               if (!e.currentTarget.disabled) {
-                e.currentTarget.style.backgroundColor = 'var(--accent-primary)';
+                e.currentTarget.style.backgroundColor = 'var(--pe-gold)';
               }
             }}
           >
@@ -168,9 +168,9 @@ export default function LoginPage() {
             <a 
               href="/cadastro" 
               className="font-medium transition-colors"
-              style={{ color: 'var(--accent-primary)' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-secondary)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--accent-primary)'}
+              style={{ color: 'var(--pe-gold)' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#c9a24d'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--pe-gold)'}
             >
               Criar conta
             </a>

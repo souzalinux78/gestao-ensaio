@@ -69,7 +69,7 @@ export default function MetricasPage() {
     return (
       <AdminLayout>
         <div className="text-center py-8">
-          <div className="w-12 h-12 border-4 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--accent-primary)', borderTopColor: 'transparent' }}></div>
+          <div className="w-12 h-12 border-4 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--pe-gold)', borderTopColor: 'transparent' }}></div>
           <p className="text-gray-600 dark:text-[var(--text-secondary)]">Carregando métricas...</p>
         </div>
       </AdminLayout>
@@ -101,7 +101,7 @@ export default function MetricasPage() {
               color: 'var(--text-primary)'
             }}
             onFocus={(e) => {
-              e.currentTarget.style.borderColor = 'var(--accent-primary)';
+              e.currentTarget.style.borderColor = 'var(--pe-gold)';
               e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
             }}
             onBlur={(e) => {
@@ -203,7 +203,7 @@ export default function MetricasPage() {
         </div>
 
         {/* Ensaios por Mês */}
-        <div className="rounded-lg shadow p-4 sm:p-6 mt-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
+          <div className="rounded-lg shadow p-4 sm:p-6 mt-6" style={{ backgroundColor: 'var(--pe-white)', border: '1px solid var(--border-default)' }}>
           <h2 className="text-base sm:text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Ensaios por Mês (Últimos 6 meses)</h2>
           <div className="space-y-2">
             {metricas.ensaios.porMes.map((item, index) => {
@@ -216,11 +216,11 @@ export default function MetricasPage() {
                       className="h-full rounded-full flex items-center justify-end pr-2"
                       style={{
                         width: `${Math.min((item.total / maxTotal) * 100, 100)}%`,
-                        backgroundColor: 'var(--accent-primary)'
+                        backgroundColor: 'var(--pe-gold)'
                       }}
                     >
                       {item.total > 0 && (
-                        <span className="text-xs font-medium" style={{ color: 'var(--dark-primary)' }}>{item.total}</span>
+                        <span className="text-xs font-medium" style={{ color: 'var(--pe-black)' }}>{item.total}</span>
                       )}
                     </div>
                   </div>

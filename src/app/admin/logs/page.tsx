@@ -91,7 +91,7 @@ export default function LogsPage() {
               color: 'var(--text-primary)'
             }}
             onFocus={(e) => {
-              e.currentTarget.style.borderColor = 'var(--accent-primary)';
+              e.currentTarget.style.borderColor = 'var(--pe-gold)';
               e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
             }}
             onBlur={(e) => {
@@ -174,7 +174,7 @@ export default function LogsPage() {
                         style={{ 
                           backgroundColor: index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'
                         }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.08)'}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-soft)'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'}
                       >
                         <td className="px-4 py-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
