@@ -3,8 +3,19 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/AdminLayout';
-import { Usuario } from '@/types';
+import { Usuario, TipoUsuario } from '@/types';
 import { apiFetch } from '@/lib/api-client';
+
+// Função helper para exibir nome amigável do tipo
+function getTipoLabel(tipo: TipoUsuario): string {
+  const labels: Record<TipoUsuario, string> = {
+    admin: 'Admin',
+    instrutor: 'Instrutor',
+    encarregado: 'Encarregado',
+    secretario: 'Secretário',
+  };
+  return labels[tipo] || tipo;
+}
 
 export default function UsuariosPage() {
   const router = useRouter();
@@ -20,7 +31,7 @@ export default function UsuariosPage() {
     nome: '',
     email: '',
     senha: '',
-    tipo: 'instrutor' as 'admin' | 'instrutor',
+    tipo: 'instrutor' as TipoUsuario,
     igreja: '',
     aprovado: false, // Por padrão, não aprovar - admin decide se aprova na hora
   });
@@ -391,10 +402,12 @@ export default function UsuariosPage() {
                 <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">Tipo</label>
                 <select
                   value={formData.tipo}
-                  onChange={(e) => setFormData({ ...formData, tipo: e.target.value as 'admin' | 'instrutor' })}
+                  onChange={(e) => setFormData({ ...formData, tipo: e.target.value as TipoUsuario })}
                   className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 >
                   <option value="instrutor">Instrutor</option>
+                  <option value="encarregado">Encarregado</option>
+                  <option value="secretario">Secretário</option>
                   <option value="admin">Administrador</option>
                 </select>
               </div>
@@ -512,7 +525,7 @@ export default function UsuariosPage() {
                       <span className={`inline-block mt-1 px-2 py-1 rounded text-xs ${
                         usuario.tipo === 'admin' ? 'bg-accent/20 text-accent-dark' : 'bg-primary/20 text-primary'
                       }`}>
-                        {usuario.tipo === 'admin' ? 'Admin' : 'Instrutor'}
+                        {getTipoLabel(usuario.tipo)}
                       </span>
                       {usuario.igreja && (
                         <p className="text-xs text-gray-500 dark:text-[var(--text-tertiary)] mt-1">{usuario.igreja}</p>
@@ -604,7 +617,7 @@ export default function UsuariosPage() {
                         <span className={`inline-block px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
                           usuario.tipo === 'admin' ? 'bg-accent/20 text-accent-dark' : 'bg-primary/20 text-primary'
                         }`}>
-                          {usuario.tipo === 'admin' ? 'Admin' : 'Instrutor'}
+                          {getTipoLabel(usuario.tipo)}
                         </span>
                       </td>
                       <td className="px-4 py-3 align-middle">

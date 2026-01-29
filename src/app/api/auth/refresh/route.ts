@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       id: usuario.id,
       nome: usuario.nome,
       email: usuario.email,
-      tipo: usuario.tipo as 'admin' | 'instrutor',
+      tipo: usuario.tipo,
       igreja: usuario.igreja,
       aprovado: usuario.aprovado,
       tenantId: usuario.tenantId ?? null, // ISOLAMENTO: incluir tenantId

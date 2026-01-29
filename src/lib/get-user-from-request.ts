@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from './db';
-import { Usuario } from '@/types';
+import { Usuario, TipoUsuario } from '@/types';
 import { verifyAccessToken } from './jwt';
 
 export async function obterUsuarioDaRequisicao(
@@ -42,7 +42,7 @@ export async function obterUsuarioDaRequisicao(
             id: usuario.id,
             nome: usuario.nome,
             email: usuario.email,
-            tipo: usuario.tipo as 'admin' | 'instrutor',
+            tipo: usuario.tipo as TipoUsuario,
             igreja: usuario.igreja,
             aprovado: usuario.aprovado,
             tenantId: usuario.tenantId ?? null, // Incluir tenantId
@@ -71,7 +71,7 @@ export async function obterUsuarioDaRequisicao(
             id: usuario.id,
             nome: usuario.nome,
             email: usuario.email,
-            tipo: usuario.tipo as 'admin' | 'instrutor',
+            tipo: usuario.tipo as TipoUsuario,
             igreja: usuario.igreja,
             aprovado: usuario.aprovado,
             tenantId: usuario.tenantId ?? null, // Incluir tenantId
@@ -101,7 +101,7 @@ export async function obterUsuarioDaRequisicao(
           id: usuario.id,
           nome: usuario.nome,
           email: usuario.email,
-          tipo: usuario.tipo as 'admin' | 'instrutor',
+          tipo: usuario.tipo as TipoUsuario,
           igreja: usuario.igreja,
           aprovado: usuario.aprovado,
           tenantId: usuario.tenantId ?? null, // Incluir tenantId

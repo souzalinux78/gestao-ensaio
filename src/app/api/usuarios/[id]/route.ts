@@ -43,9 +43,10 @@ export async function PUT(
       updateData.email = email.trim().toLowerCase();
     }
     if (tipo) {
-      if (tipo !== 'admin' && tipo !== 'instrutor') {
+      const tiposValidos = ['admin', 'instrutor', 'encarregado', 'secretario'];
+      if (!tiposValidos.includes(tipo)) {
         return NextResponse.json(
-          { error: 'Tipo deve ser "admin" ou "instrutor"' },
+          { error: `Tipo deve ser um dos seguintes: ${tiposValidos.join(', ')}` },
           { status: 400 }
         );
       }

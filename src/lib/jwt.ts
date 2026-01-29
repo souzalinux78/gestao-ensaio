@@ -1,5 +1,5 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
-import { Usuario } from '@/types';
+import { Usuario, TipoUsuario } from '@/types';
 
 // Configurações JWT
 const JWT_SECRET: string = process.env.JWT_SECRET || 'change-me-in-production-minimum-32-characters';
@@ -9,7 +9,7 @@ const REFRESH_TOKEN_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 // Tipos para payload dos tokens
 export interface AccessTokenPayload {
   userId: number;
-  tipo: 'admin' | 'instrutor';
+  tipo: TipoUsuario;
   aprovado: boolean;
   tenantId?: number | null; // ID do tenant (multi-tenant) - opcional para compatibilidade retroativa
   iat?: number;
