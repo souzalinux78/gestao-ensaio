@@ -20,33 +20,39 @@ export default function RelatorioTable({
   onEditar,
 }: RelatorioTableProps) {
   return (
-    <div className="overflow-x-auto bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm">
+    <div className="overflow-x-auto rounded-lg shadow-sm" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
       <div className="block sm:hidden">
         {/* Versão mobile: cards */}
         {ensaios.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 dark:text-[var(--text-secondary)]">Nenhum ensaio encontrado</div>
+          <div className="p-8 text-center" style={{ color: 'var(--text-secondary)' }}>Nenhum ensaio encontrado</div>
         ) : (
-          <div className="divide-y divide-gray-200 dark:divide-[var(--border-primary)]">
+          <div className="divide-y" style={{ borderColor: 'var(--border-default)' }}>
             {ensaios.map((ensaio) => (
               <div key={ensaio.id} className="p-4">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <p className="font-semibold text-primary dark:text-[var(--text-primary)]">
+                    <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>
                       {format(new Date(ensaio.data), 'dd/MM/yyyy', { locale: ptBR })}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-[var(--text-secondary)]">
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                       Instrutor: {ensaio.instrutor?.nome || 'N/A'}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-[var(--text-secondary)]">
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                       Igreja: {ensaio.instrutor?.igreja || '-'}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-[var(--text-secondary)]">Total: {ensaio.totalGeral}</p>
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Total: {ensaio.totalGeral}</p>
                   </div>
                   <div className="flex gap-2 items-center flex-wrap">
                     {onEditar ? (
                       <button
                         onClick={() => onEditar(ensaio)}
-                        className="bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium whitespace-nowrap"
+                        className="px-3 py-2 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+                        style={{
+                          backgroundColor: 'var(--bg-muted)',
+                          color: 'var(--text-primary)'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
                         title="Editar ensaio"
                       >
                         ✏️ Editar
@@ -55,14 +61,26 @@ export default function RelatorioTable({
                     {onEnviarWebhook ? (
                       <button
                         onClick={() => onEnviarWebhook(ensaio)}
-                        className="bg-accent text-white px-3 py-2 rounded-lg hover:bg-accent-dark transition-colors text-sm font-medium whitespace-nowrap"
+                        className="px-3 py-2 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+                        style={{
+                          backgroundColor: 'var(--accent-primary)',
+                          color: 'var(--dark-primary)'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
                       >
                         Enviar
                       </button>
                     ) : null}
                     <button
                       onClick={() => onGerarPDF(ensaio)}
-                      className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium whitespace-nowrap"
+                      className="px-4 py-2 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+                      style={{
+                        backgroundColor: 'var(--accent-primary)',
+                        color: 'var(--dark-primary)'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
                     >
                       PDF
                     </button>
@@ -77,7 +95,7 @@ export default function RelatorioTable({
       {/* Versão desktop: tabela */}
       <table className="hidden sm:table min-w-full">
         <thead>
-          <tr className="bg-primary text-white">
+          <tr style={{ backgroundColor: 'var(--bg-muted)', color: 'var(--text-primary)' }}>
             <th className="px-4 py-3 text-left font-semibold">Data</th>
             <th className="px-4 py-3 text-left font-semibold">Instrutor</th>
             <th className="px-4 py-3 text-left font-semibold">Igreja</th>
@@ -85,32 +103,46 @@ export default function RelatorioTable({
             <th className="px-4 py-3 text-left font-semibold">Ações</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200 dark:divide-[var(--border-primary)]">
+        <tbody className="divide-y" style={{ borderColor: 'var(--border-default)' }}>
           {ensaios.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-4 py-8 text-center text-gray-500 dark:text-[var(--text-secondary)]">
+              <td colSpan={5} className="px-4 py-8 text-center" style={{ color: 'var(--text-secondary)' }}>
                 Nenhum ensaio encontrado
               </td>
             </tr>
           ) : (
-            ensaios.map((ensaio) => (
-              <tr key={ensaio.id} className="hover:bg-gray-50 dark:hover:bg-[var(--bg-secondary)] transition-colors">
-                <td className="px-4 py-3 text-[var(--text-primary)]">
+            ensaios.map((ensaio, index) => (
+              <tr 
+                key={ensaio.id} 
+                className="transition-colors"
+                style={{ 
+                  backgroundColor: index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.08)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'}
+              >
+                <td className="px-4 py-3" style={{ color: 'var(--text-primary)' }}>
                   {format(new Date(ensaio.data), 'dd/MM/yyyy', { locale: ptBR })}
                 </td>
-                <td className="px-4 py-3 text-[var(--text-primary)]">
+                <td className="px-4 py-3" style={{ color: 'var(--text-primary)' }}>
                   {ensaio.instrutor?.nome || 'N/A'}
                 </td>
-                <td className="px-4 py-3 text-[var(--text-primary)]">
+                <td className="px-4 py-3" style={{ color: 'var(--text-primary)' }}>
                   {ensaio.instrutor?.igreja || '-'}
                 </td>
-                <td className="px-4 py-3 font-medium text-[var(--text-primary)]">{ensaio.totalGeral}</td>
+                <td className="px-4 py-3 font-medium" style={{ color: 'var(--text-primary)' }}>{ensaio.totalGeral}</td>
                 <td className="px-4 py-3">
                   <div className="flex gap-2 items-center flex-wrap">
                     {onEditar ? (
                       <button
                         onClick={() => onEditar(ensaio)}
-                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium whitespace-nowrap"
+                        className="px-4 py-2 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+                        style={{
+                          backgroundColor: 'var(--bg-muted)',
+                          color: 'var(--text-primary)'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
                         title="Editar ensaio"
                       >
                         ✏️ Editar
@@ -119,14 +151,26 @@ export default function RelatorioTable({
                     {onEnviarWebhook ? (
                       <button
                         onClick={() => onEnviarWebhook(ensaio)}
-                        className="bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent-dark transition-colors text-sm font-medium whitespace-nowrap"
+                        className="px-4 py-2 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+                        style={{
+                          backgroundColor: 'var(--accent-primary)',
+                          color: 'var(--dark-primary)'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
                       >
                         Enviar
                       </button>
                     ) : null}
                     <button
                       onClick={() => onGerarPDF(ensaio)}
-                      className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium whitespace-nowrap"
+                      className="px-4 py-2 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+                      style={{
+                        backgroundColor: 'var(--accent-primary)',
+                        color: 'var(--dark-primary)'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
                     >
                       Gerar PDF
                     </button>

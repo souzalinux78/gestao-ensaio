@@ -232,9 +232,14 @@
   }
   
   .btn-primary {
-    @apply bg-primary text-white hover:bg-primary-dark focus:ring-primary;
+    background-color: var(--accent-primary);
+    color: var(--dark-primary);
     @apply shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98];
     @apply hover:-translate-y-0.5;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--accent-secondary);
   }
   
   .btn-success {
@@ -250,9 +255,14 @@
   }
   
   .btn-secondary {
-    @apply bg-gray-500 text-white hover:bg-gray-600 focus:ring-gray-500;
+    background-color: var(--bg-muted);
+    color: var(--text-primary);
     @apply shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98];
     @apply hover:-translate-y-0.5;
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--bg-muted);
   }
   
   /* Botão outline */
@@ -278,7 +288,9 @@
   
   /* Card padrão */
   .card {
-    @apply bg-white dark:bg-[var(--bg-primary)] rounded-card shadow-soft p-4 sm:p-6;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    @apply rounded-card shadow-soft p-4 sm:p-6;
     @apply text-[var(--text-primary)] transition-all duration-200;
   }
   

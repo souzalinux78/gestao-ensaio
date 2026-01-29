@@ -22,24 +22,36 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-primary text-white p-3 sm:p-4 shadow-lg">
+    <header 
+      className="p-3 sm:p-4 shadow-lg"
+      style={{
+        background: 'linear-gradient(180deg, var(--dark-primary), var(--dark-secondary))',
+        color: 'var(--text-inverse)'
+      }}
+    >
       <div className="container mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
         <div className="flex-1 min-w-0">
-          <h1 className="text-lg sm:text-xl font-bold">Gestão de Ensaio</h1>
+          <h1 className="text-lg sm:text-xl font-bold" style={{ color: 'var(--text-inverse)' }}>Gestão de Ensaio</h1>
           {usuario && (
-            <p className="text-xs sm:text-sm text-white/80 truncate">
+            <p className="text-xs sm:text-sm truncate" style={{ color: 'var(--text-secondary)' }}>
               {usuario.nome} {usuario.igreja && `- ${usuario.igreja}`}
             </p>
           )}
         </div>
         <nav className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-end sm:items-center w-full sm:w-auto">
           {usuario && (
-            <span className="text-xs sm:text-sm text-white/80 hidden sm:inline">{usuario.email}</span>
+            <span className="text-xs sm:text-sm hidden sm:inline" style={{ color: 'var(--text-secondary)' }}>{usuario.email}</span>
           )}
           <ThemeToggle />
           <button
             onClick={handleLogout}
-            className="bg-red-500 px-3 sm:px-4 py-1.5 sm:py-2 rounded hover:bg-red-600 text-sm sm:text-base transition-colors w-full sm:w-auto"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 rounded text-sm sm:text-base transition-colors w-full sm:w-auto"
+            style={{
+              backgroundColor: 'var(--color-error)',
+              color: 'var(--text-inverse)'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-error)'}
           >
             Sair
           </button>

@@ -449,13 +449,33 @@ export default function UsuariosPage() {
               <button
                 onClick={salvarUsuario}
                 disabled={carregando}
-                className="flex-1 sm:flex-none bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                className="flex-1 sm:flex-none px-6 py-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                style={{
+                  backgroundColor: 'var(--accent-primary)',
+                  color: 'var(--dark-primary)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = 'var(--accent-secondary)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    e.currentTarget.style.backgroundColor = 'var(--accent-primary)';
+                  }
+                }}
               >
                 {carregando ? 'Salvando...' : 'Salvar'}
               </button>
               <button
                 onClick={cancelarEdicao}
-                className="flex-1 sm:flex-none bg-gray-400 text-white px-6 py-2.5 rounded-lg hover:bg-gray-500 transition-colors font-medium"
+                className="flex-1 sm:flex-none px-6 py-2.5 rounded-lg transition-colors font-medium"
+                style={{
+                  backgroundColor: 'var(--bg-muted)',
+                  color: 'var(--text-primary)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
               >
                 Cancelar
               </button>
@@ -517,7 +537,13 @@ export default function UsuariosPage() {
                     )}
                     <button
                       onClick={() => iniciarEdicao(usuario)}
-                      className="flex-1 bg-primary text-white px-3 py-2 rounded-lg text-xs hover:bg-primary-dark transition-colors font-medium"
+                      className="flex-1 px-3 py-2 rounded-lg text-xs transition-colors font-medium"
+                      style={{
+                        backgroundColor: 'var(--accent-primary)',
+                        color: 'var(--dark-primary)'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
                     >
                       Editar
                     </button>
@@ -541,7 +567,7 @@ export default function UsuariosPage() {
             {/* Versão desktop: tabela */}
             <div className="hidden sm:block overflow-x-auto">
               <table className="min-w-full table-fixed">
-                <thead className="bg-primary text-white">
+                <thead style={{ backgroundColor: 'var(--bg-muted)', color: 'var(--text-primary)' }}>
                   <tr>
                     <th className="px-4 py-3 text-left font-semibold w-[20%]">Nome</th>
                     <th className="px-4 py-3 text-left font-semibold w-[25%]">Email</th>
@@ -551,14 +577,22 @@ export default function UsuariosPage() {
                     <th className="px-4 py-3 text-center font-semibold w-[15%]">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-[var(--border-primary)] bg-white dark:bg-[var(--bg-primary)]">
-                  {usuariosFiltrados.map((usuario) => (
-                    <tr key={usuario.id} className="hover:bg-gray-50 dark:hover:bg-[var(--bg-secondary)] transition-colors">
+                <tbody className="divide-y" style={{ borderColor: 'var(--border-default)' }}>
+                  {usuariosFiltrados.map((usuario, index) => (
+                    <tr 
+                      key={usuario.id} 
+                      className="transition-colors"
+                      style={{ 
+                        backgroundColor: index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.08)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'}
+                    >
                       <td className="px-4 py-3 align-middle">
-                        <span className="font-medium text-gray-900 dark:text-[var(--text-primary)]">{usuario.nome}</span>
+                        <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{usuario.nome}</span>
                       </td>
                       <td className="px-4 py-3 align-middle">
-                        <span className="text-sm text-gray-600 dark:text-[var(--text-secondary)] break-words">{usuario.email}</span>
+                        <span className="text-sm break-words" style={{ color: 'var(--text-secondary)' }}>{usuario.email}</span>
                       </td>
                       <td className="px-4 py-3 align-middle">
                         <span className={`inline-block px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
@@ -568,7 +602,7 @@ export default function UsuariosPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 align-middle">
-                        <span className="text-sm text-gray-600 dark:text-[var(--text-secondary)] break-words">{usuario.igreja || '-'}</span>
+                        <span className="text-sm break-words" style={{ color: 'var(--text-secondary)' }}>{usuario.igreja || '-'}</span>
                       </td>
                       <td className="px-4 py-3 align-middle">
                         {usuario.tipo !== 'admin' ? (
@@ -580,7 +614,7 @@ export default function UsuariosPage() {
                             {usuario.aprovado ? '✓ Aprovado' : '⏳ Aguardando'}
                           </span>
                         ) : (
-                          <span className="text-xs text-gray-400 dark:text-[var(--text-tertiary)]">-</span>
+                          <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>-</span>
                         )}
                       </td>
                       <td className="px-4 py-3 align-middle">
@@ -599,7 +633,13 @@ export default function UsuariosPage() {
                           )}
                           <button
                             onClick={() => iniciarEdicao(usuario)}
-                            className="bg-primary text-white px-3 py-1.5 rounded-lg text-xs hover:bg-primary-dark transition-colors font-medium whitespace-nowrap"
+                            className="px-3 py-1.5 rounded-lg text-xs transition-colors font-medium whitespace-nowrap"
+                            style={{
+                              backgroundColor: 'var(--accent-primary)',
+                              color: 'var(--dark-primary)'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
                           >
                             Editar
                           </button>
@@ -662,7 +702,21 @@ export default function UsuariosPage() {
                 <button
                   onClick={() => alterarSenha(mostrarAlterarSenha)}
                   disabled={carregando}
-                  className="flex-1 sm:flex-none bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                  style={{
+                    backgroundColor: 'var(--accent-primary)',
+                    color: 'var(--dark-primary)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.backgroundColor = 'var(--accent-secondary)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.backgroundColor = 'var(--accent-primary)';
+                    }
+                  }}
                 >
                   {carregando ? 'Alterando...' : 'Alterar Senha'}
                 </button>
@@ -671,7 +725,13 @@ export default function UsuariosPage() {
                     setMostrarAlterarSenha(null);
                     setSenhaForm({ senhaAtual: '', novaSenha: '', confirmarSenha: '' });
                   }}
-                  className="flex-1 sm:flex-none bg-gray-400 text-white px-6 py-2.5 rounded-lg hover:bg-gray-500 transition-colors font-medium"
+                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-lg transition-colors font-medium"
+                  style={{
+                    backgroundColor: 'var(--bg-muted)',
+                    color: 'var(--text-primary)'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
                 >
                   Cancelar
                 </button>

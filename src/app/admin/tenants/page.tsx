@@ -126,7 +126,13 @@ export default function TenantsPage() {
           {!mostrarForm && (
             <button
               onClick={() => setMostrarForm(true)}
-              className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors font-medium"
+              className="px-4 py-2 rounded-lg transition-colors font-medium"
+              style={{
+                backgroundColor: 'var(--accent-primary)',
+                color: 'var(--dark-primary)'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
             >
               + Novo Tenant
             </button>
@@ -146,7 +152,7 @@ export default function TenantsPage() {
         )}
 
         {mostrarForm && (
-          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-6 mb-6">
+          <div className="rounded-lg shadow p-6 mb-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
             <h2 className="text-xl font-semibold mb-4 text-[var(--text-primary)]">
               {editandoId ? 'Editar Tenant' : 'Novo Tenant'}
             </h2>
@@ -207,13 +213,25 @@ export default function TenantsPage() {
             <div className="flex flex-col sm:flex-row gap-3 mt-4">
               <button
                 onClick={salvarTenant}
-                className="w-full sm:w-auto bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary-dark transition-colors font-medium"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg transition-colors font-medium"
+                style={{
+                  backgroundColor: 'var(--accent-primary)',
+                  color: 'var(--dark-primary)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
               >
                 Salvar
               </button>
               <button
                 onClick={cancelarEdicao}
-                className="w-full sm:w-auto bg-gray-400 text-white px-6 py-2.5 rounded-lg hover:bg-gray-500 transition-colors font-medium"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg transition-colors font-medium"
+                style={{
+                  backgroundColor: 'var(--bg-muted)',
+                  color: 'var(--text-primary)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
               >
                 Cancelar
               </button>
@@ -226,11 +244,11 @@ export default function TenantsPage() {
             Carregando tenants...
           </div>
         ) : tenants.length === 0 ? (
-          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm p-8 text-center text-gray-500 dark:text-[var(--text-secondary)]">
+          <div className="rounded-lg shadow-sm p-8 text-center" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)', color: 'var(--text-secondary)' }}>
             Nenhum tenant cadastrado.
           </div>
         ) : (
-          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm overflow-hidden">
+          <div className="rounded-lg shadow-sm overflow-hidden" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
             {/* Versão Mobile: Cards */}
             <div className="block sm:hidden divide-y divide-gray-200 dark:divide-[var(--border-primary)]">
               {tenants.map((tenant) => (
@@ -281,7 +299,7 @@ export default function TenantsPage() {
             {/* Versão Desktop: Tabela */}
             <div className="hidden sm:block overflow-x-auto">
               <table className="min-w-full">
-                <thead className="bg-primary text-white">
+                <thead style={{ backgroundColor: 'var(--bg-muted)', color: 'var(--text-primary)' }}>
                   <tr>
                     <th className="px-4 py-3 text-left font-semibold">ID</th>
                     <th className="px-4 py-3 text-left font-semibold">Nome</th>
@@ -292,11 +310,16 @@ export default function TenantsPage() {
                     <th className="px-4 py-3 text-center font-semibold">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-[var(--border-primary)]">
-                  {tenants.map((tenant) => (
+                <tbody className="divide-y" style={{ borderColor: 'var(--border-default)' }}>
+                  {tenants.map((tenant, index) => (
                     <tr
                       key={tenant.id}
-                      className="hover:bg-gray-50 dark:hover:bg-[var(--bg-secondary)] transition-colors"
+                      className="transition-colors"
+                      style={{ 
+                        backgroundColor: index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.08)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'}
                     >
                       <td className="px-4 py-3 text-[var(--text-primary)]">{tenant.id}</td>
                       <td className="px-4 py-3 text-[var(--text-primary)] font-medium">{tenant.nome}</td>
@@ -322,7 +345,13 @@ export default function TenantsPage() {
                         <div className="flex gap-2 justify-center">
                           <button
                             onClick={() => iniciarEdicao(tenant)}
-                            className="bg-blue-500 text-white px-3 py-1.5 rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                            className="px-3 py-1.5 rounded-lg transition-colors text-sm font-medium"
+                            style={{
+                              backgroundColor: 'var(--accent-primary)',
+                              color: 'var(--dark-primary)'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-secondary)'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
                           >
                             Editar
                           </button>

@@ -1,33 +1,47 @@
 /* ============================================
-   SISTEMA DE TEMA DARK/LIGHT
+   SISTEMA DE TEMA DARK/LIGHT - DESIGN TOKENS GLOBAIS
    ============================================ */
 
-/* Variáveis CSS para Light Theme (padrão) */
+/* DESIGN TOKENS BASE - LIGHT MODE */
 :root {
-  /* Cores de fundo */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --bg-tertiary: #f3f4f6;
+  /* Fundos */
+  --bg-page: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-muted: #f1f5f9;
   
-  /* Cores de texto */
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-tertiary: #6b7280;
+  /* Texto */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
   --text-inverse: #ffffff;
   
-  /* Cores de borda */
-  --border-primary: #e5e7eb;
+  /* Destaque */
+  --accent-primary: #d4af37;
+  --accent-secondary: #c9a24d;
+  
+  /* Neutros escuros (para menus) */
+  --dark-primary: #0b0b0b;
+  --dark-secondary: #1a1a1a;
+  
+  /* Bordas */
+  --border-default: #e5e7eb;
+  
+  /* Compatibilidade com sistema antigo */
+  --bg-primary: var(--bg-surface);
+  --bg-secondary: var(--bg-page);
+  --bg-tertiary: var(--bg-muted);
+  --text-tertiary: #9ca3af;
+  --border-primary: var(--border-default);
   --border-secondary: #d1d5db;
   --border-focus: #1e3a5f;
   
-  /* Cores primárias (mantém cores do sistema) */
+  /* Cores primárias (mantém para compatibilidade) */
   --color-primary: #1e3a5f;
   --color-primary-dark: #0f1f35;
   --color-primary-light: #2d4a6f;
   
-  /* Cores de accent (mantém cores do sistema) */
-  --color-accent: #d4af37;
-  --color-accent-dark: #b8941f;
+  /* Cores de accent */
+  --color-accent: var(--accent-primary);
+  --color-accent-dark: var(--accent-secondary);
   --color-accent-light: #f5d76e;
   
   /* Cores semânticas */
@@ -47,21 +61,35 @@
   --scrollbar-thumb-hover: #0f1f35;
 }
 
-/* Variáveis CSS para Dark Theme */
+/* DESIGN TOKENS - DARK MODE */
 [data-theme="dark"] {
-  /* Cores de fundo */
-  --bg-primary: #111827;
-  --bg-secondary: #1f2937;
+  /* Fundos */
+  --bg-page: #020617;
+  --bg-surface: #0f172a;
+  --bg-muted: #020617;
+  
+  /* Texto */
+  --text-primary: #e5e7eb;
+  --text-secondary: #9ca3af;
+  --text-inverse: #ffffff;
+  
+  /* Destaque (mantém dourado) */
+  --accent-primary: #d4af37;
+  --accent-secondary: #c9a24d;
+  
+  /* Neutros escuros (para menus) */
+  --dark-primary: #0b0b0b;
+  --dark-secondary: #1a1a1a;
+  
+  /* Bordas */
+  --border-default: #1f2937;
+  
+  /* Compatibilidade com sistema antigo */
+  --bg-primary: var(--bg-surface);
+  --bg-secondary: var(--bg-page);
   --bg-tertiary: #374151;
-  
-  /* Cores de texto */
-  --text-primary: #f9fafb;
-  --text-secondary: #d1d5db;
   --text-tertiary: #9ca3af;
-  --text-inverse: #111827;
-  
-  /* Cores de borda */
-  --border-primary: #374151;
+  --border-primary: var(--border-default);
   --border-secondary: #4b5563;
   --border-focus: #2d4a6f;
   
@@ -70,9 +98,9 @@
   --color-primary-dark: #1e3a5f;
   --color-primary-light: #3d5a8f;
   
-  /* Cores de accent (mantém, mas ajusta) */
-  --color-accent: #d4af37;
-  --color-accent-dark: #b8941f;
+  /* Cores de accent */
+  --color-accent: var(--accent-primary);
+  --color-accent-dark: var(--accent-secondary);
   --color-accent-light: #f5d76e;
   
   /* Cores semânticas (ajustadas para dark) */

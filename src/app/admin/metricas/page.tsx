@@ -94,7 +94,20 @@ export default function MetricasPage() {
           <select
             value={periodo}
             onChange={(e) => setPeriodo(e.target.value)}
-            className="w-full sm:w-auto border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-primary"
+            className="w-full sm:w-auto border rounded-lg px-4 py-2 transition-all duration-200"
+            style={{
+              borderColor: 'var(--border-default)',
+              backgroundColor: 'var(--bg-surface)',
+              color: 'var(--text-primary)'
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = 'var(--accent-primary)';
+              e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-default)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
             <option value="7">Últimos 7 dias</option>
             <option value="30">Últimos 30 dias</option>
@@ -105,7 +118,7 @@ export default function MetricasPage() {
 
         {/* Cards de Métricas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-6">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
             <h3 className="text-sm font-medium text-gray-500 dark:text-[var(--text-secondary)] mb-2">
               Total de Usuários
             </h3>
@@ -115,7 +128,7 @@ export default function MetricasPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-6">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
             <h3 className="text-sm font-medium text-gray-500 dark:text-[var(--text-secondary)] mb-2">
               Total de Ensaios
             </h3>
@@ -125,7 +138,7 @@ export default function MetricasPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-6">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
             <h3 className="text-sm font-medium text-gray-500 dark:text-[var(--text-secondary)] mb-2">
               Usuários Pendentes
             </h3>
@@ -135,7 +148,7 @@ export default function MetricasPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-6">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
             <h3 className="text-sm font-medium text-gray-500 dark:text-[var(--text-secondary)] mb-2">
               Tenants Ativos
             </h3>
@@ -151,7 +164,7 @@ export default function MetricasPage() {
         {/* Detalhamento */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Usuários */}
-          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-6">
+          <div className="rounded-lg shadow p-6" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
             <h2 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">Usuários</h2>
             <div className="space-y-3">
               <div className="flex justify-between">

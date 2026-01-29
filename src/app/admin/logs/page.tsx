@@ -84,7 +84,20 @@ export default function LogsPage() {
               setFiltroTipo(e.target.value);
               setPage(1);
             }}
-            className="w-full sm:w-auto border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-primary"
+            className="w-full sm:w-auto border rounded-lg px-4 py-2 transition-all duration-200"
+            style={{
+              borderColor: 'var(--border-default)',
+              backgroundColor: 'var(--bg-surface)',
+              color: 'var(--text-primary)'
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = 'var(--accent-primary)';
+              e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.2)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-default)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
             <option value="todos">Todos os tipos</option>
             <option value="criacao">Criações</option>
@@ -99,14 +112,14 @@ export default function LogsPage() {
             <p className="text-gray-600 dark:text-[var(--text-secondary)]">Carregando logs...</p>
           </div>
         ) : logs.length === 0 ? (
-          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm p-8 text-center text-gray-500 dark:text-[var(--text-secondary)]">
+          <div className="rounded-lg shadow-sm p-8 text-center" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)', color: 'var(--text-secondary)' }}>
             Nenhum log encontrado.
           </div>
         ) : (
           <>
-            <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow-sm overflow-hidden">
+            <div className="rounded-lg shadow-sm overflow-hidden" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
               {/* Versão Mobile: Cards */}
-              <div className="block sm:hidden divide-y divide-gray-200 dark:divide-[var(--border-primary)]">
+              <div className="block sm:hidden divide-y" style={{ borderColor: 'var(--border-default)' }}>
                 {logs.map((log) => (
                   <div key={log.id} className="p-4">
                     <div className="flex items-start gap-3">
@@ -145,21 +158,26 @@ export default function LogsPage() {
               {/* Versão Desktop: Tabela */}
               <div className="hidden sm:block overflow-x-auto">
                 <table className="min-w-full">
-                  <thead className="bg-gray-50 dark:bg-[var(--bg-secondary)]">
+                  <thead style={{ backgroundColor: 'var(--bg-muted)', color: 'var(--text-primary)' }}>
                     <tr>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">Data/Hora</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">Tipo</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">Ação</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">Detalhes</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Data/Hora</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Tipo</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Ação</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Detalhes</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 dark:divide-[var(--border-primary)]">
-                    {logs.map((log) => (
+                  <tbody className="divide-y" style={{ borderColor: 'var(--border-default)' }}>
+                    {logs.map((log, index) => (
                       <tr
                         key={log.id}
-                        className="hover:bg-gray-50 dark:hover:bg-[var(--bg-secondary)] transition-colors"
+                        className="transition-colors"
+                        style={{ 
+                          backgroundColor: index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.08)'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'}
                       >
-                        <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">
+                        <td className="px-4 py-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
                           {formatarData(log.timestamp)}
                         </td>
                         <td className="px-4 py-3">
@@ -171,10 +189,10 @@ export default function LogsPage() {
                             {log.tipo}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-sm text-[var(--text-primary)] font-medium">
+                        <td className="px-4 py-3 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                           {log.acao}
                         </td>
-                        <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{log.detalhes}</td>
+                        <td className="px-4 py-3 text-sm" style={{ color: 'var(--text-secondary)' }}>{log.detalhes}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -188,17 +206,45 @@ export default function LogsPage() {
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-[var(--text-primary)] rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  style={{
+                    backgroundColor: 'var(--bg-muted)',
+                    color: 'var(--text-primary)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.backgroundColor = 'var(--bg-muted)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.backgroundColor = 'var(--bg-muted)';
+                    }
+                  }}
                 >
                   Anterior
                 </button>
-                <span className="text-[var(--text-primary)]">
+                <span style={{ color: 'var(--text-primary)' }}>
                   Página {page} de {Math.ceil(total / 50)}
                 </span>
                 <button
                   onClick={() => setPage((p) => p + 1)}
                   disabled={page >= Math.ceil(total / 50)}
-                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-[var(--text-primary)] rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  style={{
+                    backgroundColor: 'var(--bg-muted)',
+                    color: 'var(--text-primary)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.backgroundColor = 'var(--bg-muted)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.backgroundColor = 'var(--bg-muted)';
+                    }
+                  }}
                 >
                   Próxima
                 </button>
