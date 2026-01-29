@@ -166,13 +166,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               onClick={() => setMenuAberto(false)}
             />
             <aside 
-              className="fixed left-0 top-[80px] w-64 shadow-xl z-50 lg:hidden overflow-y-auto relative"
+              className="fixed left-0 w-64 shadow-xl z-50 lg:hidden overflow-y-auto relative"
               style={{
                 background: 'linear-gradient(90deg, #0b0b0b 0%, #1a1a1a 50%, #3a2f0f 100%)',
-                height: 'calc(100dvh - 80px)',
+                top: '80px',
+                bottom: '0',
+                height: 'auto',
                 minHeight: 'calc(100dvh - 80px)',
-                maxHeight: 'calc(100dvh - 80px)',
-                paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+                paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)'
               }}
             >
               {/* Faixa dourada lateral visível */}

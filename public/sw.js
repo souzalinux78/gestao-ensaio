@@ -1,8 +1,8 @@
 // Service Worker para PWA
 // IMPORTANTE: Incrementar a versão a cada deploy para forçar atualização do cache
-// Versão atual: v5 - Cache melhorado com assets estáticos
-const CACHE_NAME = 'gestao-ensaio-v5';
-const CACHE_VERSION = '5';
+// Versão atual: v6 - Manifest corrigido (ícones válidos)
+const CACHE_NAME = 'gestao-ensaio-v6';
+const CACHE_VERSION = '6';
 
 // URLs críticas para cache inicial
 const urlsToCache = [
