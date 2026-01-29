@@ -10,8 +10,8 @@
   html {
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
+    background-color: var(--pe-black);
+    color: var(--pe-white);
   }
   
   body {
@@ -20,8 +20,8 @@
     /* Safe area para iOS */
     padding-left: max(12px, env(safe-area-inset-left));
     padding-right: max(12px, env(safe-area-inset-right));
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
+    background-color: var(--pe-black);
+    color: var(--pe-white);
     transition: background-color 0.3s ease, color 0.3s ease;
   }
   

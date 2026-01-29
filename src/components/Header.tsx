@@ -25,12 +25,10 @@ export default function Header() {
     <header 
       className="p-3 sm:p-4 shadow-lg relative"
       style={{
-        background: 'linear-gradient(90deg, #0b0b0b 0%, #1a1a1a 50%, #3a2f0f 100%)',
+        background: 'linear-gradient(90deg, #3a2f0f 0%, #d4af37 40%, #1a1a1a 100%)',
         color: 'var(--pe-white)'
       }}
     >
-      {/* Faixa dourada visível no topo */}
-      <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: 'var(--pe-gold-main)' }}></div>
       <div className="container mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
         <div className="flex-1 min-w-0">
           <h1 className="text-lg sm:text-xl font-bold" style={{ color: 'var(--pe-white)' }}>Gestão de Ensaio</h1>

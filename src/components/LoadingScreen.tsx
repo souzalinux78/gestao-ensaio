@@ -36,7 +36,12 @@ export default function LoadingScreen() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-primary via-primary-dark to-primary">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{
+        background: 'linear-gradient(90deg, #0b0b0b 0%, #1a1a1a 55%, #3a2f0f 100%)'
+      }}
+    >
       <div className="flex flex-col items-center justify-center space-y-6 animate-fade-in">
         {/* Logo ou Ícone */}
         <div className="relative w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center">
@@ -48,7 +53,7 @@ export default function LoadingScreen() {
               onError={() => setLogoError(true)}
             />
           ) : (
-            <svg className="w-24 h-24 text-accent animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-24 h-24 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--pe-gold-main)' }}>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
             </svg>
           )}
@@ -56,19 +61,19 @@ export default function LoadingScreen() {
 
         {/* Nome do App */}
         <div className="text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: 'var(--pe-gold-main)' }}>
             Gestão de Ensaio
           </h1>
-          <p className="text-white/80 text-sm sm:text-base">
+          <p className="text-sm sm:text-base" style={{ color: 'var(--pe-gray-text)' }}>
             Carregando...
           </p>
         </div>
 
         {/* Spinner */}
         <div className="flex space-x-2">
-          <div className="w-3 h-3 bg-accent rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
-          <div className="w-3 h-3 bg-accent rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-          <div className="w-3 h-3 bg-accent rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+          <div className="w-3 h-3 rounded-full animate-bounce" style={{ backgroundColor: 'var(--pe-gold-main)', animationDelay: '0s' }}></div>
+          <div className="w-3 h-3 rounded-full animate-bounce" style={{ backgroundColor: 'var(--pe-gold-main)', animationDelay: '0.2s' }}></div>
+          <div className="w-3 h-3 rounded-full animate-bounce" style={{ backgroundColor: 'var(--pe-gold-main)', animationDelay: '0.4s' }}></div>
         </div>
       </div>
 

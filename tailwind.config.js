@@ -10,13 +10,13 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#1e3a5f', // Azul escuro/navy do logo
-          dark: '#0f1f35',
-          light: '#2d4a6f',
+          DEFAULT: '#d4af37', // Dourado dominante (Partiu Ensaio)
+          dark: '#c9a24d',
+          light: '#f5d76e',
         },
         accent: {
           DEFAULT: '#d4af37', // Dourado do logo
-          dark: '#b8941f',
+          dark: '#c9a24d',
           light: '#f5d76e',
         },
         // Cores semânticas padronizadas
@@ -62,8 +62,8 @@ module.exports = {
         'soft': '0 2px 8px rgba(0, 0, 0, 0.08)',
         'medium': '0 4px 12px rgba(0, 0, 0, 0.1)',
         'strong': '0 8px 24px rgba(0, 0, 0, 0.12)',
-        'glow': '0 0 20px rgba(30, 58, 95, 0.15)',
-        'glow-accent': '0 0 20px rgba(212, 175, 55, 0.2)',
+        'glow': '0 0 20px rgba(212, 175, 55, 0.25)',
+        'glow-accent': '0 0 20px rgba(212, 175, 55, 0.3)',
         'inner-soft': 'inset 0 2px 4px rgba(0, 0, 0, 0.06)',
       },
       borderRadius: {

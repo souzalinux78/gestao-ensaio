@@ -40,7 +40,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: '#1e3a5f',
+  themeColor: '#d4af37',
 };
 
 export default function RootLayout({
@@ -57,7 +57,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Gestão de Ensaio" />
         <meta name="application-name" content="Gestão de Ensaio" />
-        <meta name="msapplication-TileColor" content="#1e3a5f" />
+        <meta name="msapplication-TileColor" content="#d4af37" />
         <meta name="msapplication-tap-highlight" content="no" />
         {/* Splash screen iOS */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -66,7 +66,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png" />
         {/* Splash screen Android */}
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#1e3a5f" />
+        <meta name="theme-color" content="#d4af37" />
       </head>
       <body>
         <script
