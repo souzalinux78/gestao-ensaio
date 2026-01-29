@@ -6,15 +6,21 @@
    IDENTIDADE VISUAL PARTIU ENSAIO
    ============================================ */
 
-/* CORES OFICIAIS PARTIU ENSAIO */
+/* CORES OFICIAIS PARTIU ENSAIO - DOURADO DOMINANTE */
 :root {
   /* Base Partiu Ensaio */
   --pe-black: #0b0b0b;
   --pe-black-soft: #1a1a1a;
-  --pe-gold: #d4af37;
-  --pe-gold-soft: rgba(212, 175, 55, 0.15);
+  --pe-gold-main: #d4af37;
+  --pe-gold-strong: #c9a24d;
+  --pe-gold-bg: rgba(212, 175, 55, 0.22);
   --pe-white: #ffffff;
-  --pe-gray-text: #cbd5e1;
+  --pe-gray-light: #f8fafc;
+  --pe-gray-text: #e5e7eb;
+  
+  /* Compatibilidade (mapeando para novas variáveis) */
+  --pe-gold: var(--pe-gold-main);
+  --pe-gold-soft: var(--pe-gold-bg);
   --pe-gray-muted: #9ca3af;
   
   /* Fundos (Light Mode) */
@@ -87,10 +93,10 @@
   --text-secondary: var(--pe-gray-muted);
   --text-inverse: var(--pe-white);
   
-  /* Identidade Premium (mantém cores Partiu Ensaio) */
-  --accent-primary: var(--pe-gold);
-  --accent-secondary: #c9a24d;
-  --accent-soft: var(--pe-gold-soft);
+  /* Identidade Premium (mantém cores Partiu Ensaio - DOURADO DOMINANTE) */
+  --accent-primary: var(--pe-gold-main);
+  --accent-secondary: var(--pe-gold-strong);
+  --accent-soft: var(--pe-gold-bg);
   
   /* Neutros escuros (usando cores Partiu Ensaio) */
   --dark-primary: var(--pe-black);

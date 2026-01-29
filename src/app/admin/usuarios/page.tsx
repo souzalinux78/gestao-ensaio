@@ -349,11 +349,11 @@ export default function UsuariosPage() {
                 }}
                 className="px-4 py-2.5 rounded-lg whitespace-nowrap font-medium shadow-sm transition-colors"
                 style={{
-                  backgroundColor: 'var(--pe-gold)',
+                  backgroundColor: 'var(--pe-gold-main)',
                   color: 'var(--pe-black)'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c9a24d'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold)'}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-strong)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-main)'}
               >
                 + Novo Usuário
               </button>
@@ -591,7 +591,7 @@ export default function UsuariosPage() {
                       style={{ 
                         backgroundColor: index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-soft)'}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-bg)'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'}
                     >
                       <td className="px-4 py-3 align-middle">

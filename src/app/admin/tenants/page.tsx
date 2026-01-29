@@ -215,11 +215,11 @@ export default function TenantsPage() {
                 onClick={salvarTenant}
                 className="w-full sm:w-auto px-6 py-2.5 rounded-lg transition-colors font-medium"
                 style={{
-                  backgroundColor: 'var(--pe-gold)',
+                  backgroundColor: 'var(--pe-gold-main)',
                   color: 'var(--pe-black)'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c9a24d'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold)'}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-strong)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-main)'}
               >
                 Salvar
               </button>

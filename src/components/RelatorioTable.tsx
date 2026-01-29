@@ -63,11 +63,11 @@ export default function RelatorioTable({
                         onClick={() => onEnviarWebhook(ensaio)}
                         className="px-3 py-2 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
                         style={{
-                          backgroundColor: 'var(--pe-gold)',
+                          backgroundColor: 'var(--pe-gold-main)',
                           color: 'var(--pe-black)'
                         }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c9a24d'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold)'}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-strong)'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-main)'}
                       >
                         Enviar
                       </button>
@@ -118,7 +118,7 @@ export default function RelatorioTable({
                 style={{ 
                   backgroundColor: index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'
                 }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-soft)'}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-bg)'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'}
               >
                 <td className="px-4 py-3" style={{ color: 'var(--text-primary)' }}>
@@ -153,11 +153,11 @@ export default function RelatorioTable({
                         onClick={() => onEnviarWebhook(ensaio)}
                         className="px-4 py-2 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
                         style={{
-                          backgroundColor: 'var(--pe-gold)',
+                          backgroundColor: 'var(--pe-gold-main)',
                           color: 'var(--pe-black)'
                         }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c9a24d'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold)'}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-strong)'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-main)'}
                       >
                         Enviar
                       </button>
