@@ -17,6 +17,7 @@ const CSRF_EXEMPT_ROUTES = [
   '/api/auth', // Autenticação pode ter fluxo diferente
   '/api/webhook', // Webhooks geralmente não usam CSRF
   '/api/health',
+  '/api/usuarios', // Cadastro público não deve exigir CSRF
 ];
 
 /**
