@@ -1,42 +1,53 @@
 USE gestao_ensaio;
 
-INSERT IGNORE INTO Instrumento (nome) VALUES
-('Violino'),
-('Violino Contralto'),
-('Viola'),
-('Violoncelo'),
-('Flauta'),
-('Flauta Contralto'),
-('Flauta Baixo'),
-('Clarinete'),
-('Clarinete Alto'),
-('Clarinete Baixo'),
-('Clarinete Contra Baixo'),
-('Oboé'),
-('Oboé d’Amore'),
-('Corne Inglês'),
-('Fagote'),
-('Saxofone Sopranino C'),
-('Saxofone Sopranino R'),
-('Saxofone Soprano Curvo'),
-('Saxofone Soprano Reto'),
-('Saxofone Alto'),
-('Saxofone Tenor'),
-('Saxofone Barítono'),
-('Saxofone Baixo'),
-('Pocket'),
-('Cornet'),
-('Trompete'),
-('Flugelhorn'),
-('Trompa'),
-('Trombonito'),
-('Barítono de Pisto'),
-('Melofone'),
-('Trombone'),
-('Sax Horn'),
-('Tuba Wagneriana'),
-('Euphonium'),
-('Tuba'),
-('Tuba Helicon'),
-('Acordeon'),
-('Órgão');
+-- Inserir instrumentos organizados por naipes
+-- Cordas
+INSERT IGNORE INTO Instrumento (nome, tenantId) VALUES
+('VIOLA', NULL),
+('VIOLINO', NULL),
+('VIOLINO CONTRALTO', NULL),
+('VIOLONCELO', NULL);
+
+-- Madeiras
+INSERT IGNORE INTO Instrumento (nome, tenantId) VALUES
+('CLARINETE', NULL),
+('CLARINETE ALTO', NULL),
+('CLARINETE BAIXO', NULL),
+('CLARINETE CONTRA BAIXO', NULL),
+('CORNE INGLÊS', NULL),
+('FAGOTE', NULL),
+('FLAUTA', NULL),
+('FLAUTA BAIXO', NULL),
+('FLAUTA CONTRALTO', NULL),
+('OBOÉ', NULL),
+('OBOÉ D\'AMORE', NULL),
+('SAXOFONE ALTO', NULL),
+('SAXOFONE BAIXO', NULL),
+('SAXOFONE BARÍTONO', NULL),
+('SAXOFONE SOPRANINO C', NULL),
+('SAXOFONE SOPRANINO R', NULL),
+('SAXOFONE SOPRANO CUR', NULL),
+('SAXOFONE SOPRANO RET', NULL),
+('SAXOFONE TENOR', NULL);
+
+-- Metais
+INSERT IGNORE INTO Instrumento (nome, tenantId) VALUES
+('BARÍTONO DE PISTO', NULL),
+('CORNET', NULL),
+('EUPHONIUM', NULL),
+('FLUGELHORN', NULL),
+('MELOFONE', NULL),
+('POCKET', NULL),
+('SAX HORN', NULL),
+('TROMBONE', NULL),
+('TROMBONITO', NULL),
+('TROMPA', NULL),
+('TROMPETE', NULL),
+('TUBA', NULL),
+('TUBA HELICON', NULL),
+('TUBA WAGNERIANA', NULL);
+
+-- Teclas
+INSERT IGNORE INTO Instrumento (nome, tenantId) VALUES
+('ACORDEON', NULL),
+('ÓRGÃO', NULL);
