@@ -20,22 +20,34 @@ BACKUP_DIR="${BACKUP_DIR:-./backups}"
 
 # Ler variáveis de ambiente do .env
 if [ -f .env ]; then
-    export $(cat .env | grep -v '^#' | xargs)
+    # Ler DATABASE_URL do .env de forma segura (lidando com aspas e espaços)
+    DATABASE_URL=$(grep -E '^DATABASE_URL=' .env | head -1 | cut -d'=' -f2- | sed 's/^["'\'']//' | sed 's/["'\'']$//' | tr -d ' ')
+    
+    if [ -z "$DATABASE_URL" ]; then
+        # Tentar método alternativo
+        DATABASE_URL=$(grep DATABASE_URL .env | grep -v '^#' | head -1 | sed 's/.*=//' | sed 's/^["'\'']//' | sed 's/["'\'']$//' | tr -d ' ')
+    fi
 fi
 
 # Extrair informações da DATABASE_URL
 if [ -z "$DATABASE_URL" ]; then
     echo -e "${RED}❌ DATABASE_URL não encontrada no .env${NC}"
+    echo "   Verifique se o arquivo .env existe e contém DATABASE_URL"
     exit 1
 fi
 
 # Parse DATABASE_URL (mysql://user:pass@host:port/dbname)
-DB_URL=$(echo "$DATABASE_URL" | sed 's|mysql://||')
+# Remover o protocolo mysql://
+DB_URL=$(echo "$DATABASE_URL" | sed 's|^mysql://||')
+# Extrair usuário (antes do :)
 DB_USER=$(echo "$DB_URL" | cut -d: -f1)
-DB_PASS=$(echo "$DB_URL" | cut -d: -f2 | cut -d@ -f1)
+# Extrair senha (entre : e @)
+DB_PASS=$(echo "$DB_URL" | sed "s|^${DB_USER}:||" | cut -d@ -f1)
+# Extrair host:port (depois do @, antes do /)
 DB_HOST_PORT=$(echo "$DB_URL" | cut -d@ -f2 | cut -d/ -f1)
 DB_HOST=$(echo "$DB_HOST_PORT" | cut -d: -f1)
 DB_PORT=$(echo "$DB_HOST_PORT" | cut -d: -f2)
+# Extrair nome do banco (depois do /, antes do ?)
 DB_NAME=$(echo "$DB_URL" | cut -d/ -f2 | cut -d? -f1)
 
 # Se porta não especificada, usar padrão 3306

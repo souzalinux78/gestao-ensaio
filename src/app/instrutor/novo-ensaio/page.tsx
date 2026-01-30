@@ -115,9 +115,18 @@ function NovoEnsaioContent() {
   }
 
   async function carregarInstrumentos() {
-    const res = await fetch('/api/instrumentos');
-    const data = await res.json();
-    setInstrumentos(data);
+    try {
+      const res = await fetch('/api/instrumentos');
+      if (!res.ok) {
+        console.error('Erro ao carregar instrumentos:', res.status, res.statusText);
+        return;
+      }
+      const data = await res.json();
+      setInstrumentos(data || []);
+    } catch (error) {
+      console.error('Erro ao carregar instrumentos:', error);
+      setInstrumentos([]);
+    }
   }
 
   async function carregarMusicos(instrutorId: number) {

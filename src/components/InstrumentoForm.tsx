@@ -166,29 +166,42 @@ export default function InstrumentoForm({
     );
   }
 
+  // Verificar se há instrumentos para exibir
+  const temInstrumentos = instrumentos.length > 0;
+  const naipesComInstrumentos = ORDEM_NAIPES.filter((naipe) => {
+    const lista = instrumentosPorNaipe.get(naipe);
+    return lista && lista.length > 0;
+  });
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-primary">Instrumentos</h3>
       
-      <div className="max-h-96 overflow-y-auto border border-gray-300 rounded-lg p-3 sm:p-4 bg-gray-50 space-y-6">
-        {ORDEM_NAIPES.map((naipe) => {
-          const lista = instrumentosPorNaipe.get(naipe);
-          if (!lista || lista.length === 0) {
-            return null;
-          }
+      {temInstrumentos ? (
+        <div className="max-h-96 overflow-y-auto border border-gray-300 rounded-lg p-3 sm:p-4 bg-gray-50 space-y-6">
+          {naipesComInstrumentos.map((naipe) => {
+            const lista = instrumentosPorNaipe.get(naipe);
+            if (!lista || lista.length === 0) {
+              return null;
+            }
 
-          return (
-            <div key={naipe} className="space-y-2">
-              <h4 className="text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                {naipe}
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {lista.map((instrumento) => renderInstrumentoItem(instrumento))}
+            return (
+              <div key={naipe} className="space-y-2">
+                <h4 className="text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                  {naipe}
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {lista.map((instrumento) => renderInstrumentoItem(instrumento))}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="border border-gray-300 rounded-lg p-4 bg-gray-50 text-center text-gray-500 text-sm">
+          Nenhum instrumento cadastrado. Use o botão abaixo para adicionar.
+        </div>
+      )}
 
       {mostrarNovo ? (
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-4 p-4 bg-accent/10 border border-accent/20 rounded-lg">
