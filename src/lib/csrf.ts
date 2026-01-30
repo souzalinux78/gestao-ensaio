@@ -4,7 +4,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { randomBytes, createHash } from 'crypto';
 
 /**
  * Métodos HTTP que precisam de proteção CSRF
@@ -21,17 +20,25 @@ const CSRF_EXEMPT_ROUTES = [
 ];
 
 /**
- * Gera token CSRF
+ * Gera token CSRF usando Web Crypto API (compatível com Edge Runtime)
  */
 export function generateCSRFToken(): string {
-  return randomBytes(32).toString('hex');
+  // Usar Web Crypto API que é suportado no Edge Runtime
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
 /**
- * Cria hash do token para armazenamento seguro
+ * Cria hash do token para armazenamento seguro usando Web Crypto API
  */
-export function hashCSRFToken(token: string): string {
-  return createHash('sha256').update(token).digest('hex');
+export async function hashCSRFToken(token: string): Promise<string> {
+  // Usar Web Crypto API que é suportado no Edge Runtime
+  const encoder = new TextEncoder();
+  const data = encoder.encode(token);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
 /**
@@ -69,10 +76,10 @@ export function getCSRFToken(request: NextRequest): string | null {
 /**
  * Valida token CSRF
  */
-export function validateCSRFToken(
+export async function validateCSRFToken(
   request: NextRequest,
   sessionToken?: string
-): { valid: boolean; error?: string } {
+): Promise<{ valid: boolean; error?: string }> {
   const requestToken = getCSRFToken(request);
 
   if (!requestToken) {
@@ -90,8 +97,8 @@ export function validateCSRFToken(
   }
 
   // Comparar tokens (hash para segurança)
-  const requestHash = hashCSRFToken(requestToken);
-  const sessionHash = hashCSRFToken(sessionToken);
+  const requestHash = await hashCSRFToken(requestToken);
+  const sessionHash = await hashCSRFToken(sessionToken);
 
   if (requestHash !== sessionHash) {
     return {
@@ -107,10 +114,10 @@ export function validateCSRFToken(
  * Middleware para verificar CSRF
  * Use em rotas que precisam de proteção
  */
-export function verifyCSRF(
+export async function verifyCSRF(
   request: NextRequest,
   sessionToken?: string
-): { valid: boolean; error?: NextResponse } {
+): Promise<{ valid: boolean; error?: NextResponse }> {
   const { pathname } = request.nextUrl;
   const method = request.method;
 
@@ -120,7 +127,7 @@ export function verifyCSRF(
   }
 
   // Validar token
-  const validation = validateCSRFToken(request, sessionToken);
+  const validation = await validateCSRFToken(request, sessionToken);
 
   if (!validation.valid) {
     return {

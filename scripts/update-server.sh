@@ -17,40 +17,50 @@ NC='\033[0m'
 
 cd /var/www/gestao-ensaio
 
-# 1. Parar aplicação
-echo "1. Parando aplicação..."
-pm2 stop gestao-ensaio 2>/dev/null || echo "   Aplicação não estava rodando"
-echo ""
-
-# 2. Atualizar código (Git)
-if [ -d ".git" ]; then
-    echo "2. Atualizando código do Git..."
-    git pull || echo -e "${YELLOW}⚠️ Aviso: Erro ao fazer git pull (continuando...)${NC}"
+# 1. Backup do banco de dados
+echo "1. Fazendo backup do banco de dados..."
+if [ -f "scripts/backup-banco.sh" ]; then
+    chmod +x scripts/backup-banco.sh
+    ./scripts/backup-banco.sh || echo -e "${YELLOW}⚠️ Aviso: Erro ao fazer backup (continuando...)${NC}"
 else
-    echo "2. Git não configurado, pulando atualização de código..."
+    echo -e "${YELLOW}⚠️ Script de backup não encontrado (pulando...)${NC}"
 fi
 echo ""
 
-# 3. Instalar dependências
-echo "3. Instalando dependências..."
+# 2. Parar aplicação
+echo "2. Parando aplicação..."
+pm2 stop gestao-ensaio 2>/dev/null || echo "   Aplicação não estava rodando"
+echo ""
+
+# 3. Atualizar código (Git)
+if [ -d ".git" ]; then
+    echo "3. Atualizando código do Git..."
+    git pull || echo -e "${YELLOW}⚠️ Aviso: Erro ao fazer git pull (continuando...)${NC}"
+else
+    echo "3. Git não configurado, pulando atualização de código..."
+fi
+echo ""
+
+# 4. Instalar dependências
+echo "4. Instalando dependências..."
 npm install
 echo -e "${GREEN}✅ Dependências instaladas${NC}"
 echo ""
 
-# 4. Gerar Prisma Client
-echo "4. Gerando Prisma Client..."
+# 5. Gerar Prisma Client
+echo "5. Gerando Prisma Client..."
 npm run db:generate || echo -e "${YELLOW}⚠️ Aviso: Erro ao gerar Prisma Client${NC}"
 echo ""
 
-# 5. Limpar cache
-echo "5. Limpando cache..."
+# 6. Limpar cache
+echo "6. Limpando cache..."
 rm -rf .next
 rm -rf node_modules/.cache
 echo -e "${GREEN}✅ Cache limpo${NC}"
 echo ""
 
-# 6. Build
-echo "6. Fazendo build..."
+# 7. Build
+echo "7. Fazendo build..."
 npm run build
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✅ Build concluído${NC}"
@@ -60,7 +70,7 @@ else
 fi
 echo ""
 
-# 7. Verificar build
+# 8. Verificar build
 if [ ! -f ".next/BUILD_ID" ]; then
     echo -e "${RED}❌ Build não foi criado corretamente${NC}"
     exit 1
@@ -70,19 +80,19 @@ BUILD_ID=$(cat .next/BUILD_ID)
 echo "   BUILD_ID: $BUILD_ID"
 echo ""
 
-# 8. Reiniciar aplicação
-echo "7. Reiniciando aplicação..."
+# 9. Reiniciar aplicação
+echo "9. Reiniciando aplicação..."
 pm2 restart gestao-ensaio || pm2 start npm --name "gestao-ensaio" -- start
 echo -e "${GREEN}✅ Aplicação reiniciada${NC}"
 echo ""
 
-# 9. Aguardar
-echo "8. Aguardando inicialização..."
+# 10. Aguardar
+echo "10. Aguardando inicialização..."
 sleep 3
 echo ""
 
-# 10. Testar
-echo "9. Testando aplicação..."
+# 11. Testar
+echo "11. Testando aplicação..."
 RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 2>/dev/null)
 if [ "$RESPONSE" == "200" ] || [ "$RESPONSE" == "302" ] || [ "$RESPONSE" == "307" ]; then
     echo -e "${GREEN}✅ Aplicação respondendo (Status: $RESPONSE)${NC}"
@@ -92,8 +102,8 @@ else
 fi
 echo ""
 
-# 11. Mostrar status
-echo "10. Status final:"
+# 12. Mostrar status
+echo "12. Status final:"
 pm2 status | grep gestao-ensaio || echo "Aplicação não encontrada"
 echo ""
 

@@ -127,7 +127,7 @@ export async function middleware(request: NextRequest) {
   // A função verifyCSRF já verifica internamente se a rota precisa de proteção
   if (pathname.startsWith('/api/')) {
     const sessionToken = await getSessionCSRFToken(request);
-    const csrfCheck = verifyCSRF(request, sessionToken);
+    const csrfCheck = await verifyCSRF(request, sessionToken);
 
     // Se a verificação falhou, bloquear
     if (!csrfCheck.valid) {

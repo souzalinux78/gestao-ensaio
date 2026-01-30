@@ -22,7 +22,7 @@ async function diagnosticarBanco() {
       prisma.musico.count().catch(() => 0),
       prisma.contato.count().catch(() => 0),
       prisma.tenant.count().catch(() => 0),
-      prisma.configuracao.count().catch(() => 0),
+      prisma.configuracoes.count().catch(() => 0),
     ]);
     
     console.log(`   📊 Usuários:        ${usuariosCount}`);
