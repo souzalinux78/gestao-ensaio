@@ -115,7 +115,20 @@ export default function RootLayout({
                   lastUpdateCheck = now;
                   
                   if (registration) {
-                    registration.update().catch(function(err) {
+                    registration.update().then(function() {
+                      // Verificar se há nova versão instalada
+                      if (registration.waiting) {
+                        console.log('🔄 Nova versão do Service Worker detectada!');
+                        // Forçar ativação imediata
+                        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                        // Recarregar após 1 segundo
+                        setTimeout(function() {
+                          if (!isReloading) {
+                            safeReload();
+                          }
+                        }, 1000);
+                      }
+                    }).catch(function(err) {
                       console.warn('Erro ao verificar atualizações:', err);
                     });
                   }
@@ -139,15 +152,30 @@ export default function RootLayout({
                             // Só recarregar se realmente houver uma nova versão instalada
                             // e já houver um service worker ativo (não é a primeira instalação)
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller && !isReloading) {
-                              console.log('🔄 Nova versão do Service Worker disponível');
-                              // Pedir para o novo worker ativar
+                              console.log('🔄 Nova versão do Service Worker disponível - forçando atualização...');
+                              // Pedir para o novo worker ativar imediatamente
                               newWorker.postMessage({ type: 'SKIP_WAITING' });
-                              // Recarregar apenas uma vez
-                              safeReload();
+                              // Recarregar após breve delay para garantir que o novo worker está ativo
+                              setTimeout(function() {
+                                if (!isReloading) {
+                                  safeReload();
+                                }
+                              }, 500);
                             }
                           });
                         }
                       });
+                      
+                      // Verificar se já há um worker esperando (atualização pendente)
+                      if (reg.waiting && navigator.serviceWorker.controller) {
+                        console.log('🔄 Service Worker aguardando ativação - aplicando atualização...');
+                        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                        setTimeout(function() {
+                          if (!isReloading) {
+                            safeReload();
+                          }
+                        }, 1000);
+                      }
                     })
                     .catch(function(error) {
                       console.error('❌ Erro ao registrar Service Worker:', error);

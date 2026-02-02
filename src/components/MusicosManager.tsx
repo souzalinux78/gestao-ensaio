@@ -33,7 +33,7 @@ export default function MusicosManager() {
     router.push('/login');
   }
 
-  async function carregarMusicos(instrutorId: number) {
+  async function carregarMusicos(instrutorId: number, silencioso: boolean = false) {
     setCarregando(true);
     try {
       const res = await fetch(`/api/musicos?instrutorId=${instrutorId}`, {
@@ -47,9 +47,15 @@ export default function MusicosManager() {
         }
         throw new Error(data.error || 'Erro ao carregar músicos');
       }
-      setMusicos(data);
+      setMusicos(data || []); // Garantir que sempre seja um array
     } catch (error) {
-      setMensagem({ tipo: 'erro', texto: 'Erro ao carregar músicos' });
+      console.error('Erro ao carregar músicos:', error);
+      // Sempre definir array vazio para evitar tela branca
+      setMusicos([]);
+      // Só mostrar mensagem se não estiver em modo silencioso
+      if (!silencioso) {
+        setMensagem({ tipo: 'erro', texto: 'Erro ao carregar músicos' });
+      }
     } finally {
       setCarregando(false);
     }
@@ -115,13 +121,17 @@ export default function MusicosManager() {
         throw new Error(data.error || 'Erro ao salvar músico');
       }
 
-      await carregarMusicos(usuario.id);
+      // Carregar músicos atualizados (modo silencioso para não mostrar erro se falhar)
+      await carregarMusicos(usuario.id, true);
+      
+      // Limpar formulário e mostrar mensagem de sucesso
       cancelarEdicao();
       setMensagem({
         tipo: 'sucesso',
         texto: editandoId ? 'Músico atualizado!' : 'Músico adicionado!',
       });
     } catch (error: any) {
+      console.error('Erro ao salvar músico:', error);
       setMensagem({ tipo: 'erro', texto: error.message || 'Erro ao salvar músico' });
     } finally {
       setSalvando(false);
@@ -195,7 +205,10 @@ export default function MusicosManager() {
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               placeholder="Nome do músico"
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="words"
             />
           </div>
           <div className="flex flex-col sm:flex-row gap-3">

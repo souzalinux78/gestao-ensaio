@@ -1,8 +1,9 @@
 // Service Worker para PWA
-// IMPORTANTE: Incrementar a versão a cada deploy para forçar atualização do cache
-// Versão atual: v7 - Cache seguro com try/catch individual
-const CACHE_NAME = 'gestao-ensaio-v7';
-const CACHE_VERSION = '7';
+// IMPORTANTE: Versão atualizada automaticamente via timestamp do build
+// Versão atual: v8 - Atualização automática forçada
+const BUILD_TIMESTAMP = '{{BUILD_TIMESTAMP}}';
+const CACHE_NAME = `gestao-ensaio-${BUILD_TIMESTAMP || Date.now()}`;
+const CACHE_VERSION = BUILD_TIMESTAMP || '8';
 
 // URLs críticas para cache inicial - APENAS arquivos estáticos válidos
 // NÃO incluir rotas protegidas, APIs ou páginas que podem retornar 401/403/404
