@@ -38,11 +38,19 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {campos.filter(c => ['ancioes', 'diaconos', 'cooperadorOficio', 'cooperadorJovens'].includes(c.key)).map((campo) => (
               <div key={campo.key} className="flex items-center gap-3">
-                <label className="flex-1 text-sm sm:text-base text-gray-700">{campo.label}</label>
+                <label 
+                  htmlFor={`funcao-${campo.key}`}
+                  className="flex-1 text-sm sm:text-base text-gray-700 min-w-0"
+                  title={campo.label}
+                >
+                  {campo.label}
+                </label>
                 <input
+                  id={`funcao-${campo.key}`}
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
+                  aria-label={`Quantidade de ${campo.label}`}
                   value={(() => {
                     const valor = valores[campo.key as keyof typeof valores];
                     return valor !== undefined && valor !== null && valor > 0 
@@ -83,8 +91,8 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
                       e.preventDefault();
                     }
                   }}
-                  placeholder=""
-                  className="border border-gray-300 rounded-lg px-3 py-2 w-20 sm:w-24 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-center"
+                  placeholder="0"
+                  className="border border-gray-300 rounded-lg px-3 py-2 w-20 sm:w-24 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-center text-gray-900 bg-white"
                 />
               </div>
             ))}
@@ -96,11 +104,19 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {campos.filter(c => ['instrutores', 'encarregadosLocais', 'encarregadosRegionais'].includes(c.key)).map((campo) => (
               <div key={campo.key} className="flex items-center gap-3">
-                <label className="flex-1 text-sm sm:text-base text-gray-700">{campo.label}</label>
+                <label 
+                  htmlFor={`funcao-${campo.key}`}
+                  className="flex-1 text-sm sm:text-base text-gray-700 min-w-0"
+                  title={campo.label}
+                >
+                  {campo.label}
+                </label>
                 <input
+                  id={`funcao-${campo.key}`}
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
+                  aria-label={`Quantidade de ${campo.label}`}
                   value={(() => {
                     const valor = valores[campo.key as keyof typeof valores];
                     return valor !== undefined && valor !== null && valor > 0 
@@ -141,8 +157,8 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
                       e.preventDefault();
                     }
                   }}
-                  placeholder=""
-                  className="border border-gray-300 rounded-lg px-3 py-2 w-20 sm:w-24 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-center"
+                  placeholder="0"
+                  className="border border-gray-300 rounded-lg px-3 py-2 w-20 sm:w-24 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-center text-gray-900 bg-white"
                 />
               </div>
             ))}

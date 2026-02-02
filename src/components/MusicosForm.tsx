@@ -15,8 +15,14 @@ export default function MusicosForm({
   onToggle,
 }: MusicosFormProps) {
   const selecionadosSet = useMemo(() => new Set(selecionados), [selecionados]);
+  
+  // Filtrar apenas músicos válidos (com nome)
+  const musicosValidos = useMemo(() => 
+    musicos.filter((musico) => musico?.nome?.trim()),
+    [musicos]
+  );
 
-  if (musicos.length === 0) {
+  if (musicosValidos.length === 0) {
     return (
       <div>
         <h3 className="text-lg font-semibold text-primary">Músicos Presentes</h3>
@@ -37,20 +43,29 @@ export default function MusicosForm({
       </div>
       <div className="max-h-64 overflow-y-auto border border-gray-300 rounded-lg p-3 sm:p-4 bg-gray-50">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-          {musicos.map((musico) => (
-            <label
-              key={musico.id}
-              className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm sm:text-base"
-            >
-              <input
-                type="checkbox"
-                checked={selecionadosSet.has(musico.id)}
-                onChange={() => onToggle(musico.id)}
-                className="accent-primary"
-              />
-              <span className="truncate">{musico.nome}</span>
-            </label>
-          ))}
+          {musicosValidos.map((musico) => {
+            // Validar se músico tem nome válido
+            const nomeMusico = musico?.nome?.trim() || `Músico #${musico.id}`;
+            
+            return (
+              <label
+                key={musico.id}
+                className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm sm:text-base hover:bg-gray-50 transition-colors cursor-pointer"
+                title={nomeMusico}
+              >
+                <input
+                  type="checkbox"
+                  checked={selecionadosSet.has(musico.id)}
+                  onChange={() => onToggle(musico.id)}
+                  className="accent-primary flex-shrink-0"
+                  aria-label={`Selecionar ${nomeMusico}`}
+                />
+                <span className="truncate text-gray-900 flex-1 min-w-0" title={nomeMusico}>
+                  {nomeMusico}
+                </span>
+              </label>
+            );
+          })}
         </div>
       </div>
     </div>

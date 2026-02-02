@@ -63,7 +63,7 @@ export default function MusicosManager() {
 
   function iniciarEdicao(musico: Musico) {
     setEditandoId(musico.id);
-    setNome(musico.nome);
+    setNome(musico.nome?.trim() || '');
     setMostrarForm(true);
   }
 
@@ -240,10 +240,14 @@ export default function MusicosManager() {
           <h3 className="font-semibold mb-4">Músicos Cadastrados</h3>
           {/* Versão Mobile: Cards */}
           <div className="block sm:hidden space-y-3">
-            {musicos.map((musico) => (
+            {musicos
+              .filter((musico) => musico?.nome?.trim()) // Filtrar apenas músicos com nome válido
+              .map((musico) => {
+                const nomeMusico = musico.nome?.trim() || `Músico #${musico.id}`;
+                return (
               <div key={musico.id} className="border rounded-lg p-4 bg-gray-50">
                 <div className="flex justify-between items-start mb-3">
-                  <p className="font-medium text-gray-900 flex-1">{musico.nome}</p>
+                  <p className="font-medium text-gray-900 flex-1" title={nomeMusico}>{nomeMusico}</p>
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -260,7 +264,8 @@ export default function MusicosManager() {
                   </button>
                 </div>
               </div>
-            ))}
+                );
+              })}
           </div>
           {/* Versão Desktop: Tabela */}
           <div className="hidden sm:block overflow-x-auto">
@@ -272,9 +277,13 @@ export default function MusicosManager() {
                 </tr>
               </thead>
               <tbody>
-                {musicos.map((musico) => (
+                {musicos
+                  .filter((musico) => musico?.nome?.trim()) // Filtrar apenas músicos com nome válido
+                  .map((musico) => {
+                    const nomeMusico = musico.nome?.trim() || `Músico #${musico.id}`;
+                    return (
                   <tr key={musico.id}>
-                    <td className="border px-4 py-2">{musico.nome}</td>
+                    <td className="border px-4 py-2" title={nomeMusico}>{nomeMusico}</td>
                     <td className="border px-4 py-2">
                       <div className="flex gap-2 justify-center">
                         <button
@@ -292,7 +301,8 @@ export default function MusicosManager() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                    );
+                  })}
               </tbody>
             </table>
           </div>

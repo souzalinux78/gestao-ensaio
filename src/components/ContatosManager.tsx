@@ -39,8 +39,8 @@ export default function ContatosManager() {
 
   function iniciarEdicao(contato: Contato) {
     setEditandoId(contato.id);
-    setNome(contato.nome);
-    setTelefone(contato.telefone);
+    setNome(contato.nome?.trim() || '');
+    setTelefone(contato.telefone?.trim() || '');
     setMostrarForm(true);
   }
 
@@ -206,11 +206,16 @@ export default function ContatosManager() {
           <h3 className="font-semibold mb-4">Contatos Cadastrados</h3>
           {/* Versão Mobile: Cards */}
           <div className="block sm:hidden space-y-3">
-            {contatos.map((contato) => (
+            {contatos
+              .filter((contato) => contato?.nome?.trim() && contato?.telefone?.trim()) // Filtrar apenas contatos válidos
+              .map((contato) => {
+                const nomeContato = contato.nome?.trim() || `Contato #${contato.id}`;
+                const telefoneContato = contato.telefone?.trim() || 'Sem telefone';
+                return (
               <div key={contato.id} className="border rounded-lg p-4 bg-gray-50">
                 <div className="mb-3">
-                  <p className="font-medium text-gray-900 mb-1">{contato.nome}</p>
-                  <p className="text-sm text-gray-600">{contato.telefone}</p>
+                  <p className="font-medium text-gray-900 mb-1" title={nomeContato}>{nomeContato}</p>
+                  <p className="text-sm text-gray-600" title={telefoneContato}>{telefoneContato}</p>
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -227,7 +232,8 @@ export default function ContatosManager() {
                   </button>
                 </div>
               </div>
-            ))}
+                );
+              })}
           </div>
           {/* Versão Desktop: Tabela */}
           <div className="hidden sm:block overflow-x-auto">
@@ -240,10 +246,15 @@ export default function ContatosManager() {
                 </tr>
               </thead>
               <tbody>
-                {contatos.map((contato) => (
+                {contatos
+                  .filter((contato) => contato?.nome?.trim() && contato?.telefone?.trim()) // Filtrar apenas contatos válidos
+                  .map((contato) => {
+                    const nomeContato = contato.nome?.trim() || `Contato #${contato.id}`;
+                    const telefoneContato = contato.telefone?.trim() || 'Sem telefone';
+                    return (
                   <tr key={contato.id}>
-                    <td className="border px-4 py-2">{contato.nome}</td>
-                    <td className="border px-4 py-2">{contato.telefone}</td>
+                    <td className="border px-4 py-2" title={nomeContato}>{nomeContato}</td>
+                    <td className="border px-4 py-2" title={telefoneContato}>{telefoneContato}</td>
                     <td className="border px-4 py-2">
                       <div className="flex gap-2 justify-center">
                         <button
@@ -261,7 +272,8 @@ export default function ContatosManager() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                    );
+                  })}
               </tbody>
             </table>
           </div>

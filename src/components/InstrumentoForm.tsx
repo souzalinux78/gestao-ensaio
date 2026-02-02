@@ -136,6 +136,9 @@ export default function InstrumentoForm({
   }, [instrumentos]);
 
   function renderInstrumentoItem(instrumento: Instrumento) {
+    // Validar se instrumento tem nome válido
+    const nomeInstrumento = instrumento?.nome?.trim() || `Instrumento #${instrumento.id}`;
+    
     // Obter valor do estado temporário ou do estado principal
     const valorTemporario = valoresTemporarios.get(instrumento.id);
     const valorPrincipal = valores[instrumento.id] !== undefined &&
@@ -149,14 +152,20 @@ export default function InstrumentoForm({
 
     return (
       <div key={instrumento.id} className="flex items-center gap-2 sm:gap-3">
-        <label className="flex-1 text-sm sm:text-base text-gray-700 min-w-0 truncate">
-          {instrumento.nome}
+        <label 
+          htmlFor={`instrumento-qtd-${instrumento.id}`}
+          className="flex-1 text-sm sm:text-base text-gray-700 min-w-0 truncate"
+          title={nomeInstrumento}
+        >
+          {nomeInstrumento}
         </label>
         <input
+          id={`instrumento-qtd-${instrumento.id}`}
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
           value={valorExibido}
+          aria-label={`Quantidade de ${nomeInstrumento}`}
           onChange={(e) => {
             // Permitir apenas números
             const valorDigitado = e.target.value.replace(/[^0-9]/g, '');
@@ -236,11 +245,14 @@ export default function InstrumentoForm({
     );
   }
 
+  // Filtrar instrumentos válidos (com nome)
+  const instrumentosValidos = instrumentos.filter((inst) => inst?.nome?.trim());
+  
   // Verificar se há instrumentos para exibir
-  const temInstrumentos = instrumentos.length > 0;
+  const temInstrumentos = instrumentosValidos.length > 0;
   const naipesComInstrumentos = ORDEM_NAIPES.filter((naipe) => {
     const lista = instrumentosPorNaipe.get(naipe);
-    return lista && lista.length > 0;
+    return lista && lista.length > 0 && lista.some((inst) => inst?.nome?.trim());
   });
 
   return (
@@ -261,7 +273,9 @@ export default function InstrumentoForm({
                   {naipe}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {lista.map((instrumento) => renderInstrumentoItem(instrumento))}
+                  {lista
+                    .filter((inst) => inst?.nome?.trim()) // Filtrar apenas instrumentos com nome válido
+                    .map((instrumento) => renderInstrumentoItem(instrumento))}
                 </div>
               </div>
             );

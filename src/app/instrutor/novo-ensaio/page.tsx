@@ -120,10 +120,15 @@ function NovoEnsaioContent() {
       const res = await fetch('/api/instrumentos');
       if (!res.ok) {
         console.error('Erro ao carregar instrumentos:', res.status, res.statusText);
+        setInstrumentos([]);
         return;
       }
       const data = await res.json();
-      setInstrumentos(data || []);
+      // Filtrar apenas instrumentos válidos (com nome)
+      const instrumentosValidos = Array.isArray(data)
+        ? data.filter((instrumento: Instrumento) => instrumento?.nome?.trim())
+        : [];
+      setInstrumentos(instrumentosValidos);
     } catch (error) {
       console.error('Erro ao carregar instrumentos:', error);
       setInstrumentos([]);
