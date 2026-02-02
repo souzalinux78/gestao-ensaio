@@ -164,7 +164,7 @@ export default function ContatosManager() {
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               placeholder="Nome do contato"
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           <div>
@@ -174,7 +174,7 @@ export default function ContatosManager() {
               value={telefone}
               onChange={(e) => setTelefone(e.target.value)}
               placeholder="(00) 00000-0000"
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           <div className="flex flex-col sm:flex-row gap-3">

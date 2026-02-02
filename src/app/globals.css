@@ -27,6 +27,31 @@
   
   input, textarea, select {
     font-size: 16px; /* Previne zoom no iOS */
+    /* Garantir visibilidade do texto - padrão seguro */
+    color: #1f2937; /* text-gray-800 - cor escura visível */
+    background-color: #ffffff; /* bg-white - fundo branco */
+  }
+  
+  /* Garantir que inputs dentro de formulários sempre tenham texto visível */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  textarea,
+  select {
+    color: #1f2937 !important; /* Forçar cor de texto visível */
+    background-color: #ffffff !important; /* Forçar fundo branco */
+  }
+  
+  /* Placeholder deve ser visível mas mais claro */
+  input::placeholder,
+  textarea::placeholder {
+    color: #9ca3af !important; /* text-gray-400 - placeholder visível */
+    opacity: 1; /* Garantir opacidade total */
   }
   
   @media (max-width: 640px) {

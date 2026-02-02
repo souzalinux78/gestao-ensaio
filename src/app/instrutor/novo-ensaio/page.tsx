@@ -294,7 +294,7 @@ function NovoEnsaioContent() {
               value={hinosEnsaidos}
               onChange={(e) => setHinosEnsaidos(e.target.value)}
               placeholder="Ex: 1, 22, 33, 44"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-gray-900 bg-white"
             />
             <p className="text-sm text-gray-500 mt-1">
               Digite os números dos hinos separados por vírgula
@@ -308,7 +308,7 @@ function NovoEnsaioContent() {
               onChange={(e) => setRegencia(e.target.value)}
               placeholder="Ex:&#10;João Silva São Paulo Central&#10;Pedro Oliveira Campinas Bairro Novo"
               rows={4}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors resize-y"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors resize-y text-gray-900 bg-white"
             />
             <p className="text-sm text-gray-500 mt-1">
               Digite o nome do regente e a localidade (um por linha)

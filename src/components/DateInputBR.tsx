@@ -128,7 +128,7 @@ export default function DateInputBR({ value, onChange, className = '', required 
           onBlur={handleBlur}
           placeholder="DD/MM/AAAA"
           maxLength={10}
-          className={`flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors ${className}`}
+          className={`flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-gray-900 bg-white ${className}`}
           required={required}
         />
         <button
@@ -146,7 +146,7 @@ export default function DateInputBR({ value, onChange, className = '', required 
             type="date"
             value={value}
             onChange={handleDatePickerChange}
-            className="border-0 p-2"
+            className="border-0 p-2 text-gray-900 bg-white"
             lang="pt-BR"
           />
         </div>
