@@ -119,6 +119,9 @@ export default function InstrumentoForm({
 }: InstrumentoFormProps) {
   const [novoInstrumento, setNovoInstrumento] = useState('');
   const [mostrarNovo, setMostrarNovo] = useState(false);
+  // Map para armazenar valores temporários durante digitação
+  const [valoresTemporarios, setValoresTemporarios] = useState<Map<number, string>>(new Map());
+  
   const instrumentosPorNaipe = useMemo(() => {
     const grupos = new Map<Naipe, Instrumento[]>();
 
@@ -133,6 +136,17 @@ export default function InstrumentoForm({
   }, [instrumentos]);
 
   function renderInstrumentoItem(instrumento: Instrumento) {
+    // Obter valor do estado temporário ou do estado principal
+    const valorTemporario = valoresTemporarios.get(instrumento.id);
+    const valorPrincipal = valores[instrumento.id] !== undefined &&
+      valores[instrumento.id] !== null &&
+      valores[instrumento.id] > 0
+        ? String(valores[instrumento.id])
+        : '';
+    
+    // Usar valor temporário se existir, senão usar valor principal
+    const valorExibido = valorTemporario !== undefined ? valorTemporario : valorPrincipal;
+
     return (
       <div key={instrumento.id} className="flex items-center gap-2 sm:gap-3">
         <label className="flex-1 text-sm sm:text-base text-gray-700 min-w-0 truncate">
@@ -142,25 +156,22 @@ export default function InstrumentoForm({
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
-          value={
-            valores[instrumento.id] !== undefined &&
-            valores[instrumento.id] !== null &&
-            valores[instrumento.id] > 0
-              ? String(valores[instrumento.id])
-              : ''
-          }
+          value={valorExibido}
           onChange={(e) => {
             // Permitir apenas números
             const valorDigitado = e.target.value.replace(/[^0-9]/g, '');
-
-            // Se estiver vazio, remover do estado
+            
+            // Atualizar valor temporário imediatamente para feedback visual
+            const novosValoresTemporarios = new Map(valoresTemporarios);
             if (valorDigitado === '') {
-              onChange(instrumento.id, undefined);
-              return;
+              novosValoresTemporarios.delete(instrumento.id);
+            } else {
+              novosValoresTemporarios.set(instrumento.id, valorDigitado);
             }
+            setValoresTemporarios(novosValoresTemporarios);
 
-            // Se for apenas "0", também remover
-            if (valorDigitado === '0') {
+            // Se estiver vazio, remover do estado pai
+            if (valorDigitado === '') {
               onChange(instrumento.id, undefined);
               return;
             }
@@ -168,18 +179,34 @@ export default function InstrumentoForm({
             // Converter para número
             const valor = parseInt(valorDigitado, 10);
 
-            // Se for um número válido e maior que 0, salvar
+            // Se for um número válido e maior que 0, salvar no estado pai
             if (!isNaN(valor) && valor > 0) {
               onChange(instrumento.id, valor);
             } else {
-              // Se não for válido, remover
+              // Se for 0 ou inválido, remover do estado pai mas manter no temporário para digitação
               onChange(instrumento.id, undefined);
             }
           }}
           onBlur={(e) => {
-            // Ao sair do campo, se estiver vazio ou 0, garantir que está limpo
-            if (e.target.value === '' || e.target.value === '0') {
+            // Ao sair do campo, validar e limpar se necessário
+            const valorDigitado = e.target.value.replace(/[^0-9]/g, '');
+            
+            // Remover do estado temporário
+            const novosValoresTemporarios = new Map(valoresTemporarios);
+            novosValoresTemporarios.delete(instrumento.id);
+            setValoresTemporarios(novosValoresTemporarios);
+            
+            if (valorDigitado === '' || valorDigitado === '0') {
+              // Limpar se estiver vazio ou for apenas 0
               onChange(instrumento.id, undefined);
+            } else {
+              // Garantir que o valor final está salvo corretamente
+              const valor = parseInt(valorDigitado, 10);
+              if (!isNaN(valor) && valor > 0) {
+                onChange(instrumento.id, valor);
+              } else {
+                onChange(instrumento.id, undefined);
+              }
             }
           }}
           onKeyDown={(e) => {
@@ -202,8 +229,8 @@ export default function InstrumentoForm({
               e.preventDefault();
             }
           }}
-          placeholder=""
-          className="border border-gray-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 w-16 sm:w-20 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-center"
+          placeholder="0"
+          className="border border-gray-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 w-16 sm:w-20 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-center text-gray-900 bg-white"
         />
       </div>
     );

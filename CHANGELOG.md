@@ -168,3 +168,5 @@ Todas as alterações importantes do projeto.
 - Lista de instrumento
 - Lista de instrumento
 ## v2.1.19 - 2026-02-02
+
+## v2.1.20 - 2026-02-02
