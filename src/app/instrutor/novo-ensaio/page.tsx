@@ -9,6 +9,7 @@ import MusicosForm from '@/components/MusicosForm';
 import DateInputBR from '@/components/DateInputBR';
 import { Instrumento, Usuario, Ensaio, Musico } from '@/types';
 import { obterSessao } from '@/lib/session';
+import { fetchWithCSRF } from '@/lib/csrf-client';
 
 function NovoEnsaioContent() {
   const router = useRouter();
@@ -149,7 +150,7 @@ function NovoEnsaioContent() {
   }
 
   async function adicionarNovoInstrumento(nome: string) {
-    const res = await fetch('/api/instrumentos', {
+    const res = await fetchWithCSRF('/api/instrumentos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nome }),
@@ -211,7 +212,7 @@ function NovoEnsaioContent() {
       const url = isEditando && ensaioId ? `/api/ensaios/${ensaioId}` : '/api/ensaios';
       const method = isEditando && ensaioId ? 'PUT' : 'POST';
 
-      const res = await fetch(url, {
+      const res = await fetchWithCSRF(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(isEditando ? body : { ...body, instrutorId: usuario.id }),

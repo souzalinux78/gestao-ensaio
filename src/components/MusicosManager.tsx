@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Musico, Usuario } from '@/types';
 import { obterSessao, removerSessao } from '@/lib/session';
+import { fetchWithCSRF } from '@/lib/csrf-client';
 
 export default function MusicosManager() {
   const router = useRouter();
@@ -89,7 +90,7 @@ export default function MusicosManager() {
       const url = editandoId ? `/api/musicos/${editandoId}` : '/api/musicos';
       const method = editandoId ? 'PUT' : 'POST';
 
-      const res = await fetch(url, {
+      const res = await fetchWithCSRF(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -138,7 +139,7 @@ export default function MusicosManager() {
     }
 
     try {
-      const res = await fetch(`/api/musicos/${id}`, {
+      const res = await fetchWithCSRF(`/api/musicos/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${usuario.id}` },
       });

@@ -1,8 +1,10 @@
 import { obterSessao } from './session';
+import { getCSRFToken } from './csrf-client';
 
 /**
- * Cliente HTTP que adiciona autenticação automaticamente
+ * Cliente HTTP que adiciona autenticação e CSRF automaticamente
  * Prioriza accessToken (JWT) se disponível, senão usa ID (compatibilidade)
+ * Adiciona token CSRF para métodos POST, PUT, PATCH, DELETE
  */
 export async function apiFetch(
   url: string,
@@ -39,6 +41,19 @@ export async function apiFetch(
   // PRIORIDADE 2: Fallback para sistema antigo (compatibilidade)
   else if (sessao?.id) {
     headers['Authorization'] = `Bearer ${sessao.id}`;
+  }
+
+  // Adicionar token CSRF para métodos que precisam de proteção
+  const method = options.method || 'GET';
+  const protectedMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
+  if (protectedMethods.includes(method.toUpperCase())) {
+    try {
+      const csrfToken = await getCSRFToken();
+      headers['X-CSRF-Token'] = csrfToken;
+    } catch (error) {
+      // Se falhar ao obter token CSRF, logar mas não bloquear (pode ser rota isenta)
+      console.warn('[apiFetch] Erro ao obter token CSRF:', error);
+    }
   }
 
   // Fazer requisição com cache: 'no-store' para evitar cache de respostas 401

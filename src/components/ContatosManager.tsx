@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Contato, Usuario } from '@/types';
 import { obterSessao } from '@/lib/session';
+import { fetchWithCSRF } from '@/lib/csrf-client';
 
 export default function ContatosManager() {
   const [contatos, setContatos] = useState<Contato[]>([]);
@@ -68,7 +69,7 @@ export default function ContatosManager() {
       const url = editandoId ? `/api/contatos/${editandoId}` : '/api/contatos';
       const method = editandoId ? 'PUT' : 'POST';
 
-      const res = await fetch(url, {
+      const res = await fetchWithCSRF(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -104,7 +105,7 @@ export default function ContatosManager() {
     }
 
     try {
-      const res = await fetch(`/api/contatos/${id}`, {
+      const res = await fetchWithCSRF(`/api/contatos/${id}`, {
         method: 'DELETE',
       });
 
