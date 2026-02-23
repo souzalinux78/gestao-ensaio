@@ -39,7 +39,7 @@ export default function LoadingScreen() {
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{
-        background: 'linear-gradient(90deg, #0b0b0b 0%, #1a1a1a 55%, #3a2f0f 100%)'
+        background: 'radial-gradient(120% 140% at 5% 5%, #f8fbff 0%, #ecf2fb 52%, #dde7f4 100%)'
       }}
     >
       <div className="flex flex-col items-center justify-center space-y-6 animate-fade-in">

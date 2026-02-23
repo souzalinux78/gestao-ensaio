@@ -81,27 +81,27 @@ export default function InstrutorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[var(--bg-secondary)]">
+    <div className="portal-shell">
       <Header />
-      <div className="container mx-auto p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-primary dark:text-[var(--text-primary)]">Meus Ensaios</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">Meus Ensaios</h1>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <button
               onClick={() => router.push('/instrutor/contatos')}
-              className="w-full sm:w-auto bg-green-600 text-white px-4 py-2.5 rounded-lg hover:bg-green-700 transition-colors font-medium"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors font-medium"
             >
-              📞 Meus Contatos
+              Meus Contatos
             </button>
             <button
               onClick={() => router.push('/instrutor/musicos')}
-              className="w-full sm:w-auto bg-yellow-600 text-white px-4 py-2.5 rounded-lg hover:bg-yellow-700 transition-colors font-medium"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors font-medium"
             >
-              🎵 Cadastro de Músicos
+              Cadastro de Musicos
             </button>
             <button
               onClick={() => router.push('/instrutor/novo-ensaio')}
-              className="w-full sm:w-auto bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary-dark transition-colors font-medium shadow-md hover:shadow-lg"
+              className="w-full sm:w-auto bg-primary text-white px-6 py-2.5 rounded-xl hover:bg-primary-dark transition-colors font-medium shadow-md hover:shadow-lg"
             >
               Novo Ensaio
             </button>

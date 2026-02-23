@@ -34,12 +34,11 @@ export async function apiFetch(
     }
   }
 
-  // PRIORIDADE 1: Usar accessToken (JWT) se disponível
-  if (sessao && 'accessToken' in sessao && sessao.accessToken) {
-    headers['Authorization'] = `Bearer ${sessao.accessToken}`;
-  } 
-  // PRIORIDADE 2: Fallback para sistema antigo (compatibilidade)
-  else if (sessao?.id) {
+  const hasJwtToken = Boolean(sessao && 'accessToken' in sessao && sessao.accessToken);
+  if (hasJwtToken) {
+    headers['Authorization'] = `Bearer ${sessao!.accessToken}`;
+  } else if (sessao?.id) {
+    // Compatibilidade com sistema legado
     headers['Authorization'] = `Bearer ${sessao.id}`;
   }
 
@@ -56,25 +55,58 @@ export async function apiFetch(
     }
   }
 
-  // Fazer requisição com cache: 'no-store' para evitar cache de respostas 401
-  const response = await fetch(url, {
-    ...options,
-    headers,
-    cache: 'no-store', // Sempre buscar versão fresca, nunca usar cache
-    credentials: 'same-origin', // Incluir cookies se necessário
-  });
+  const requestWith = (requestHeaders: Record<string, string>) =>
+    fetch(url, {
+      ...options,
+      headers: requestHeaders,
+      cache: 'no-store',
+      credentials: 'same-origin',
+    });
 
-  // Se receber 401, limpar sessão e redirecionar para login
-  if (response.status === 401) {
-    // Limpar sessão local
-    if (typeof window !== 'undefined') {
-      const { removerSessao } = await import('./session');
-      removerSessao();
-      
-      // Redirecionar para login apenas se não estiver já na página de login
-      if (!window.location.pathname.startsWith('/login')) {
-        window.location.href = '/login';
+  let response = await requestWith(headers);
+
+  // Se JWT falhar com 401, tentar fallback legado com ID antes de deslogar
+  if (response.status === 401 && hasJwtToken && sessao?.id) {
+    const legacyHeaders = { ...headers, Authorization: `Bearer ${sessao.id}` };
+    response = await requestWith(legacyHeaders);
+  }
+
+  // Se ainda 401, tentar refresh de token e repetir uma vez
+  if (response.status === 401 && sessao?.id) {
+    try {
+      const refreshResponse = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+      });
+
+      if (refreshResponse.ok) {
+        const refreshData = await refreshResponse.json();
+        if (refreshData?.accessToken) {
+          const { salvarSessao } = await import('./session');
+          salvarSessao({
+            ...sessao,
+            accessToken: refreshData.accessToken,
+          });
+
+          const refreshedHeaders = {
+            ...headers,
+            Authorization: `Bearer ${refreshData.accessToken}`,
+          };
+          response = await requestWith(refreshedHeaders);
+        }
       }
+    } catch {
+      // Ignorar erro de refresh e tratar 401 abaixo
+    }
+  }
+
+  // Se ainda 401 após retries, limpar sessão e redirecionar para login
+  if (response.status === 401 && typeof window !== 'undefined') {
+    const { removerSessao } = await import('./session');
+    removerSessao();
+    if (!window.location.pathname.startsWith('/login')) {
+      window.location.href = '/login';
     }
   }
 

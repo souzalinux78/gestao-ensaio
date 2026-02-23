@@ -167,11 +167,11 @@ export default function MusicosManager() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 space-y-6">
+    <div className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-xl shadow-sm p-4 sm:p-6 space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-lg sm:text-xl font-semibold mb-2 text-primary">Gerenciar Músicos</h2>
-          <p className="text-sm sm:text-base text-gray-600">
+          <p className="text-sm sm:text-base text-[var(--text-secondary)]">
             Cadastre os músicos da comum. Eles aparecerão na tela de novo ensaio para marcar presença.
           </p>
         </div>
@@ -196,16 +196,16 @@ export default function MusicosManager() {
       )}
 
       {mostrarForm && (
-        <div className="border rounded p-4 bg-gray-50 space-y-4">
+        <div className="border border-[var(--border-default)] rounded-xl p-4 bg-[var(--bg-muted)] space-y-4">
           <h3 className="font-semibold">{editandoId ? 'Editar Músico' : 'Novo Músico'}</h3>
           <div>
-            <label className="block mb-2">Nome</label>
+            <label className="block mb-2 text-[var(--text-primary)]">Nome</label>
             <input
               type="text"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               placeholder="Nome do músico"
-              className="w-full border rounded px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full border border-[var(--border-default)] rounded-lg px-3 py-2 text-[var(--text-primary)] bg-white focus:outline-none focus:ring-2 focus:ring-primary"
               autoComplete="off"
               autoCorrect="off"
               autoCapitalize="words"
@@ -232,7 +232,7 @@ export default function MusicosManager() {
       {carregando ? (
         <div className="text-center py-8">Carregando músicos...</div>
       ) : musicos.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-[var(--text-secondary)]">
           Nenhum músico cadastrado. Clique em "Adicionar Músico" para começar.
         </div>
       ) : (
@@ -245,9 +245,9 @@ export default function MusicosManager() {
               .map((musico) => {
                 const nomeMusico = musico.nome?.trim() || `Músico #${musico.id}`;
                 return (
-              <div key={musico.id} className="border rounded-lg p-4 bg-gray-50">
+              <div key={musico.id} className="border border-[var(--border-default)] rounded-xl p-4 bg-[var(--bg-muted)]">
                 <div className="flex justify-between items-start mb-3">
-                  <p className="font-medium text-gray-900 flex-1" title={nomeMusico}>{nomeMusico}</p>
+                  <p className="font-medium text-[var(--text-primary)] flex-1" title={nomeMusico}>{nomeMusico}</p>
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -271,7 +271,7 @@ export default function MusicosManager() {
           <div className="hidden sm:block overflow-x-auto">
             <table className="min-w-full border">
               <thead>
-                <tr className="bg-gray-100">
+                <tr className="bg-[var(--bg-muted)]">
                   <th className="border px-4 py-2 text-left">Nome</th>
                   <th className="border px-4 py-2 text-center">Ações</th>
                 </tr>

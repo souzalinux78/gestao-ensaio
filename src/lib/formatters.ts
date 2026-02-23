@@ -6,16 +6,25 @@
  * Formata data para formato brasileiro (dd/MM/yyyy)
  */
 export function formatDateBR(date: Date | string): string {
+  if (typeof date === 'string') {
+    // Handle YYYY-MM-DD without timezone drift
+    const isoDateOnly = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (isoDateOnly) {
+      return `${isoDateOnly[3]}/${isoDateOnly[2]}/${isoDateOnly[1]}`;
+    }
+  }
+
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+
   if (isNaN(dateObj.getTime())) {
     return '';
   }
-  
-  const day = dateObj.getDate().toString().padStart(2, '0');
-  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-  const year = dateObj.getFullYear();
-  
+
+  // Use UTC parts for deterministic output across environments
+  const day = dateObj.getUTCDate().toString().padStart(2, '0');
+  const month = (dateObj.getUTCMonth() + 1).toString().padStart(2, '0');
+  const year = dateObj.getUTCFullYear();
+
   return `${day}/${month}/${year}`;
 }
 
@@ -47,7 +56,9 @@ export function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-  }).format(value);
+  })
+    .format(value)
+    .replace(/\u00A0/g, ' ');
 }
 
 /**
@@ -64,7 +75,8 @@ export function truncateText(text: string, maxLength: number): string {
   if (!text || text.length <= maxLength) {
     return text;
   }
-  return text.slice(0, maxLength) + '...';
+  const safeLength = Math.max(maxLength - 1, 0);
+  return text.slice(0, safeLength) + '...';
 }
 
 /**

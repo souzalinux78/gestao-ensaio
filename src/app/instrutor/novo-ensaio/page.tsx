@@ -235,10 +235,10 @@ function NovoEnsaioContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="portal-shell">
       <Header />
-      <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
-        <h1 className="text-xl sm:text-2xl font-bold mb-6 text-primary">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        <h1 className="text-xl sm:text-2xl font-bold mb-6 text-[var(--text-primary)]">
           {isEditando ? 'Editar Ensaio' : 'Novo Ensaio'}
         </h1>
         
@@ -248,9 +248,9 @@ function NovoEnsaioContent() {
           </div>
         )}
 
-        <div className="space-y-6 bg-white p-4 sm:p-6 rounded-lg shadow-sm">
+        <div className="space-y-6 bg-[var(--bg-surface)] border border-[var(--border-default)] p-4 sm:p-6 rounded-xl shadow-sm">
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Data do Ensaio</label>
+            <label className="block mb-2 text-sm font-medium text-[var(--text-primary)]">Data do Ensaio</label>
             <DateInputBR
               value={data}
               onChange={(value) => setData(value)}
@@ -288,29 +288,29 @@ function NovoEnsaioContent() {
           />
 
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Hinos Ensaiados</label>
+            <label className="block mb-2 text-sm font-medium text-[var(--text-primary)]">Hinos Ensaiados</label>
             <input
               type="text"
               value={hinosEnsaidos}
               onChange={(e) => setHinosEnsaidos(e.target.value)}
               placeholder="Ex: 1, 22, 33, 44"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-gray-900 bg-white"
+              className="w-full border border-[var(--border-default)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-[var(--text-primary)] bg-white"
             />
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--text-secondary)] mt-1">
               Digite os números dos hinos separados por vírgula
             </p>
           </div>
 
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Regência</label>
+            <label className="block mb-2 text-sm font-medium text-[var(--text-primary)]">Regência</label>
             <textarea
               value={regencia}
               onChange={(e) => setRegencia(e.target.value)}
               placeholder="Ex:&#10;João Silva São Paulo Central&#10;Pedro Oliveira Campinas Bairro Novo"
               rows={4}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors resize-y text-gray-900 bg-white"
+              className="w-full border border-[var(--border-default)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors resize-y text-[var(--text-primary)] bg-white"
             />
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--text-secondary)] mt-1">
               Digite o nome do regente e a localidade (um por linha)
             </p>
           </div>
@@ -325,7 +325,7 @@ function NovoEnsaioContent() {
             </button>
             <button
               onClick={() => router.back()}
-              className="flex-1 sm:flex-none bg-gray-400 text-white px-6 py-3 rounded-lg hover:bg-gray-500 transition-colors font-medium"
+              className="flex-1 sm:flex-none bg-[var(--bg-muted)] text-[var(--text-primary)] px-6 py-3 rounded-lg hover:opacity-90 transition-colors font-medium border border-[var(--border-default)]"
             >
               Cancelar
             </button>
@@ -339,10 +339,10 @@ function NovoEnsaioContent() {
 export default function NovoEnsaioPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-50">
+      <div className="portal-shell">
         <Header />
-        <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
-          <div className="text-center py-8 text-gray-600">Carregando...</div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          <div className="text-center py-8 text-[var(--text-secondary)]">Carregando...</div>
         </div>
       </div>
     }>

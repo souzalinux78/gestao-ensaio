@@ -10,18 +10,18 @@
   html {
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
-    background-color: var(--pe-black);
-    color: var(--pe-white);
+    background-color: var(--bg-page);
+    color: var(--text-primary);
   }
   
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     /* Safe area para iOS */
-    padding-left: max(12px, env(safe-area-inset-left));
-    padding-right: max(12px, env(safe-area-inset-right));
-    background-color: var(--pe-black);
-    color: var(--pe-white);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    background-color: var(--bg-page);
+    color: var(--text-primary);
     transition: background-color 0.3s ease, color 0.3s ease;
   }
   
@@ -459,4 +459,134 @@
     @apply text-gray-900 dark:text-[var(--text-primary)];
     @apply border-gray-200 dark:border-[var(--border-primary)];
   }
+
+  /* Shared shell inspired by the reference layout */
+  .portal-shell {
+    min-height: 100vh;
+    background: radial-gradient(90% 120% at 15% 0%, #f8fbff 0%, var(--bg-page) 58%, #e8eef7 100%);
+    color: var(--text-primary);
+  }
+
+  .portal-sidebar {
+    width: 272px;
+    background-color: var(--bg-surface);
+    border-right: 1px solid var(--border-default);
+    box-shadow: 2px 0 18px rgba(15, 23, 42, 0.04);
+  }
+
+  .portal-brand {
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  .portal-brand-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent-primary), #4f88f4);
+    color: var(--text-inverse);
+    box-shadow: 0 12px 28px rgba(47, 111, 235, 0.28);
+  }
+
+  .portal-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    padding: 0.7rem 0.85rem;
+    transition: all 0.2s ease;
+  }
+
+  .portal-nav-item:hover {
+    background: #f3f7ff;
+    color: var(--text-primary);
+    border-color: #e2eaf8;
+  }
+
+  .portal-nav-item.is-active {
+    background: var(--accent-soft);
+    border-color: rgba(47, 111, 235, 0.28);
+    color: #10306b;
+    box-shadow: 0 4px 14px rgba(47, 111, 235, 0.12);
+  }
+
+  .portal-user-card {
+    border: 1px solid var(--border-default);
+    background: #f9fbff;
+  }
+
+  .portal-topbar {
+    min-height: 88px;
+    border: 1px solid var(--border-default);
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .portal-page-card {
+    border: 1px solid var(--border-default);
+    border-radius: 20px;
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-medium);
+  }
+
+  .portal-status-card {
+    border: 1px solid var(--border-default);
+    border-radius: 32px;
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-medium);
+  }
+
+  .portal-empty-state {
+    border-radius: 24px;
+    border: 2px dashed #dce5f2;
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .auth-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: radial-gradient(120% 140% at 5% 5%, #f8fbff 0%, #ecf2fb 52%, #dde7f4 100%);
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 28rem;
+    border: 1px solid var(--border-default);
+    border-radius: 1.1rem;
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-strong);
+  }
+}
+
+[data-theme='dark'] .portal-shell {
+  background: radial-gradient(90% 120% at 15% 0%, #162136 0%, #10192b 55%, #0a1321 100%);
+}
+
+[data-theme='dark'] .portal-nav-item:hover {
+  background: #1d2a42;
+  border-color: #2e4060;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .portal-nav-item.is-active {
+  background: rgba(126, 164, 255, 0.2);
+  border-color: rgba(126, 164, 255, 0.38);
+  color: #d9e5ff;
+}
+
+[data-theme='dark'] .portal-user-card {
+  background: #18253b;
+}
+
+[data-theme='dark'] .portal-empty-state {
+  border-color: #2b3a55;
+  background: rgba(18, 27, 45, 0.78);
+}
+
+[data-theme='dark'] .auth-shell {
+  background: radial-gradient(120% 140% at 5% 5%, #172136 0%, #101b30 52%, #0a1324 100%);
 }

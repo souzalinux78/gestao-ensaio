@@ -1,156 +1,118 @@
-/* ============================================
-   SISTEMA DE TEMA DARK/LIGHT - DESIGN TOKENS GLOBAIS
-   ============================================ */
-
-/* ============================================
-   IDENTIDADE VISUAL PARTIU ENSAIO
-   ============================================ */
-
-/* CORES OFICIAIS PARTIU ENSAIO - DOURADO DOMINANTE */
+/* Global design tokens */
 :root {
-  /* Base Partiu Ensaio */
-  --pe-black: #0b0b0b;
-  --pe-black-soft: #1a1a1a;
-  --pe-gold-main: #d4af37;
-  --pe-gold-strong: #c9a24d;
-  --pe-gold-bg: rgba(212, 175, 55, 0.25);
+  color-scheme: light;
+
+  /* Legacy aliases still used in the app */
+  --pe-black: #0f172a;
+  --pe-black-soft: #1f2937;
+  --pe-gold-main: #2f6feb;
+  --pe-gold-strong: #1f5dd5;
+  --pe-gold-bg: rgba(47, 111, 235, 0.14);
   --pe-white: #ffffff;
-  --pe-gray-light: #f8fafc;
-  --pe-gray-text: #e5e7eb;
-  
-  /* Compatibilidade (mapeando para novas variáveis) */
+  --pe-gray-light: #f5f7fb;
+  --pe-gray-text: #4c5f78;
   --pe-gold: var(--pe-gold-main);
   --pe-gold-soft: var(--pe-gold-bg);
-  --pe-gray-muted: #9ca3af;
-  
-  /* Fundos (Light Mode) */
-  --bg-page: #f8fafc;
+  --pe-gray-muted: #7b8ca5;
+
+  /* Surfaces */
+  --bg-page: #edf2f8;
   --bg-surface: #ffffff;
-  --bg-muted: #f1f5f9;
-  
-  /* Texto (Light Mode) */
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --text-inverse: var(--pe-white);
-  
-  /* Identidade Premium (usando cores Partiu Ensaio) */
-  --accent-primary: var(--pe-gold);
-  --accent-secondary: #c9a24d;
-  --accent-soft: var(--pe-gold-soft);
-  
-  /* Neutros escuros (usando cores Partiu Ensaio) */
-  --dark-primary: var(--pe-black);
-  --dark-secondary: var(--pe-black-soft);
-  
-  /* Bordas */
-  --border-default: #e5e7eb;
-  
-  /* Compatibilidade com sistema antigo */
+  --bg-muted: #e7eef8;
+
+  /* Text */
+  --text-primary: #0f172a;
+  --text-secondary: #5f6f86;
+  --text-tertiary: #8ca0ba;
+  --text-inverse: #ffffff;
+
+  /* Brand */
+  --accent-primary: #2f6feb;
+  --accent-secondary: #1f5dd5;
+  --accent-soft: rgba(47, 111, 235, 0.16);
+
+  /* Compatibility aliases */
   --bg-primary: var(--bg-surface);
   --bg-secondary: var(--bg-page);
   --bg-tertiary: var(--bg-muted);
-  --text-tertiary: #9ca3af;
+  --border-default: #d5deec;
   --border-primary: var(--border-default);
-  --border-secondary: #d1d5db;
-  --border-focus: #1e3a5f;
-  
-  /* Cores primárias (mantém para compatibilidade) */
-  --color-primary: #1e3a5f;
-  --color-primary-dark: #0f1f35;
-  --color-primary-light: #2d4a6f;
-  
-  /* Cores de accent */
+  --border-secondary: #bcc9dd;
+  --border-focus: #2f6feb;
+
+  --color-primary: #2f6feb;
+  --color-primary-dark: #1f5dd5;
+  --color-primary-light: #5b8cf4;
   --color-accent: var(--accent-primary);
   --color-accent-dark: var(--accent-secondary);
-  --color-accent-light: #f5d76e;
-  
-  /* Cores semânticas */
-  --color-success: #10b981;
-  --color-error: #ef4444;
-  --color-warning: #f59e0b;
-  --color-info: #3b82f6;
-  
-  /* Sombras */
-  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.12);
-  
-  /* Scrollbar */
-  --scrollbar-track: #f1f1f1;
-  --scrollbar-thumb: #1e3a5f;
-  --scrollbar-thumb-hover: #0f1f35;
+  --color-accent-light: #7ea4ff;
+
+  --color-success: #16a34a;
+  --color-error: #dc2626;
+  --color-warning: #d97706;
+  --color-info: #2563eb;
+
+  --dark-primary: #0f172a;
+  --dark-secondary: #1f2937;
+
+  --shadow-soft: 0 1px 3px rgba(15, 23, 42, 0.08);
+  --shadow-medium: 0 8px 20px rgba(15, 23, 42, 0.09);
+  --shadow-strong: 0 18px 40px rgba(15, 23, 42, 0.12);
+
+  --scrollbar-track: #dee6f2;
+  --scrollbar-thumb: #9fb0c8;
+  --scrollbar-thumb-hover: #8197b7;
 }
 
-/* DARK MODE - PARTIU ENSAIO */
-[data-theme="dark"] {
-  /* Fundos */
-  --bg-page: #020617;
-  --bg-surface: #0f172a;
-  --bg-muted: #020617;
-  
-  /* Texto (usando cores Partiu Ensaio) */
-  --text-primary: var(--pe-gray-text);
-  --text-secondary: var(--pe-gray-muted);
-  --text-inverse: var(--pe-white);
-  
-  /* Identidade Premium (mantém cores Partiu Ensaio - DOURADO DOMINANTE) */
-  --accent-primary: var(--pe-gold-main);
-  --accent-secondary: var(--pe-gold-strong);
-  --accent-soft: var(--pe-gold-bg);
-  
-  /* Neutros escuros (usando cores Partiu Ensaio) */
-  --dark-primary: var(--pe-black);
-  --dark-secondary: var(--pe-black-soft);
-  
-  /* Bordas */
-  --border-default: #1f2937;
-  
-  /* Compatibilidade com sistema antigo */
-  --bg-primary: var(--bg-surface);
-  --bg-secondary: var(--bg-page);
-  --bg-tertiary: #374151;
-  --text-tertiary: #9ca3af;
-  --border-primary: var(--border-default);
-  --border-secondary: #4b5563;
-  --border-focus: #2d4a6f;
-  
-  /* Cores primárias (ajustadas para dark) */
-  --color-primary: #2d4a6f;
-  --color-primary-dark: #1e3a5f;
-  --color-primary-light: #3d5a8f;
-  
-  /* Cores de accent */
-  --color-accent: var(--accent-primary);
-  --color-accent-dark: var(--accent-secondary);
-  --color-accent-light: #f5d76e;
-  
-  /* Cores semânticas (ajustadas para dark) */
-  --color-success: #34d399;
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg-page: #0b1220;
+  --bg-surface: #121b2d;
+  --bg-muted: #1a263b;
+
+  --text-primary: #e5ecf7;
+  --text-secondary: #b5c2d6;
+  --text-tertiary: #8fa2bf;
+  --text-inverse: #f8fbff;
+
+  --accent-primary: #6f9cff;
+  --accent-secondary: #5787ee;
+  --accent-soft: rgba(111, 156, 255, 0.18);
+
+  --border-default: #27334a;
+  --border-secondary: #334462;
+  --border-focus: #7ea4ff;
+
+  --color-primary: #7ea4ff;
+  --color-primary-dark: #5e89f5;
+  --color-primary-light: #9bb9ff;
+  --color-accent: #7ea4ff;
+  --color-accent-dark: #5e89f5;
+  --color-accent-light: #a7c0ff;
+
+  --color-success: #4ade80;
   --color-error: #f87171;
-  --color-warning: #fbbf24;
+  --color-warning: #f59e0b;
   --color-info: #60a5fa;
-  
-  /* Sombras (mais sutis no dark) */
-  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.5);
-  
-  /* Scrollbar */
-  --scrollbar-track: #1f2937;
-  --scrollbar-thumb: #4b5563;
-  --scrollbar-thumb-hover: #6b7280;
+
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-medium: 0 8px 20px rgba(0, 0, 0, 0.38);
+  --shadow-strong: 0 18px 40px rgba(0, 0, 0, 0.42);
+
+  --scrollbar-track: #1a2437;
+  --scrollbar-thumb: #3b4c68;
+  --scrollbar-thumb-hover: #50658b;
 }
 
-/* Aplicar transição suave em elementos que mudam com o tema */
 html,
 body,
-[class*="bg-"],
-[class*="text-"],
-[class*="border-"] {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+[class*='bg-'],
+[class*='text-'],
+[class*='border-'] {
+  transition: background-color 0.24s ease, color 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
 }
 
-/* Scrollbar personalizada com suporte a tema */
 .scrollbar-thin::-webkit-scrollbar-track {
   background: var(--scrollbar-track);
 }

@@ -40,7 +40,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: '#d4af37',
+  themeColor: '#2f6feb',
 };
 
 export default function RootLayout({
@@ -57,7 +57,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Gestão de Ensaio" />
         <meta name="application-name" content="Gestão de Ensaio" />
-        <meta name="msapplication-TileColor" content="#d4af37" />
+        <meta name="msapplication-TileColor" content="#2f6feb" />
         <meta name="msapplication-tap-highlight" content="no" />
         {/* Splash screen iOS */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -66,7 +66,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png" />
         {/* Splash screen Android */}
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#d4af37" />
+        <meta name="theme-color" content="#2f6feb" />
       </head>
       <body>
         <script
@@ -78,11 +78,6 @@ export default function RootLayout({
                   const savedTheme = localStorage.getItem('gestao-ensaio-theme');
                   if (savedTheme === 'dark') {
                     document.documentElement.setAttribute('data-theme', 'dark');
-                  } else {
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    if (prefersDark) {
-                      document.documentElement.setAttribute('data-theme', 'dark');
-                    }
                   }
                 } catch (e) {
                   // Ignorar erros

@@ -475,7 +475,7 @@ export default function UsuariosPage() {
                 }}
                 onMouseEnter={(e) => {
                   if (!e.currentTarget.disabled) {
-                    e.currentTarget.style.backgroundColor = '#c9a24d';
+                    e.currentTarget.style.backgroundColor = 'var(--pe-gold-strong)';
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -561,7 +561,7 @@ export default function UsuariosPage() {
                         backgroundColor: 'var(--pe-gold)',
                         color: 'var(--pe-black)'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c9a24d'}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-strong)'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold)'}
                     >
                       Editar

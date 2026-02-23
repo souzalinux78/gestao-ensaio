@@ -9,7 +9,14 @@ export async function GET(request: NextRequest) {
   try {
     // Verificar se é admin
     const usuario = await obterUsuarioDaRequisicao(request);
-    if (!usuario || usuario.tipo !== 'admin') {
+    if (!usuario) {
+      return NextResponse.json(
+        { error: 'Não autenticado' },
+        { status: 401 }
+      );
+    }
+
+    if (usuario.tipo !== 'admin') {
       return NextResponse.json(
         { error: 'Acesso negado. Apenas administradores podem visualizar usuários.' },
         { status: 403 }
@@ -24,15 +31,14 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Obter tenantId para isolamento
+    // Se tenantId for null, usar visão global (dados legados sem tenant definido)
     const tenantId = await resolveTenantFromRequest(request);
-    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+    const tenantWhere = tenantId !== null ? { tenantId } : {};
 
     // Buscar usuários e total em paralelo
     const [usuarios, total] = await Promise.all([
       prisma.usuario.findMany({
-        where: {
-          tenantId: tenantIdFinal, // ISOLAMENTO: admin vê apenas usuários do seu tenant
-        },
+        where: tenantWhere,
         orderBy: {
           nome: 'asc',
         },
@@ -49,9 +55,7 @@ export async function GET(request: NextRequest) {
         take: limit,
       }),
       prisma.usuario.count({
-        where: {
-          tenantId: tenantIdFinal, // ISOLAMENTO: contar apenas usuários do tenant
-        },
+        where: tenantWhere,
       }),
     ]);
 
@@ -83,11 +87,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const { nome, email, telefone, senha, tipo, igreja, aprovado } = await request.json();
+    const usuarioSolicitante = await obterUsuarioDaRequisicao(request);
+    const solicitanteEhAdmin = usuarioSolicitante?.tipo === 'admin';
 
     // Validar entrada
-    if (!nome || !email || !telefone || !senha || !tipo) {
+    if (!nome || !email || !senha || !tipo) {
       return NextResponse.json(
-        { error: 'Nome, email, telefone, senha e tipo são obrigatórios' },
+        { error: 'Nome, email, senha e tipo são obrigatórios' },
         { status: 400 }
       );
     }
@@ -130,7 +136,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!telefoneSanitizado) {
+    if (telefone !== undefined && telefone !== null && String(telefone).trim() !== '' && !telefoneSanitizado) {
       return NextResponse.json(
         { error: 'Telefone inválido' },
         { status: 400 }
@@ -138,24 +144,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Garantir que cadastros públicos não sejam admin
-    // Admin só pode ser criado por outro admin
-    const tipoFinal = tipo === 'admin' ? 'instrutor' : tipo;
+    // Admin só pode ser criado por outro admin autenticado
+    const tipoFinal = !solicitanteEhAdmin && tipo === 'admin' ? 'instrutor' : tipo;
     
     // Se for cadastro público (sem aprovado definido), criar como não aprovado
     // Se for admin criando, usar o valor de aprovado fornecido (ou true para admin)
     const usuarioAprovado = aprovado !== undefined ? aprovado : (tipoFinal === 'admin' ? true : false);
 
     // Obter tenantId para isolamento
-    // Se for cadastro público (sem autenticação), usar tenant padrão
-    // Se for admin criando, usar o tenant do admin
-    let tenantIdFinal = 1; // Padrão: tenant padrão (ID = 1)
-    
-    // Tentar obter tenantId da requisição (pode ser null para cadastros públicos)
+    // Para dados legados, manter null em vez de forçar tenant 1
     const tenantId = await resolveTenantFromRequest(request);
-    if (tenantId) {
-      tenantIdFinal = tenantId;
-    }
-    // Se tenantId for null, já está usando o padrão (1)
+    const tenantIdFinal = tenantId ?? null;
 
     // Criar usuário diretamente com aprovado (evita query duplicada)
     const senhaHash = await bcrypt.hash(senha, 10);

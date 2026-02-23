@@ -28,7 +28,6 @@ export async function PUT(
 
     // Obter tenantId para isolamento
     const tenantId = await resolveTenantFromRequest(request);
-    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
 
     // Verificar se usuário existe e pertence ao mesmo tenant
     const usuarioExistente = await prisma.usuario.findUnique({
@@ -43,8 +42,8 @@ export async function PUT(
       );
     }
 
-    // ISOLAMENTO: Verificar se usuário pertence ao mesmo tenant
-    if (usuarioExistente.tenantId !== tenantIdFinal) {
+    // ISOLAMENTO: quando houver tenant do solicitante, restringir ao mesmo tenant
+    if (tenantId !== null && usuarioExistente.tenantId !== tenantId) {
       return NextResponse.json(
         { error: 'Usuário não encontrado' },
         { status: 404 }

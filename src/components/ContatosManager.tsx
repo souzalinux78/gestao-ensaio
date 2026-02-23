@@ -122,11 +122,11 @@ export default function ContatosManager() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 space-y-6">
+    <div className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-xl shadow-sm p-4 sm:p-6 space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-lg sm:text-xl font-semibold mb-2 text-primary">Gerenciar Contatos</h2>
-          <p className="text-sm sm:text-base text-gray-600">
+          <p className="text-sm sm:text-base text-[var(--text-secondary)]">
             Adicione telefones e nomes que serão enviados junto com os dados do ensaio para o webhook.
           </p>
         </div>
@@ -153,28 +153,28 @@ export default function ContatosManager() {
       )}
 
       {mostrarForm && (
-        <div className="border rounded p-4 bg-gray-50 space-y-4">
+        <div className="border border-[var(--border-default)] rounded-xl p-4 bg-[var(--bg-muted)] space-y-4">
           <h3 className="font-semibold">
             {editandoId ? 'Editar Contato' : 'Novo Contato'}
           </h3>
           <div>
-            <label className="block mb-2">Nome</label>
+            <label className="block mb-2 text-[var(--text-primary)]">Nome</label>
             <input
               type="text"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               placeholder="Nome do contato"
-              className="w-full border rounded px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full border border-[var(--border-default)] rounded-lg px-3 py-2 text-[var(--text-primary)] bg-white focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           <div>
-            <label className="block mb-2">Telefone</label>
+            <label className="block mb-2 text-[var(--text-primary)]">Telefone</label>
             <input
               type="tel"
               value={telefone}
               onChange={(e) => setTelefone(e.target.value)}
               placeholder="(00) 00000-0000"
-              className="w-full border rounded px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full border border-[var(--border-default)] rounded-lg px-3 py-2 text-[var(--text-primary)] bg-white focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
@@ -198,7 +198,7 @@ export default function ContatosManager() {
       {carregando ? (
         <div className="text-center py-8">Carregando contatos...</div>
       ) : contatos.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-[var(--text-secondary)]">
           Nenhum contato cadastrado. Clique em "Adicionar Contato" para começar.
         </div>
       ) : (
@@ -212,10 +212,10 @@ export default function ContatosManager() {
                 const nomeContato = contato.nome?.trim() || `Contato #${contato.id}`;
                 const telefoneContato = contato.telefone?.trim() || 'Sem telefone';
                 return (
-              <div key={contato.id} className="border rounded-lg p-4 bg-gray-50">
+              <div key={contato.id} className="border border-[var(--border-default)] rounded-xl p-4 bg-[var(--bg-muted)]">
                 <div className="mb-3">
-                  <p className="font-medium text-gray-900 mb-1" title={nomeContato}>{nomeContato}</p>
-                  <p className="text-sm text-gray-600" title={telefoneContato}>{telefoneContato}</p>
+                  <p className="font-medium text-[var(--text-primary)] mb-1" title={nomeContato}>{nomeContato}</p>
+                  <p className="text-sm text-[var(--text-secondary)]" title={telefoneContato}>{telefoneContato}</p>
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -239,7 +239,7 @@ export default function ContatosManager() {
           <div className="hidden sm:block overflow-x-auto">
             <table className="min-w-full border">
               <thead>
-                <tr className="bg-gray-100">
+                <tr className="bg-[var(--bg-muted)]">
                   <th className="border px-4 py-2 text-left">Nome</th>
                   <th className="border px-4 py-2 text-left">Telefone</th>
                   <th className="border px-4 py-2 text-center">Ações</th>

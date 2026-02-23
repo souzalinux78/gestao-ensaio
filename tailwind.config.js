@@ -10,14 +10,14 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#d4af37', // Dourado dominante (Partiu Ensaio)
-          dark: '#c9a24d',
-          light: '#f5d76e',
+          DEFAULT: '#2f6feb',
+          dark: '#1f5dd5',
+          light: '#7ea4ff',
         },
         accent: {
-          DEFAULT: '#d4af37', // Dourado do logo
-          dark: '#c9a24d',
-          light: '#f5d76e',
+          DEFAULT: '#2f6feb',
+          dark: '#1f5dd5',
+          light: '#7ea4ff',
         },
         // Cores semânticas padronizadas
         success: {
@@ -62,8 +62,8 @@ module.exports = {
         'soft': '0 2px 8px rgba(0, 0, 0, 0.08)',
         'medium': '0 4px 12px rgba(0, 0, 0, 0.1)',
         'strong': '0 8px 24px rgba(0, 0, 0, 0.12)',
-        'glow': '0 0 20px rgba(212, 175, 55, 0.25)',
-        'glow-accent': '0 0 20px rgba(212, 175, 55, 0.3)',
+        'glow': '0 0 20px rgba(47, 111, 235, 0.26)',
+        'glow-accent': '0 0 20px rgba(47, 111, 235, 0.34)',
         'inner-soft': 'inset 0 2px 4px rgba(0, 0, 0, 0.06)',
       },
       borderRadius: {

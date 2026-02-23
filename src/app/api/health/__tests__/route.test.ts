@@ -1,3 +1,13 @@
+/**
+ * @jest-environment node
+ */
+
+jest.mock('@/lib/db', () => ({
+  prisma: {
+    $queryRaw: jest.fn().mockResolvedValue([]),
+  },
+}));
+
 import { GET } from '../route';
 
 describe('/api/health', () => {

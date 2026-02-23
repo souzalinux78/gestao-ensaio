@@ -74,13 +74,8 @@ export default function CadastroPage() {
 
   if (sucesso) {
     return (
-      <div 
-        className="min-h-screen flex items-center justify-center p-4"
-      style={{
-        background: 'linear-gradient(90deg, #0b0b0b 0%, #1a1a1a 50%, #3a2f0f 100%)'
-      }}
-      >
-        <div className="rounded-lg shadow-xl p-8 max-w-md w-full text-center" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
+      <div className="auth-shell">
+        <div className="auth-card p-8 text-center">
           <div className="mb-4">
             <div className="mx-auto w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--pe-gold-bg)' }}>
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--pe-gold-main)' }}>
@@ -112,13 +107,8 @@ export default function CadastroPage() {
   }
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{
-        background: 'linear-gradient(180deg, var(--dark-primary), var(--dark-secondary))'
-      }}
-    >
-      <div className="rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
+    <div className="auth-shell">
+      <div className="auth-card p-6 sm:p-8">
         <div className="text-center mb-6">
           <div className="flex justify-center mb-4">
             <Image
@@ -157,7 +147,7 @@ export default function CadastroPage() {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = 'var(--pe-gold-strong)';
-                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.3)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(47, 111, 235, 0.24)';
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = 'var(--border-default)';
@@ -181,7 +171,7 @@ export default function CadastroPage() {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = 'var(--pe-gold-strong)';
-                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.3)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(47, 111, 235, 0.24)';
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = 'var(--border-default)';
@@ -206,7 +196,7 @@ export default function CadastroPage() {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = 'var(--pe-gold-strong)';
-                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.3)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(47, 111, 235, 0.24)';
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = 'var(--border-default)';
@@ -229,7 +219,7 @@ export default function CadastroPage() {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = 'var(--pe-gold-strong)';
-                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.3)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(47, 111, 235, 0.24)';
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = 'var(--border-default)';
@@ -258,7 +248,7 @@ export default function CadastroPage() {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = 'var(--pe-gold-strong)';
-                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.3)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(47, 111, 235, 0.24)';
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = 'var(--border-default)';
@@ -282,7 +272,7 @@ export default function CadastroPage() {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = 'var(--pe-gold-strong)';
-                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.3)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(47, 111, 235, 0.24)';
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = 'var(--border-default)';
@@ -308,7 +298,7 @@ export default function CadastroPage() {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = 'var(--pe-gold-strong)';
-                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.3)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(47, 111, 235, 0.24)';
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = 'var(--border-default)';

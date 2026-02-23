@@ -51,13 +51,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{
-        background: 'linear-gradient(90deg, #0b0b0b 0%, #1a1a1a 50%, #3a2f0f 100%)'
-      }}
-    >
-      <div className="p-6 sm:p-8 rounded-lg shadow-2xl w-full max-w-md" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
+    <div className="auth-shell">
+      <div className="auth-card p-6 sm:p-8">
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <div className="relative w-24 h-24 sm:w-32 sm:h-32">
@@ -100,7 +95,7 @@ export default function LoginPage() {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = 'var(--pe-gold-strong)';
-                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.3)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(47, 111, 235, 0.24)';
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = 'var(--border-default)';
@@ -124,7 +119,7 @@ export default function LoginPage() {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = 'var(--pe-gold-strong)';
-                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.3)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(47, 111, 235, 0.24)';
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = 'var(--border-default)';

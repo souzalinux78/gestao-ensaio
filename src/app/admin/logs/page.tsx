@@ -92,7 +92,7 @@ export default function LogsPage() {
             }}
             onFocus={(e) => {
               e.currentTarget.style.borderColor = 'var(--pe-gold-strong)';
-              e.currentTarget.style.boxShadow = '0 0 0 2px rgba(212, 175, 55, 0.3)';
+              e.currentTarget.style.boxShadow = '0 0 0 2px rgba(47, 111, 235, 0.24)';
             }}
             onBlur={(e) => {
               e.currentTarget.style.borderColor = 'var(--border-default)';

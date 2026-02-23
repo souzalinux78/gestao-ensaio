@@ -1,8 +1,8 @@
 // Service Worker para PWA
 // IMPORTANTE: Versão atualizada automaticamente via timestamp do build
 // Versão atual: v8 - Atualização automática forçada
-const BUILD_TIMESTAMP = '{{BUILD_TIMESTAMP}}';
-const CACHE_NAME = `gestao-ensaio-${BUILD_TIMESTAMP || Date.now()}`;
+const BUILD_TIMESTAMP = '1771874986340';
+const CACHE_NAME = 'gestao-ensaio-1771875392673';
 const CACHE_VERSION = BUILD_TIMESTAMP || '8';
 
 // URLs críticas para cache inicial - APENAS arquivos estáticos válidos

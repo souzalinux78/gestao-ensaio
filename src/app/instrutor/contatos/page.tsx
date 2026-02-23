@@ -21,9 +21,9 @@ export default function ContatosPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="portal-shell">
       <Header />
-      <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <div className="flex items-center gap-4 mb-6">
           <button
             onClick={() => router.back()}
@@ -31,10 +31,10 @@ export default function ContatosPage() {
           >
             ← Voltar
           </button>
-          <h1 className="text-xl sm:text-2xl font-bold text-primary">Meus Contatos</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">Meus Contatos</h1>
         </div>
 
-        <p className="text-gray-600 mb-6 bg-white p-4 rounded-lg shadow-sm">
+        <p className="mb-6 bg-[var(--bg-surface)] border border-[var(--border-default)] text-[var(--text-secondary)] p-4 rounded-xl shadow-sm">
           Gerencie seus contatos. Quando você gerar um relatório de ensaio, os dados serão enviados apenas para estes contatos.
         </p>
 
