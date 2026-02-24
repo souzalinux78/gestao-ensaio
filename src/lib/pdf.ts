@@ -36,7 +36,7 @@ function removerPrefixoBairro(valor: string) {
 
 function extrairCidadeLocalidade(igreja?: string | null) {
   if (!igreja) {
-    return { cidade: '', localidade: 'GERAL' };
+    return { cidade: 'SEM CIDADE', localidade: 'GERAL' };
   }
 
   const partes = igreja
@@ -48,7 +48,7 @@ function extrairCidadeLocalidade(igreja?: string | null) {
     const localidade = upperSemAcento(removerPrefixoBairro(partes[0]));
     const cidade = upperSemAcento(partes[1]);
     return {
-      cidade: cidade || '',
+      cidade: cidade || 'SEM CIDADE',
       localidade: localidade || 'GERAL',
     };
   }
@@ -60,23 +60,15 @@ function extrairCidadeLocalidade(igreja?: string | null) {
 
   if (partesVirgula.length >= 2) {
     return {
-      cidade: upperSemAcento(partesVirgula[1]),
+      cidade: upperSemAcento(partesVirgula[1]) || 'SEM CIDADE',
       localidade: upperSemAcento(removerPrefixoBairro(partesVirgula[0])) || 'GERAL',
     };
   }
 
   return {
-    cidade: '',
+    cidade: 'SEM CIDADE',
     localidade: upperSemAcento(removerPrefixoBairro(igreja)) || 'GERAL',
   };
-}
-
-function formatarLabelInstrumento(valor: string) {
-  const texto = valor
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLowerCase();
-  return texto.replace(/\b\w/g, (letra) => letra.toUpperCase());
 }
 
 function extrairNomesAtendimento(ensaio: Ensaio) {
@@ -208,18 +200,20 @@ const CORDAS: LinhaInstrumento[] = [
 
 const MADEIRAS: LinhaInstrumento[] = [
   { label: 'Flauta', aliases: ['FLAUTA'] },
-  { label: 'Flauta Alto', aliases: ['FLAUTACONTRALTO', 'FLAUTAALTO'] },
+  { label: 'Flauta Alto', aliases: ['FLAUTAALTO', 'FLAUTACONTRALTO'] },
   { label: 'Flauta Baixo', aliases: ['FLAUTABAIXO'] },
   { label: 'Oboe', aliases: ['OBOE'] },
   { label: "Oboe D'Amore", aliases: ['OBOEDAMORE'] },
   { label: 'Corne Ingles', aliases: ['CORNEINGLES', 'CORNOINGLES'] },
-  { label: 'Fagote', aliases: ['FAGOTE', 'CONTRAFAGOTE', 'FAGOTECONTRABAIXO'] },
+  { label: 'Fagote', aliases: ['FAGOTE'] },
+  { label: 'Contra-Fagote', aliases: ['CONTRAFAGOTE', 'FAGOTECONTRABAIXO'] },
   { label: 'Clarinete', aliases: ['CLARINETE'] },
-  { label: 'Clarinete Alto', aliases: ['CLARINETEALTO', 'CLARINETECONTRAALTO'] },
+  { label: 'Clarinete Alto', aliases: ['CLARINETEALTO'] },
+  { label: 'Clarinete Contra-Alto', aliases: ['CLARINETECONTRAALTO'] },
   { label: 'Clarinete Baixo', aliases: ['CLARINETEBAIXO'] },
   { label: 'Clarinete Contra-Baixo', aliases: ['CLARINETECONTRABAIXO'] },
-  { label: 'Saxofone Soprano Cur', aliases: ['SAXOFONESOPRANOCUR'] },
-  { label: 'Saxofone Soprano Ret', aliases: ['SAXOFONESOPRANORET', 'SAXOFONESOPRANO'] },
+  { label: 'Saxofone Soprano Cur', aliases: ['SAXOFONESOPRANOCUR', 'SAXOFONESOPRANOCURVO'] },
+  { label: 'Saxofone Soprano Ret', aliases: ['SAXOFONESOPRANORET', 'SAXOFONESOPRANORETO', 'SAXOFONESOPRANO'] },
   { label: 'Saxofone Alto', aliases: ['SAXOFONEALTO'] },
   { label: 'Saxofone Tenor', aliases: ['SAXOFONETENOR'] },
   { label: 'Saxofone Baritono', aliases: ['SAXOFONEBARITONO'] },
@@ -270,15 +264,11 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
   });
 
   const contagem = new Map<string, number>();
-  const nomeOriginalPorChave = new Map<string, string>();
   for (const item of ensaio.instrumentos || []) {
     const nome = item.instrumento?.nome || mapaNomeInstrumento.get(item.instrumentoId);
     const chave = normalizar(nome);
     if (!chave) continue;
     contagem.set(chave, (contagem.get(chave) || 0) + (item.quantidade || 0));
-    if (!nomeOriginalPorChave.has(chave) && nome) {
-      nomeOriginalPorChave.set(chave, nome);
-    }
   }
 
   const somaAliases = (aliases: string[]) => {
@@ -288,38 +278,14 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
     return aliasesUnicos.reduce((total, aliasNormalizado) => total + (contagem.get(aliasNormalizado) || 0), 0);
   };
 
-  const linhasCordas = CORDAS
-    .map((linha) => ({ ...linha, qtd: somaAliases(linha.aliases) }))
-    .filter((linha) => linha.qtd > 0);
-  const linhasMadeiras = MADEIRAS
-    .map((linha) => ({ ...linha, qtd: somaAliases(linha.aliases) }))
-    .filter((linha) => linha.qtd > 0);
-  const linhasMetais = METAIS
-    .map((linha) => ({ ...linha, qtd: somaAliases(linha.aliases) }))
-    .filter((linha) => linha.qtd > 0);
-
-  const chavesDoTemplate = new Set<string>();
-  [...CORDAS, ...MADEIRAS, ...METAIS].forEach((linha) => {
-    linha.aliases.forEach((alias) => {
-      const chave = normalizar(alias);
-      if (chave) chavesDoTemplate.add(chave);
-    });
-  });
-
-  const chavesOrganista = new Set(ALIASES_ORGANISTA.map((alias) => normalizar(alias)));
-
-  const linhasOutros = Array.from(contagem.entries())
-    .filter(([chave, qtd]) => qtd > 0 && !chavesDoTemplate.has(chave) && !chavesOrganista.has(chave))
-    .map(([chave, qtd]) => ({
-      label: formatarLabelInstrumento(nomeOriginalPorChave.get(chave) || chave),
-      qtd,
-    }));
+  const linhasCordas = CORDAS.map((linha) => ({ ...linha, qtd: somaAliases(linha.aliases) }));
+  const linhasMadeiras = MADEIRAS.map((linha) => ({ ...linha, qtd: somaAliases(linha.aliases) }));
+  const linhasMetais = METAIS.map((linha) => ({ ...linha, qtd: somaAliases(linha.aliases) }));
 
   const totalCordas = linhasCordas.reduce((total, item) => total + item.qtd, 0);
   const totalMadeiras = linhasMadeiras.reduce((total, item) => total + item.qtd, 0);
   const totalMetais = linhasMetais.reduce((total, item) => total + item.qtd, 0);
-  const totalOutros = linhasOutros.reduce((total, item) => total + item.qtd, 0);
-  const totalMusicos = totalCordas + totalMadeiras + totalMetais + totalOutros;
+  const totalMusicos = totalCordas + totalMadeiras + totalMetais;
   const totalOrganistas = somaAliases(ALIASES_ORGANISTA);
   const totalHinosEnsaiados = (ensaio.hinosEnsaidos || '')
     .split(/[,\n;]+/)
@@ -333,7 +299,7 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
   };
 
   const { cidade, localidade } = extrairCidadeLocalidade(ensaio.instrutor?.igreja);
-  const cidadeLocalidadeTexto = cidade ? `${cidade} - ${localidade}` : localidade;
+  const cidadeLocalidadeTexto = `${cidade} - ${localidade}`;
   const atendimento = montarAtendimentoPDF(ensaio);
   const dataCurta = format(new Date(ensaio.data), 'dd/MM/yy', { locale: ptBR });
 
@@ -425,13 +391,11 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
   }
 
   // Participacao musicos
-  const linhasTabela = [...linhasCordas, ...linhasMadeiras, ...linhasMetais, ...linhasOutros];
+  const linhasTabela = [...linhasCordas, ...linhasMadeiras, ...linhasMetais];
   const yTabelaTopo = 216;
   const yTabelaCabecalho = 226;
   const alturaLinhaTabela = 12.7;
-  const yTabelaBaseMinimo = 658.7;
-  const yTabelaBaseCalculado = yTabelaCabecalho + Math.max(linhasTabela.length, 1) * alturaLinhaTabela;
-  const yTabelaBase = Math.max(yTabelaBaseMinimo, yTabelaBaseCalculado);
+  const yTabelaBase = 658.7;
 
   doc.rect(50, yTabelaTopo, 500, yTabelaBase - yTabelaTopo);
   doc.line(50, yTabelaCabecalho, 550, yTabelaCabecalho);
@@ -454,18 +418,12 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
     { label: 'CORDAS', total: totalCordas, inicio: 0, quantidade: linhasCordas.length },
     { label: 'MADEIRAS', total: totalMadeiras, inicio: linhasCordas.length, quantidade: linhasMadeiras.length },
     { label: 'METAIS', total: totalMetais, inicio: linhasCordas.length + linhasMadeiras.length, quantidade: linhasMetais.length },
-    {
-      label: 'OUTROS',
-      total: totalOutros,
-      inicio: linhasCordas.length + linhasMadeiras.length + linhasMetais.length,
-      quantidade: linhasOutros.length,
-    },
   ];
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   grupos.forEach((grupo) => {
-    if (grupo.quantidade <= 0 || grupo.total <= 0) return;
+    if (grupo.quantidade <= 0) return;
     const yCentro = yTabelaCabecalho + ((grupo.inicio + (grupo.quantidade - 1) / 2) * alturaLinhaTabela) + 8.1;
     doc.text(percentual(grupo.total), 349.995, yCentro);
     doc.text(grupo.label, 420, yCentro);
