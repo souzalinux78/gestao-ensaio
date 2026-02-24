@@ -420,6 +420,16 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
     { label: 'METAIS', total: totalMetais, inicio: linhasCordas.length + linhasMadeiras.length, quantidade: linhasMetais.length },
   ];
 
+  // Linhas de separação dos blocos na coluna de percentual/naipe (modelo oficial)
+  const limitesGrupos = [
+    yTabelaCabecalho + linhasCordas.length * alturaLinhaTabela,
+    yTabelaCabecalho + (linhasCordas.length + linhasMadeiras.length) * alturaLinhaTabela,
+  ].filter((y) => y > yTabelaCabecalho && y < yTabelaBase);
+
+  limitesGrupos.forEach((y) => {
+    doc.line(330, y, 550, y);
+  });
+
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   grupos.forEach((grupo) => {
