@@ -146,16 +146,58 @@ export async function DELETE(
       select: { id: true, nome: true },
     });
 
-    const idsParaExcluir = instrumentosMesmoEscopo
+    const idsMesmoNomeNormalizado = instrumentosMesmoEscopo
       .filter((item) => normalizarChaveInstrumento(item.nome) === chave)
       .map((item) => item.id);
 
-    await prisma.instrumento.deleteMany({
+    // Verificar referências em ensaios para preservar histórico e evitar violação FK
+    const referencias = await prisma.ensaioInstrumento.findMany({
+      where: { instrumentoId: { in: idsMesmoNomeNormalizado } },
+      select: { instrumentoId: true },
+    });
+
+    const contagemPorInstrumento = new Map<number, number>();
+    referencias.forEach((referencia) => {
+      contagemPorInstrumento.set(
+        referencia.instrumentoId,
+        (contagemPorInstrumento.get(referencia.instrumentoId) || 0) + 1
+      );
+    });
+
+    const referenciasDoSolicitado = contagemPorInstrumento.get(id) || 0;
+    if (referenciasDoSolicitado > 0) {
+      return NextResponse.json(
+        {
+          error: `Não é possível excluir este instrumento porque ele já foi usado em ${referenciasDoSolicitado} ensaio(s).`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Excluir apenas IDs não referenciados (limpa duplicatas sem quebrar histórico)
+    const idsReferenciados = new Set(Array.from(contagemPorInstrumento.keys()));
+    const idsParaExcluir = idsMesmoNomeNormalizado.filter((itemId) => !idsReferenciados.has(itemId));
+
+    if (idsParaExcluir.length === 0) {
+      return NextResponse.json(
+        { error: 'Nenhum instrumento elegível para exclusão (todos possuem histórico).' },
+        { status: 400 }
+      );
+    }
+
+    const resultado = await prisma.instrumento.deleteMany({
       where: { id: { in: idsParaExcluir } },
     });
 
-    return NextResponse.json({ success: true, removidos: idsParaExcluir.length });
+    return NextResponse.json({ success: true, removidos: resultado.count });
   } catch (error: any) {
+    if (error?.code === 'P2003') {
+      return NextResponse.json(
+        { error: 'Não foi possível excluir: instrumento vinculado a ensaios existentes.' },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
       { error: error.message || 'Erro ao excluir instrumento' },
       { status: 500 }
