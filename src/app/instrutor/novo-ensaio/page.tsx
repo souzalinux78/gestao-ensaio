@@ -20,6 +20,27 @@ function normalizarNome(valor: string) {
     .trim();
 }
 
+function extrairDataISO(valor: string | Date | null | undefined): string {
+  if (!valor) return new Date().toISOString().split('T')[0];
+  if (typeof valor === 'string') {
+    const match = valor.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (match?.[1]) return match[1];
+    const d = new Date(valor);
+    if (!Number.isNaN(d.getTime())) {
+      const y = d.getUTCFullYear();
+      const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(d.getUTCDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+    return new Date().toISOString().split('T')[0];
+  }
+
+  const y = valor.getUTCFullYear();
+  const m = String(valor.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(valor.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 type AtendimentoTipo =
   | 'ancioes'
   | 'diaconos'
@@ -97,15 +118,19 @@ function NovoEnsaioContent() {
       return;
     }
     setUsuario(sessao);
-    carregarInstrumentos();
-    carregarMusicos(sessao.id);
-    
-    if (isEditando && ensaioId) {
-      carregarEnsaio(parseInt(ensaioId));
-    }
+
+    const inicializar = async () => {
+      const instrumentosCarregados = await carregarInstrumentos();
+      await carregarMusicos(sessao.id);
+      if (isEditando && ensaioId) {
+        await carregarEnsaio(parseInt(ensaioId, 10), instrumentosCarregados);
+      }
+    };
+
+    inicializar();
   }, [router, ensaioId, isEditando]);
 
-  async function carregarEnsaio(id: number) {
+  async function carregarEnsaio(id: number, instrumentosTela: Instrumento[] = instrumentos) {
     setCarregandoEnsaio(true);
     try {
       const res = await apiFetch(`/api/ensaios/${id}`);
@@ -118,14 +143,33 @@ function NovoEnsaioContent() {
       const ensaio: Ensaio = await res.json();
       
       // Preencher data
-      const dataEnsaio = new Date(ensaio.data);
-      setData(dataEnsaio.toISOString().split('T')[0]);
+      setData(extrairDataISO(ensaio.data as unknown as string | Date));
       
       // Preencher quantidades de instrumentos
       const novasQuantidades: { [key: number]: number } = {};
       ensaio.instrumentos.forEach((item) => {
         novasQuantidades[item.instrumentoId] = item.quantidade;
       });
+
+      // Compatibilidade: se IDs mudaram entre escopos (global/tenant), remapear por nome.
+      if (instrumentosTela.length > 0) {
+        const porNome = new Map<string, number>();
+        ensaio.instrumentos.forEach((item) => {
+          const nome = item.instrumento?.nome;
+          const chave = nome ? normalizarNome(nome) : '';
+          if (!chave) return;
+          porNome.set(chave, (porNome.get(chave) || 0) + (item.quantidade || 0));
+        });
+
+        instrumentosTela.forEach((instrumento) => {
+          const chave = normalizarNome(instrumento.nome);
+          const quantidadePorNome = porNome.get(chave);
+          if (!quantidadePorNome) return;
+          if (novasQuantidades[instrumento.id] !== undefined) return;
+          novasQuantidades[instrumento.id] = quantidadePorNome;
+        });
+      }
+
       setQuantidades(novasQuantidades);
       
       // Preencher funções
@@ -168,13 +212,13 @@ function NovoEnsaioContent() {
     }
   }
 
-  async function carregarInstrumentos() {
+  async function carregarInstrumentos(): Promise<Instrumento[]> {
     try {
-      const res = await fetch('/api/instrumentos');
+      const res = await apiFetch('/api/instrumentos');
       if (!res.ok) {
         console.error('Erro ao carregar instrumentos:', res.status, res.statusText);
         setInstrumentos([]);
-        return;
+        return [];
       }
       const data = await res.json();
       // Filtrar apenas instrumentos válidos (com nome)
@@ -182,14 +226,16 @@ function NovoEnsaioContent() {
         ? data.filter((instrumento: Instrumento) => instrumento?.nome?.trim())
         : [];
       setInstrumentos(instrumentosValidos);
+      return instrumentosValidos;
     } catch (error) {
       console.error('Erro ao carregar instrumentos:', error);
       setInstrumentos([]);
+      return [];
     }
   }
 
   async function carregarMusicos(instrutorId: number) {
-    const res = await fetch('/api/musicos', {
+    const res = await apiFetch('/api/musicos', {
       headers: { Authorization: `Bearer ${instrutorId}` },
     });
     if (!res.ok) {
