@@ -6,6 +6,7 @@ import AdminLayout from '@/components/AdminLayout';
 import { Usuario, TipoUsuario } from '@/types';
 import { apiFetch } from '@/lib/api-client';
 import { obterSessao } from '@/lib/session';
+import { construirIgreja, normalizarIgreja, parseIgreja, ufEhValida } from '@/lib/igreja';
 
 // Função helper para exibir nome amigável do tipo
 function getTipoLabel(tipo: TipoUsuario): string {
@@ -19,15 +20,6 @@ function getTipoLabel(tipo: TipoUsuario): string {
 }
 
 const NOVA_IGREJA_VALUE = '__nova_igreja__';
-
-function normalizarIgreja(valor: string): string {
-  return valor
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLowerCase();
-}
 
 export default function UsuariosPage() {
   const router = useRouter();
@@ -45,6 +37,9 @@ export default function UsuariosPage() {
     senha: '',
     tipo: 'instrutor' as TipoUsuario,
     igreja: '',
+    localidade: '',
+    cidade: '',
+    uf: '',
     aprovado: false, // Por padrão, não aprovar - admin decide se aprova na hora
   });
   const [senhaForm, setSenhaForm] = useState({
@@ -68,6 +63,17 @@ export default function UsuariosPage() {
     });
     return Array.from(igrejas.values()).sort((a, b) => a.localeCompare(b, 'pt-BR'));
   }, [usuarios]);
+
+  function atualizarCamposIgreja(localidade: string, cidade: string, uf: string) {
+    const igrejaPadrao = construirIgreja(localidade, cidade, uf) || '';
+    setFormData((anterior) => ({
+      ...anterior,
+      igreja: igrejaPadrao,
+      localidade,
+      cidade,
+      uf: uf.toUpperCase(),
+    }));
+  }
 
   useEffect(() => {
     const sessao = obterSessao();
@@ -134,6 +140,7 @@ export default function UsuariosPage() {
     const igrejaExistente = igrejasExistentes.find(
       (item) => normalizarIgreja(item) === normalizarIgreja(igrejaAtual)
     );
+    const igrejaPartes = parseIgreja(igrejaAtual);
 
     setEditandoId(usuario.id);
     setFormData({
@@ -142,6 +149,9 @@ export default function UsuariosPage() {
       senha: '',
       tipo: usuario.tipo, 
       igreja: igrejaAtual,
+      localidade: igrejaPartes.localidade,
+      cidade: igrejaPartes.cidade,
+      uf: igrejaPartes.uf,
       aprovado: usuario.aprovado ?? true,
     });
     setOpcaoIgreja(
@@ -160,6 +170,9 @@ export default function UsuariosPage() {
       senha: '',
       tipo: 'instrutor',
       igreja: '',
+      localidade: '',
+      cidade: '',
+      uf: '',
       aprovado: true, // Por padrão, quando admin cria, aprovar automaticamente
     });
     setMostrarForm(false);
@@ -171,6 +184,17 @@ export default function UsuariosPage() {
     if (!formData.nome || !formData.email) {
       setMensagem({ tipo: 'erro', texto: 'Nome e email são obrigatórios' });
       return;
+    }
+
+    if (formData.tipo !== 'admin') {
+      if (!formData.localidade || !formData.cidade || !formData.uf) {
+        setMensagem({ tipo: 'erro', texto: 'Localidade, cidade e UF são obrigatórios para este tipo de usuário.' });
+        return;
+      }
+      if (!ufEhValida(formData.uf)) {
+        setMensagem({ tipo: 'erro', texto: 'UF inválida. Use 2 letras (ex: SP).' });
+        return;
+      }
     }
 
     if (!editandoId && !formData.senha) {
@@ -189,7 +213,12 @@ export default function UsuariosPage() {
         nome: formData.nome,
         email: formData.email,
         tipo: formData.tipo,
-        igreja: formData.igreja || null,
+        igreja: formData.tipo === 'admin'
+          ? (formData.igreja || null)
+          : (construirIgreja(formData.localidade, formData.cidade, formData.uf) || null),
+        localidade: formData.tipo === 'admin' ? null : formData.localidade,
+        cidade: formData.tipo === 'admin' ? null : formData.cidade,
+        uf: formData.tipo === 'admin' ? null : formData.uf.toUpperCase(),
       };
 
       if (formData.senha) {
@@ -397,6 +426,9 @@ export default function UsuariosPage() {
                     senha: '',
                     tipo: 'instrutor',
                     igreja: '',
+                    localidade: '',
+                    cidade: '',
+                    uf: '',
                     aprovado: false, // Por padrão, não aprovar - admin decide se aprova na hora
                   });
                   setOpcaoIgreja('');
@@ -454,7 +486,7 @@ export default function UsuariosPage() {
                   <option value="admin">Administrador</option>
                 </select>
               </div>
-              <div>
+              <div className="col-span-2">
                 <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">Igreja/Congregação</label>
                 {igrejasExistentes.length > 0 && (
                   <select
@@ -463,17 +495,13 @@ export default function UsuariosPage() {
                       const valor = e.target.value;
                       setOpcaoIgreja(valor);
 
-                      if (!valor) {
-                        setFormData({ ...formData, igreja: '' });
+                      if (!valor || valor === NOVA_IGREJA_VALUE) {
+                        atualizarCamposIgreja('', '', '');
                         return;
                       }
 
-                      if (valor === NOVA_IGREJA_VALUE) {
-                        setFormData({ ...formData, igreja: '' });
-                        return;
-                      }
-
-                      setFormData({ ...formData, igreja: valor });
+                      const partes = parseIgreja(valor);
+                      atualizarCamposIgreja(partes.localidade, partes.cidade, partes.uf);
                     }}
                     className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 mb-2 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                   >
@@ -486,20 +514,43 @@ export default function UsuariosPage() {
                     <option value={NOVA_IGREJA_VALUE}>+ Cadastrar nova igreja</option>
                   </select>
                 )}
-                {(igrejasExistentes.length === 0 || opcaoIgreja === NOVA_IGREJA_VALUE) && (
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="sm:col-span-2">
+                    <label className="block mb-1 text-xs font-medium text-gray-600 dark:text-[var(--text-secondary)]">Localidade</label>
+                    <input
+                      type="text"
+                      value={formData.localidade}
+                      onChange={(e) => atualizarCamposIgreja(e.target.value, formData.cidade, formData.uf)}
+                      placeholder="Ex: Bairro do Cruzeiro"
+                      className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] placeholder:text-gray-400 dark:placeholder:text-[var(--text-tertiary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block mb-1 text-xs font-medium text-gray-600 dark:text-[var(--text-secondary)]">UF</label>
+                    <input
+                      type="text"
+                      value={formData.uf}
+                      onChange={(e) => atualizarCamposIgreja(formData.localidade, formData.cidade, e.target.value.toUpperCase().slice(0, 2))}
+                      placeholder="SP"
+                      className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] placeholder:text-gray-400 dark:placeholder:text-[var(--text-tertiary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors uppercase"
+                      maxLength={2}
+                    />
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <label className="block mb-1 text-xs font-medium text-gray-600 dark:text-[var(--text-secondary)]">Cidade</label>
                   <input
                     type="text"
-                    name="igreja_nome"
-                    autoComplete="organization"
-                    value={formData.igreja}
-                    onChange={(e) => setFormData({ ...formData, igreja: e.target.value })}
-                    placeholder="Digite o nome da nova igreja"
+                    value={formData.cidade}
+                    onChange={(e) => atualizarCamposIgreja(formData.localidade, e.target.value, formData.uf)}
+                    placeholder="Ex: Bragança Paulista"
                     className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] placeholder:text-gray-400 dark:placeholder:text-[var(--text-tertiary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                   />
-                )}
+                </div>
                 {igrejasExistentes.length > 0 && (
                   <p className="mt-1 text-xs text-gray-500 dark:text-[var(--text-tertiary)]">
-                    Selecione uma igreja existente ou escolha "Cadastrar nova igreja".
+                    Selecione uma igreja existente ou preencha Localidade, Cidade e UF.
                   </p>
                 )}
               </div>

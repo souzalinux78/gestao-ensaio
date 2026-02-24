@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { obterUsuarioDaRequisicao } from '@/lib/get-user-from-request';
 import { resolveTenantFromRequest } from '@/lib/middleware';
 import { validateEmail, validatePassword, sanitizeString } from '@/lib/validators';
+import { construirIgreja, parseIgreja, ufEhValida } from '@/lib/igreja';
 import bcrypt from 'bcryptjs';
 
 export async function GET(request: NextRequest) {
@@ -86,7 +87,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { nome, email, telefone, senha, tipo, igreja, aprovado } = await request.json();
+    const { nome, email, telefone, senha, tipo, igreja, localidade, cidade, uf, aprovado } = await request.json();
     const usuarioSolicitante = await obterUsuarioDaRequisicao(request);
     const solicitanteEhAdmin = usuarioSolicitante?.tipo === 'admin';
 
@@ -127,7 +128,31 @@ export async function POST(request: NextRequest) {
     // Sanitizar strings
     const nomeSanitizado = sanitizeString(nome, 255);
     const telefoneSanitizado = sanitizeString(telefone, 20);
-    const igrejaSanitizada = igreja ? sanitizeString(igreja, 255) : null;
+    const localidadeSanitizada = sanitizeString(localidade, 120);
+    const cidadeSanitizada = sanitizeString(cidade, 120);
+    const ufSanitizadaBruta = sanitizeString(uf, 2);
+    const ufSanitizada = ufSanitizadaBruta ? ufSanitizadaBruta.toUpperCase() : null;
+
+    if (!ufEhValida(ufSanitizada)) {
+      return NextResponse.json(
+        { error: 'UF inválida. Use apenas 2 letras (ex: SP).' },
+        { status: 400 }
+      );
+    }
+
+    const recebeuCamposPadrao = localidade !== undefined || cidade !== undefined || uf !== undefined;
+    const possuiAlgumCampoPadrao = Boolean(localidadeSanitizada || cidadeSanitizada || ufSanitizada);
+
+    if (recebeuCamposPadrao && possuiAlgumCampoPadrao && (!localidadeSanitizada || !cidadeSanitizada || !ufSanitizada)) {
+      return NextResponse.json(
+        { error: 'Preencha Localidade, Cidade e UF para salvar a igreja padronizada.' },
+        { status: 400 }
+      );
+    }
+
+    let igrejaSanitizada = recebeuCamposPadrao
+      ? construirIgreja(localidadeSanitizada, cidadeSanitizada, ufSanitizada)
+      : (igreja ? sanitizeString(igreja, 255) : null);
 
     if (!nomeSanitizado) {
       return NextResponse.json(
@@ -146,6 +171,21 @@ export async function POST(request: NextRequest) {
     // Garantir que cadastros públicos não sejam admin
     // Admin só pode ser criado por outro admin autenticado
     const tipoFinal = !solicitanteEhAdmin && tipo === 'admin' ? 'instrutor' : tipo;
+
+    if (igrejaSanitizada) {
+      const igrejaPartes = parseIgreja(igrejaSanitizada);
+      igrejaSanitizada = construirIgreja(igrejaPartes.localidade, igrejaPartes.cidade, igrejaPartes.uf) || igrejaSanitizada;
+    }
+
+    if (tipoFinal !== 'admin') {
+      const igrejaPartes = parseIgreja(igrejaSanitizada);
+      if (!igrejaPartes.localidade || !igrejaPartes.cidade || !igrejaPartes.uf) {
+        return NextResponse.json(
+          { error: 'Localidade, cidade e UF são obrigatórios para este tipo de usuário.' },
+          { status: 400 }
+        );
+      }
+    }
     
     // Se for cadastro público (sem aprovado definido), criar como não aprovado
     // Se for admin criando, usar o valor de aprovado fornecido (ou true para admin)

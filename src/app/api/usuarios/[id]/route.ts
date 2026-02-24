@@ -4,6 +4,7 @@ import { alterarSenha } from '@/lib/auth';
 import { resolveTenantFromRequest } from '@/lib/middleware';
 import bcrypt from 'bcryptjs';
 import { safeParseInt, sanitizeString, validateEmail, validatePassword } from '@/lib/validators';
+import { construirIgreja, parseIgreja, ufEhValida } from '@/lib/igreja';
 
 export async function PUT(
   request: NextRequest,
@@ -19,7 +20,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { nome, email, tipo, igreja, senha, aprovado } = body;
+    const { nome, email, tipo, igreja, localidade, cidade, uf, senha, aprovado } = body;
 
     const updateData: any = {};
     if (nome) {
@@ -56,8 +57,37 @@ export async function PUT(
         updateData.aprovado = true;
       }
     }
-    if (igreja !== undefined) {
-      updateData.igreja = igreja ? sanitizeString(igreja, 255) : null;
+    const localidadeSanitizada = sanitizeString(localidade, 120);
+    const cidadeSanitizada = sanitizeString(cidade, 120);
+    const ufSanitizadaBruta = sanitizeString(uf, 2);
+    const ufSanitizada = ufSanitizadaBruta ? ufSanitizadaBruta.toUpperCase() : null;
+    const recebeuCamposPadrao = localidade !== undefined || cidade !== undefined || uf !== undefined;
+    const possuiAlgumCampoPadrao = Boolean(localidadeSanitizada || cidadeSanitizada || ufSanitizada);
+
+    if (!ufEhValida(ufSanitizada)) {
+      return NextResponse.json(
+        { error: 'UF inválida. Use apenas 2 letras (ex: SP).' },
+        { status: 400 }
+      );
+    }
+
+    if (recebeuCamposPadrao && possuiAlgumCampoPadrao && (!localidadeSanitizada || !cidadeSanitizada || !ufSanitizada)) {
+      return NextResponse.json(
+        { error: 'Preencha Localidade, Cidade e UF para salvar a igreja padronizada.' },
+        { status: 400 }
+      );
+    }
+
+    if (recebeuCamposPadrao) {
+      updateData.igreja = construirIgreja(localidadeSanitizada, cidadeSanitizada, ufSanitizada);
+    } else if (igreja !== undefined) {
+      const igrejaSanitizada = igreja ? sanitizeString(igreja, 255) : null;
+      if (igrejaSanitizada) {
+        const partes = parseIgreja(igrejaSanitizada);
+        updateData.igreja = construirIgreja(partes.localidade, partes.cidade, partes.uf) || igrejaSanitizada;
+      } else {
+        updateData.igreja = null;
+      }
     }
     if (senha) {
       // Validar senha
@@ -86,7 +116,7 @@ export async function PUT(
     // Verificar se usuário existe e pertence ao mesmo tenant
     const usuarioExistente = await prisma.usuario.findUnique({
       where: { id },
-      select: { id: true, tenantId: true },
+      select: { id: true, tenantId: true, tipo: true },
     });
 
     if (!usuarioExistente) {
@@ -102,6 +132,19 @@ export async function PUT(
         { error: 'Usuário não encontrado' },
         { status: 404 }
       );
+    }
+
+    if (updateData.igreja !== undefined) {
+      const tipoFinalUsuario = updateData.tipo || usuarioExistente.tipo;
+      if (tipoFinalUsuario !== 'admin') {
+        const partes = parseIgreja(updateData.igreja);
+        if (!partes.localidade || !partes.cidade || !partes.uf) {
+          return NextResponse.json(
+            { error: 'Localidade, cidade e UF são obrigatórios para este tipo de usuário.' },
+            { status: 400 }
+          );
+        }
+      }
     }
 
     const usuario = await prisma.usuario.update({

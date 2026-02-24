@@ -1,8 +1,7 @@
 'use client';
 
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { Ensaio, Instrumento } from '@/types';
+import { formatDateBR } from '@/lib/formatters';
 
 interface RelatorioTableProps {
   ensaios: Ensaio[];
@@ -34,7 +33,7 @@ export default function RelatorioTable({
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-                      {format(new Date(ensaio.data), 'dd/MM/yyyy', { locale: ptBR })}
+                      {formatDateBR(ensaio.data as unknown as string)}
                     </p>
                     <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                       Responsável: {ensaio.instrutor?.nome || 'N/A'}
@@ -138,7 +137,7 @@ export default function RelatorioTable({
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-page)'}
               >
                 <td className="px-4 py-3" style={{ color: 'var(--text-primary)' }}>
-                  {format(new Date(ensaio.data), 'dd/MM/yyyy', { locale: ptBR })}
+                  {formatDateBR(ensaio.data as unknown as string)}
                 </td>
                 <td className="px-4 py-3" style={{ color: 'var(--text-primary)' }}>
                   {ensaio.instrutor?.nome || 'N/A'}

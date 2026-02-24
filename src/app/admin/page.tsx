@@ -7,6 +7,7 @@ import RelatorioTable from '@/components/RelatorioTable';
 import { Ensaio, Instrumento } from '@/types';
 import { gerarPDFEnsaio } from '@/lib/pdf';
 import { apiFetch } from '@/lib/api-client';
+import { formatDateBR } from '@/lib/formatters';
 
 interface Metricas {
   periodo: string;
@@ -150,7 +151,7 @@ export default function AdminPage() {
   }
 
   async function handleExcluir(ensaio: Ensaio) {
-    const confirmar = confirm(`Excluir ensaio de ${new Date(ensaio.data).toLocaleDateString('pt-BR')}? Esta ação não pode ser desfeita.`);
+    const confirmar = confirm(`Excluir ensaio de ${formatDateBR(ensaio.data as unknown as string)}? Esta ação não pode ser desfeita.`);
     if (!confirmar) return;
 
     try {

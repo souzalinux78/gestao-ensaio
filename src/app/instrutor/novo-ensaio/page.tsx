@@ -145,6 +145,29 @@ function NovoEnsaioContent() {
       // Preencher data
       setData(extrairDataISO(ensaio.data as unknown as string | Date));
       
+      // Compatibilidade legada:
+      // garante que instrumentos já vinculados ao ensaio apareçam na tela,
+      // mesmo se a lista atual vier deduplicada/normalizada com outros IDs.
+      const mapaPorId = new Map(instrumentosTela.map((instrumento) => [instrumento.id, instrumento]));
+      const instrumentosLegados: Instrumento[] = [];
+      ensaio.instrumentos.forEach((item) => {
+        if (mapaPorId.has(item.instrumentoId)) return;
+        if (!item.instrumento?.nome?.trim()) return;
+        instrumentosLegados.push({
+          id: item.instrumentoId,
+          nome: item.instrumento.nome,
+        });
+      });
+
+      let instrumentosComCompat = instrumentosTela;
+      if (instrumentosLegados.length > 0) {
+        const combinado = [...instrumentosTela, ...instrumentosLegados];
+        const porId = new Map<number, Instrumento>();
+        combinado.forEach((instrumento) => porId.set(instrumento.id, instrumento));
+        instrumentosComCompat = Array.from(porId.values()).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+        setInstrumentos(instrumentosComCompat);
+      }
+
       // Preencher quantidades de instrumentos
       const novasQuantidades: { [key: number]: number } = {};
       ensaio.instrumentos.forEach((item) => {
@@ -152,7 +175,7 @@ function NovoEnsaioContent() {
       });
 
       // Compatibilidade: se IDs mudaram entre escopos (global/tenant), remapear por nome.
-      if (instrumentosTela.length > 0) {
+      if (instrumentosComCompat.length > 0) {
         const porNome = new Map<string, number>();
         ensaio.instrumentos.forEach((item) => {
           const nome = item.instrumento?.nome;
@@ -161,7 +184,7 @@ function NovoEnsaioContent() {
           porNome.set(chave, (porNome.get(chave) || 0) + (item.quantidade || 0));
         });
 
-        instrumentosTela.forEach((instrumento) => {
+        instrumentosComCompat.forEach((instrumento) => {
           const chave = normalizarNome(instrumento.nome);
           const quantidadePorNome = porNome.get(chave);
           if (!quantidadePorNome) return;

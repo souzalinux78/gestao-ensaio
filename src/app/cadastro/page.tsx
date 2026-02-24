@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { construirIgreja, ufEhValida } from '@/lib/igreja';
 
 export default function CadastroPage() {
   const router = useRouter();
@@ -13,7 +14,9 @@ export default function CadastroPage() {
     senha: '',
     confirmarSenha: '',
     tipo: 'instrutor' as 'instrutor' | 'encarregado' | 'secretario',
-    igreja: '',
+    localidade: '',
+    cidade: '',
+    uf: '',
   });
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState(false);
@@ -24,8 +27,14 @@ export default function CadastroPage() {
     setCarregando(true);
     setErro('');
 
-    if (!formData.nome || !formData.email || !formData.telefone || !formData.senha || !formData.igreja) {
+    if (!formData.nome || !formData.email || !formData.telefone || !formData.senha || !formData.localidade || !formData.cidade || !formData.uf) {
       setErro('Todos os campos são obrigatórios');
+      setCarregando(false);
+      return;
+    }
+
+    if (!ufEhValida(formData.uf)) {
+      setErro('UF inválida. Use 2 letras (ex: SP).');
       setCarregando(false);
       return;
     }
@@ -42,6 +51,13 @@ export default function CadastroPage() {
       return;
     }
 
+    const igrejaPadrao = construirIgreja(formData.localidade, formData.cidade, formData.uf);
+    if (!igrejaPadrao) {
+      setErro('Preencha Localidade, Cidade e UF corretamente.');
+      setCarregando(false);
+      return;
+    }
+
     try {
       const res = await fetch('/api/usuarios', {
         method: 'POST',
@@ -52,7 +68,10 @@ export default function CadastroPage() {
           telefone: formData.telefone,
           senha: formData.senha,
           tipo: formData.tipo,
-          igreja: formData.igreja,
+          localidade: formData.localidade,
+          cidade: formData.cidade,
+          uf: formData.uf.toUpperCase(),
+          igreja: igrejaPadrao,
           aprovado: false, // Sempre criar como não aprovado
         }),
       });
@@ -234,12 +253,12 @@ export default function CadastroPage() {
           </div>
 
           <div>
-            <label className="block mb-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Igreja/Congregação</label>
+            <label className="block mb-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Localidade</label>
             <input
               type="text"
-              value={formData.igreja}
-              onChange={(e) => setFormData({ ...formData, igreja: e.target.value })}
-              placeholder="Ex: CCB Teste"
+              value={formData.localidade}
+              onChange={(e) => setFormData({ ...formData, localidade: e.target.value })}
+              placeholder="Ex: Bairro do Cruzeiro"
               className="w-full border rounded-lg px-4 py-2.5 transition-all duration-200"
               style={{
                 borderColor: 'var(--border-default)',
@@ -256,6 +275,58 @@ export default function CadastroPage() {
               }}
               required
             />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="sm:col-span-2">
+              <label className="block mb-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Cidade</label>
+              <input
+                type="text"
+                value={formData.cidade}
+                onChange={(e) => setFormData({ ...formData, cidade: e.target.value })}
+                placeholder="Ex: Bragança Paulista"
+                className="w-full border rounded-lg px-4 py-2.5 transition-all duration-200"
+                style={{
+                  borderColor: 'var(--border-default)',
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--text-primary)'
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--pe-gold-strong)';
+                  e.currentTarget.style.boxShadow = '0 0 0 2px rgba(47, 111, 235, 0.24)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-default)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+                required
+              />
+            </div>
+            <div>
+              <label className="block mb-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>UF</label>
+              <input
+                type="text"
+                value={formData.uf}
+                onChange={(e) => setFormData({ ...formData, uf: e.target.value.toUpperCase().slice(0, 2) })}
+                placeholder="SP"
+                className="w-full border rounded-lg px-4 py-2.5 transition-all duration-200 uppercase"
+                style={{
+                  borderColor: 'var(--border-default)',
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--text-primary)'
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--pe-gold-strong)';
+                  e.currentTarget.style.boxShadow = '0 0 0 2px rgba(47, 111, 235, 0.24)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-default)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+                required
+                maxLength={2}
+              />
+            </div>
           </div>
 
           <div>
