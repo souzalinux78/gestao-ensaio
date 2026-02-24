@@ -292,6 +292,11 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
     .map((hino) => hino.trim())
     .filter(Boolean).length;
   const totalGeral = totalMusicos + totalOrganistas;
+  const hinosCorosLista = (ensaio.hinosEnsaidos || '')
+    .split(/[,\n;]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const hinosCorosTexto = hinosCorosLista.length > 0 ? hinosCorosLista.join(', ') : 'NAO INFORMADO';
 
   const percentual = (valor: number) => {
     if (totalMusicos <= 0) return '0%';
@@ -439,8 +444,24 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
     doc.text(grupo.label, 420, yCentro);
   });
 
+  // Hinos e coros ensaiados (acima do bloco de totais)
+  const yHinosTopo = yTabelaBase + 10.3;
+  let linhasHinosCoros = doc.splitTextToSize(hinosCorosTexto, 488) as string[];
+  if (linhasHinosCoros.length > 3) {
+    linhasHinosCoros = linhasHinosCoros.slice(0, 3);
+    linhasHinosCoros[2] = `${linhasHinosCoros[2]}...`;
+  }
+  const alturaHinosConteudo = Math.max(12, linhasHinosCoros.length * 9);
+  const alturaHinosBloco = 10 + alturaHinosConteudo + 4;
+  doc.rect(50, yHinosTopo, 500, alturaHinosBloco);
+  doc.line(50, yHinosTopo + 10, 550, yHinosTopo + 10);
+  drawCentered('HINOS E COROS ENSAIADOS', yHinosTopo + 7.03, 7, true);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text(linhasHinosCoros, 55, yHinosTopo + 20);
+
   // Totais
-  const yTotaisTopo = yTabelaBase + 10.3;
+  const yTotaisTopo = yHinosTopo + alturaHinosBloco + 6;
   const yTotaisCabecalho = yTotaisTopo + 10;
   doc.rect(50, yTotaisTopo, 500, 57);
   doc.line(50, yTotaisCabecalho, 550, yTotaisCabecalho);

@@ -22,6 +22,17 @@ function validarAdmin(usuario: Awaited<ReturnType<typeof obterUsuarioDaRequisica
   return null;
 }
 
+function adminPodeGerenciarInstrumento(
+  usuario: NonNullable<Awaited<ReturnType<typeof obterUsuarioDaRequisicao>>>,
+  tenantIdInstrumento: number | null
+) {
+  // Admin global (sem tenant) pode gerenciar tudo.
+  if (usuario.tenantId === null) return true;
+  // Admin de tenant pode gerenciar instrumentos do próprio tenant e globais (legados/compartilhados).
+  if (tenantIdInstrumento === null) return true;
+  return tenantIdInstrumento === usuario.tenantId;
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -62,7 +73,7 @@ export async function PUT(
       );
     }
 
-    if (usuario!.tenantId !== null && instrumento.tenantId !== usuario!.tenantId) {
+    if (!adminPodeGerenciarInstrumento(usuario!, instrumento.tenantId)) {
       return NextResponse.json(
         { error: 'Acesso negado para este instrumento' },
         { status: 403 }
@@ -121,7 +132,7 @@ export async function DELETE(
       );
     }
 
-    if (usuario!.tenantId !== null && instrumento.tenantId !== usuario!.tenantId) {
+    if (!adminPodeGerenciarInstrumento(usuario!, instrumento.tenantId)) {
       return NextResponse.json(
         { error: 'Acesso negado para este instrumento' },
         { status: 403 }
