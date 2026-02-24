@@ -281,6 +281,10 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
   const totalMetais = linhasMetais.reduce((total, item) => total + item.qtd, 0) + extrasMetais;
   const totalMusicos = totalCordas + totalMadeiras + totalMetais;
   const totalOrganistas = somaAliases(ALIASES_ORGANISTA);
+  const totalHinosEnsaiados = (ensaio.hinosEnsaidos || '')
+    .split(/[,\n;]+/)
+    .map((hino) => hino.trim())
+    .filter(Boolean).length;
   const totalGeral = totalMusicos + totalOrganistas;
 
   const percentual = (valor: number) => {
@@ -407,36 +411,39 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
   doc.text(percentual(totalMadeiras), 352.775, 393.28);
   doc.text(percentual(totalMetais), 349.995, 590.13);
 
-  doc.text('CORDAS', 470, 245.05, { angle: 90 });
-  doc.text('MADEIRAS', 470, 391.1, { angle: 90 });
-  doc.text('METAIS', 470, 587.95, { angle: 90 });
+  doc.text('CORDAS', 420, 247.23);
+  doc.text('MADEIRAS', 420, 393.28);
+  doc.text('METAIS', 420, 590.13);
 
   // Totais
-  doc.rect(50, 669, 500, 45);
+  doc.rect(50, 669, 500, 57);
   doc.line(50, 679, 550, 679);
-  drawCentered('TOTAIS DE M\u00daSICOS E ORGANISTAS', 676.03, 7, true);
-  doc.line(125, 679, 125, 714);
+  drawCentered('TOTAIS DE M\u00daSICOS, ORGANISTAS E HINOS ENSAIADOS', 676.03, 7, true);
+  doc.line(125, 679, 125, 726);
 
   doc.rect(50, 679, 75, 11.6);
   doc.rect(50, 690.6, 75, 11.6);
-  doc.rect(50, 702.2, 75, 12.6);
+  doc.rect(50, 702.2, 75, 11.6);
+  doc.rect(50, 713.8, 75, 12.2);
 
   doc.setTextColor(204, 0, 0);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   doc.text(String(totalOrganistas), 84.72, 687.68);
   doc.text(String(totalMusicos), 84.72, 699.28);
+  doc.text(String(totalHinosEnsaiados), 84.72, 710.88);
   doc.setFontSize(11);
-  doc.text(String(totalGeral), 84.442, 712.098);
+  doc.text(String(totalGeral), 84.442, 723.598);
   doc.setTextColor(0, 0, 0);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.text('Organista', 130, 687.68);
   doc.text('M\u00fasico', 130, 699.28);
+  doc.text('Hinos Ensaiados', 130, 710.88);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.text('TOTAL GERAL', 130, 712.098);
+  doc.text('TOTAL GERAL', 130, 723.598);
 
   return doc;
 }
