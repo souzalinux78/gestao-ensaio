@@ -7,7 +7,7 @@ import { safeParseInt, sanitizeString } from '@/lib/validators';
 function validarAdmin(usuario: Awaited<ReturnType<typeof obterUsuarioDaRequisicao>>) {
   if (!usuario) {
     return NextResponse.json(
-      { error: 'Não autenticado' },
+      { error: 'Nao autenticado' },
       { status: 401 }
     );
   }
@@ -26,9 +26,7 @@ function adminPodeGerenciarInstrumento(
   usuario: NonNullable<Awaited<ReturnType<typeof obterUsuarioDaRequisicao>>>,
   tenantIdInstrumento: number | null
 ) {
-  // Admin global (sem tenant) pode gerenciar tudo.
   if (usuario.tenantId === null) return true;
-  // Admin de tenant pode gerenciar instrumentos do próprio tenant e globais (legados/compartilhados).
   if (tenantIdInstrumento === null) return true;
   return tenantIdInstrumento === usuario.tenantId;
 }
@@ -47,7 +45,7 @@ export async function PUT(
     const id = safeParseInt(params.id);
     if (!id || id <= 0) {
       return NextResponse.json(
-        { error: 'ID inválido' },
+        { error: 'ID invalido' },
         { status: 400 }
       );
     }
@@ -56,7 +54,7 @@ export async function PUT(
     const nomeSanitizado = sanitizeString(nome, 255);
     if (!nomeSanitizado) {
       return NextResponse.json(
-        { error: 'Nome do instrumento é obrigatório' },
+        { error: 'Nome do instrumento e obrigatorio' },
         { status: 400 }
       );
     }
@@ -68,7 +66,7 @@ export async function PUT(
 
     if (!instrumento) {
       return NextResponse.json(
-        { error: 'Instrumento não encontrado' },
+        { error: 'Instrumento nao encontrado' },
         { status: 404 }
       );
     }
@@ -89,7 +87,7 @@ export async function PUT(
   } catch (error: any) {
     if (error.code === 'P2002') {
       return NextResponse.json(
-        { error: 'Instrumento já existe' },
+        { error: 'Instrumento ja existe' },
         { status: 400 }
       );
     }
@@ -115,7 +113,7 @@ export async function DELETE(
     const id = safeParseInt(params.id);
     if (!id || id <= 0) {
       return NextResponse.json(
-        { error: 'ID inválido' },
+        { error: 'ID invalido' },
         { status: 400 }
       );
     }
@@ -127,7 +125,7 @@ export async function DELETE(
 
     if (!instrumento) {
       return NextResponse.json(
-        { error: 'Instrumento não encontrado' },
+        { error: 'Instrumento nao encontrado' },
         { status: 404 }
       );
     }
@@ -139,7 +137,6 @@ export async function DELETE(
       );
     }
 
-    // Remove também variações duplicadas no mesmo escopo (ex.: "Tuba Wagneriana" e "TUBA WAGNERIANA")
     const chave = normalizarChaveInstrumento(instrumento.nome);
     const instrumentosMesmoEscopo = await prisma.instrumento.findMany({
       where: { tenantId: instrumento.tenantId },
@@ -150,7 +147,6 @@ export async function DELETE(
       .filter((item) => normalizarChaveInstrumento(item.nome) === chave)
       .map((item) => item.id);
 
-    // Verificar referências em ensaios para preservar histórico e evitar violação FK
     const referencias = await prisma.ensaioInstrumento.findMany({
       where: { instrumentoId: { in: idsMesmoNomeNormalizado } },
       select: { instrumentoId: true },
@@ -166,21 +162,48 @@ export async function DELETE(
 
     const referenciasDoSolicitado = contagemPorInstrumento.get(id) || 0;
     if (referenciasDoSolicitado > 0) {
+      const referenciasDetalhadas = await prisma.ensaioInstrumento.findMany({
+        where: { instrumentoId: id },
+        select: {
+          ensaio: {
+            select: {
+              id: true,
+              data: true,
+              instrutor: {
+                select: { nome: true },
+              },
+            },
+          },
+        },
+      });
+
+      const ensaiosRelacionados = referenciasDetalhadas
+        .map((item) => {
+          const data = item.ensaio.data.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+          const instrutor = item.ensaio.instrutor?.nome || 'N/A';
+          return `#${item.ensaio.id} (${data} - ${instrutor})`;
+        })
+        .slice(0, 10);
+
+      const sufixoLista = ensaiosRelacionados.length > 0
+        ? ` Ensaios vinculados: ${ensaiosRelacionados.join(', ')}.`
+        : '';
+
       return NextResponse.json(
         {
-          error: `Não é possível excluir este instrumento porque ele já foi usado em ${referenciasDoSolicitado} ensaio(s).`,
+          error: `Nao e possivel excluir este instrumento porque ele ja foi usado em ${referenciasDoSolicitado} ensaio(s).${sufixoLista}`,
+          ensaiosRelacionados,
         },
         { status: 400 }
       );
     }
 
-    // Excluir apenas IDs não referenciados (limpa duplicatas sem quebrar histórico)
     const idsReferenciados = new Set(Array.from(contagemPorInstrumento.keys()));
     const idsParaExcluir = idsMesmoNomeNormalizado.filter((itemId) => !idsReferenciados.has(itemId));
 
     if (idsParaExcluir.length === 0) {
       return NextResponse.json(
-        { error: 'Nenhum instrumento elegível para exclusão (todos possuem histórico).' },
+        { error: 'Nenhum instrumento elegivel para exclusao (todos possuem historico).' },
         { status: 400 }
       );
     }
@@ -193,7 +216,7 @@ export async function DELETE(
   } catch (error: any) {
     if (error?.code === 'P2003') {
       return NextResponse.json(
-        { error: 'Não foi possível excluir: instrumento vinculado a ensaios existentes.' },
+        { error: 'Nao foi possivel excluir: instrumento vinculado a ensaios existentes.' },
         { status: 400 }
       );
     }
