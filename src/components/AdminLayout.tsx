@@ -11,7 +11,7 @@ interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
-type MenuIcon = 'home' | 'users' | 'building' | 'chart' | 'logs' | 'settings';
+type MenuIcon = 'home' | 'users' | 'music' | 'building' | 'chart' | 'logs' | 'settings';
 
 function SidebarIcon({ icon }: { icon: MenuIcon }) {
   const baseClass = 'w-5 h-5';
@@ -36,6 +36,14 @@ function SidebarIcon({ icon }: { icon: MenuIcon }) {
       return (
         <svg className={baseClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 21h16M6 21V7l6-3 6 3v14M9 10h2m-2 4h2m4-4h2m-2 4h2" />
+        </svg>
+      );
+    case 'music':
+      return (
+        <svg className={baseClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 18V6l10-2v12" />
+          <circle cx="7" cy="18" r="2" />
+          <circle cx="17" cy="16" r="2" />
         </svg>
       );
     case 'chart':
@@ -97,6 +105,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     () => [
       { href: '/admin', label: 'Inicio', icon: 'home' as const },
       { href: '/admin/usuarios', label: 'Usuarios', icon: 'users' as const },
+      { href: '/admin/instrumentos', label: 'Instrumentos', icon: 'music' as const },
       { href: '/admin/tenants', label: 'Tenants', icon: 'building' as const },
       { href: '/admin/metricas', label: 'Metricas', icon: 'chart' as const },
       { href: '/admin/logs', label: 'Logs', icon: 'logs' as const },

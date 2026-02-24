@@ -29,7 +29,7 @@ export async function GET(
 
     // Obter tenantId para isolamento
     const tenantId = await resolveTenantFromRequest(request);
-    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+    const tenantIdFinal = tenantId ?? null;
 
     const ensaio = await prisma.ensaio.findUnique({
       where: { id },
@@ -62,7 +62,7 @@ export async function GET(
     }
 
     // ISOLAMENTO: Verificar se ensaio pertence ao mesmo tenant
-    if (ensaio.tenantId !== tenantIdFinal) {
+    if (tenantIdFinal !== null && ensaio.tenantId !== tenantIdFinal) {
       return NextResponse.json(
         { error: 'Ensaio não encontrado' },
         { status: 404 }
@@ -100,11 +100,23 @@ export async function PUT(
       );
     }
     const body = await request.json();
-    const { data, instrumentos, funcoes, totalGeral, hinosEnsaidos, regencia, musicos } = body;
+    const {
+      data,
+      instrumentos,
+      funcoes,
+      totalGeral,
+      hinosEnsaidos,
+      regencia,
+      atendimento1Nome,
+      atendimento1Tipo,
+      atendimento2Nome,
+      atendimento2Tipo,
+      musicos,
+    } = body;
 
     // Obter tenantId para isolamento
     const tenantId = await resolveTenantFromRequest(request);
-    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+    const tenantIdFinal = tenantId ?? null;
 
     // Verificar se o ensaio existe
     const ensaioExistente = await prisma.ensaio.findUnique({
@@ -127,7 +139,7 @@ export async function PUT(
     }
 
     // ISOLAMENTO: Verificar se ensaio pertence ao mesmo tenant
-    if (ensaioExistente.tenantId !== tenantIdFinal) {
+    if (tenantIdFinal !== null && ensaioExistente.tenantId !== tenantIdFinal) {
       return NextResponse.json(
         { error: 'Ensaio não encontrado' },
         { status: 404 }
@@ -160,7 +172,7 @@ export async function PUT(
         where: {
           id: { in: ids },
           instrutorId: ensaioExistente.instrutorId,
-          tenantId: tenantIdFinal, // ISOLAMENTO: garantir que músicos são do mesmo tenant
+          ...(tenantIdFinal !== null ? { tenantId: tenantIdFinal } : {}), // ISOLAMENTO quando tenant estiver definido
         },
       });
       if (totalMusicos !== ids.length) {
@@ -193,6 +205,10 @@ export async function PUT(
         totalGeral,
         hinosEnsaidos: hinosEnsaidos || null,
         regencia: regencia || null,
+        atendimento1Nome: atendimento1Nome || null,
+        atendimento1Tipo: atendimento1Tipo || null,
+        atendimento2Nome: atendimento2Nome || null,
+        atendimento2Tipo: atendimento2Tipo || null,
         instrumentos: {
           create: instrumentos.map((item: any) => ({
             instrumentoId: item.instrumentoId,

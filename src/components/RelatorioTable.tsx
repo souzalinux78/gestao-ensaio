@@ -35,7 +35,7 @@ export default function RelatorioTable({
                       {format(new Date(ensaio.data), 'dd/MM/yyyy', { locale: ptBR })}
                     </p>
                     <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      Instrutor: {ensaio.instrutor?.nome || 'N/A'}
+                      Responsável: {ensaio.instrutor?.nome || 'N/A'}
                     </p>
                     <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                       Igreja: {ensaio.instrutor?.igreja || '-'}
@@ -97,7 +97,7 @@ export default function RelatorioTable({
         <thead>
           <tr style={{ backgroundColor: 'var(--bg-muted)', color: 'var(--text-primary)' }}>
             <th className="px-4 py-3 text-left font-semibold">Data</th>
-            <th className="px-4 py-3 text-left font-semibold">Instrutor</th>
+            <th className="px-4 py-3 text-left font-semibold">Responsável</th>
             <th className="px-4 py-3 text-left font-semibold">Igreja</th>
             <th className="px-4 py-3 text-left font-semibold">Total Geral</th>
             <th className="px-4 py-3 text-left font-semibold">Ações</th>

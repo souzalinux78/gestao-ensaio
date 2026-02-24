@@ -10,6 +10,38 @@ import DateInputBR from '@/components/DateInputBR';
 import { Instrumento, Usuario, Ensaio, Musico } from '@/types';
 import { obterSessao } from '@/lib/session';
 import { fetchWithCSRF } from '@/lib/csrf-client';
+import { apiFetch } from '@/lib/api-client';
+
+function normalizarNome(valor: string) {
+  return valor
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .trim();
+}
+
+type AtendimentoTipo =
+  | 'ancioes'
+  | 'diaconos'
+  | 'cooperadorOficio'
+  | 'cooperadorJovens'
+  | 'encarregadosLocais'
+  | 'encarregadosRegionais'
+  | 'instrutores'
+  | 'examinadora'
+  | '';
+
+const TIPOS_ATENDIMENTO: Array<{ value: AtendimentoTipo; label: string }> = [
+  { value: '', label: 'Selecione o tipo' },
+  { value: 'ancioes', label: 'Ancião' },
+  { value: 'diaconos', label: 'Diácono' },
+  { value: 'cooperadorOficio', label: 'Coop. de Ofício' },
+  { value: 'cooperadorJovens', label: 'Coop. de Jovens' },
+  { value: 'encarregadosLocais', label: 'Encarregado Local' },
+  { value: 'encarregadosRegionais', label: 'Encarregado Regional' },
+  { value: 'instrutores', label: 'Instrutor' },
+  { value: 'examinadora', label: 'Examinadora' },
+];
 
 function NovoEnsaioContent() {
   const router = useRouter();
@@ -26,6 +58,7 @@ function NovoEnsaioContent() {
     diaconos: number | undefined;
     cooperadorOficio: number | undefined;
     cooperadorJovens: number | undefined;
+    examinadora: number | undefined;
     encarregadosLocais: number | undefined;
     encarregadosRegionais: number | undefined;
     instrutores: number | undefined;
@@ -34,9 +67,21 @@ function NovoEnsaioContent() {
     diaconos: undefined,
     cooperadorOficio: undefined,
     cooperadorJovens: undefined,
+    examinadora: undefined,
     encarregadosLocais: undefined,
     encarregadosRegionais: undefined,
     instrutores: undefined,
+  });
+  const [atendimento, setAtendimento] = useState<{
+    primeiroNome: string;
+    primeiroTipo: AtendimentoTipo;
+    segundoNome: string;
+    segundoTipo: AtendimentoTipo;
+  }>({
+    primeiroNome: '',
+    primeiroTipo: '',
+    segundoNome: '',
+    segundoTipo: '',
   });
   const [data, setData] = useState(new Date().toISOString().split('T')[0]);
   const [hinosEnsaidos, setHinosEnsaidos] = useState('');
@@ -63,7 +108,7 @@ function NovoEnsaioContent() {
   async function carregarEnsaio(id: number) {
     setCarregandoEnsaio(true);
     try {
-      const res = await fetch(`/api/ensaios/${id}`);
+      const res = await apiFetch(`/api/ensaios/${id}`);
       if (!res.ok) {
         alert('Erro ao carregar ensaio. Redirecionando...');
         router.push('/instrutor');
@@ -90,11 +135,19 @@ function NovoEnsaioContent() {
           diaconos: ensaio.funcoes.diaconos || undefined,
           cooperadorOficio: ensaio.funcoes.cooperadorOficio || undefined,
           cooperadorJovens: ensaio.funcoes.cooperadorJovens || undefined,
+          examinadora: ensaio.funcoes.examinadora || undefined,
           encarregadosLocais: ensaio.funcoes.encarregadosLocais || undefined,
           encarregadosRegionais: ensaio.funcoes.encarregadosRegionais || undefined,
           instrutores: ensaio.funcoes.instrutores || undefined,
         });
       }
+
+      setAtendimento({
+        primeiroNome: ensaio.atendimento1Nome || '',
+        primeiroTipo: (ensaio.atendimento1Tipo as AtendimentoTipo) || '',
+        segundoNome: ensaio.atendimento2Nome || '',
+        segundoTipo: (ensaio.atendimento2Tipo as AtendimentoTipo) || '',
+      });
       
       // Preencher hinos e regência
       setHinosEnsaidos(ensaio.hinosEnsaidos || '');
@@ -155,21 +208,26 @@ function NovoEnsaioContent() {
   }
 
   async function adicionarNovoInstrumento(nome: string) {
-    const res = await fetchWithCSRF('/api/instrumentos', {
+    const res = await apiFetch('/api/instrumentos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nome }),
     });
     if (res.ok) {
       await carregarInstrumentos();
+      return;
     }
+
+    const dataErro = await res.json().catch(() => null);
+    alert(dataErro?.error || 'Erro ao adicionar instrumento');
   }
 
   async function salvarEnsaio() {
     setCarregando(true);
     try {
       // Encontrar o ID do instrumento "Órgão"
-      const orgao = instrumentos.find((i) => i.nome === 'Órgão');
+      const nomesOrganista = new Set(['ORGAO', 'ORGANISTA']);
+      const orgao = instrumentos.find((i) => nomesOrganista.has(normalizarNome(i.nome)));
       const orgaoId = orgao?.id;
 
       // Calcular total de músicos (todos os instrumentos EXCETO Órgão)
@@ -205,10 +263,15 @@ function NovoEnsaioContent() {
           diaconos: funcoes.diaconos ?? 0,
           cooperadorOficio: funcoes.cooperadorOficio ?? 0,
           cooperadorJovens: funcoes.cooperadorJovens ?? 0,
+          examinadora: funcoes.examinadora ?? 0,
           encarregadosLocais: funcoes.encarregadosLocais ?? 0,
           encarregadosRegionais: funcoes.encarregadosRegionais ?? 0,
           instrutores: funcoes.instrutores ?? 0,
         },
+        atendimento1Nome: atendimento.primeiroNome.trim() || null,
+        atendimento1Tipo: atendimento.primeiroTipo || null,
+        atendimento2Nome: atendimento.segundoNome.trim() || null,
+        atendimento2Tipo: atendimento.segundoTipo || null,
         totalGeral,
         hinosEnsaidos: hinosEnsaidos.trim() || null,
         regencia: regencia.trim() || null,
@@ -287,6 +350,69 @@ function NovoEnsaioContent() {
             }}
           />
 
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-[var(--text-primary)]">Atendimento</h3>
+            <p className="text-sm text-[var(--text-secondary)]">
+              Informe quem atendeu o culto/ensaio e a função ministerial de cada pessoa.
+            </p>
+            <p className="text-xs text-[var(--text-secondary)]">
+              Dica: se deixar em branco, o PDF tenta usar automaticamente a Regência no formato
+              {' '}<strong>Regional - Nome - Localidade</strong> ou <strong>Local - Nome - Localidade</strong>.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block mb-2 text-sm font-medium text-[var(--text-primary)]">1º Atendimento</label>
+                <input
+                  type="text"
+                  value={atendimento.primeiroNome}
+                  onChange={(e) => setAtendimento({ ...atendimento, primeiroNome: e.target.value })}
+                  placeholder="Ex: Eduardo"
+                  className="w-full border border-[var(--border-default)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-[var(--text-primary)] bg-white"
+                />
+              </div>
+              <div>
+                <label className="block mb-2 text-sm font-medium text-[var(--text-primary)]">Função do 1º</label>
+                <select
+                  value={atendimento.primeiroTipo}
+                  onChange={(e) => setAtendimento({ ...atendimento, primeiroTipo: e.target.value as AtendimentoTipo })}
+                  className="w-full border border-[var(--border-default)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-[var(--text-primary)] bg-white"
+                >
+                  {TIPOS_ATENDIMENTO.map((tipo) => (
+                    <option key={`primeiro-${tipo.value || 'vazio'}`} value={tipo.value}>
+                      {tipo.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-[var(--text-primary)]">2º Atendimento</label>
+                <input
+                  type="text"
+                  value={atendimento.segundoNome}
+                  onChange={(e) => setAtendimento({ ...atendimento, segundoNome: e.target.value })}
+                  placeholder="Ex: Willian"
+                  className="w-full border border-[var(--border-default)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-[var(--text-primary)] bg-white"
+                />
+              </div>
+              <div>
+                <label className="block mb-2 text-sm font-medium text-[var(--text-primary)]">Função do 2º</label>
+                <select
+                  value={atendimento.segundoTipo}
+                  onChange={(e) => setAtendimento({ ...atendimento, segundoTipo: e.target.value as AtendimentoTipo })}
+                  className="w-full border border-[var(--border-default)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors text-[var(--text-primary)] bg-white"
+                >
+                  {TIPOS_ATENDIMENTO.map((tipo) => (
+                    <option key={`segundo-${tipo.value || 'vazio'}`} value={tipo.value}>
+                      {tipo.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
           <div>
             <label className="block mb-2 text-sm font-medium text-[var(--text-primary)]">Hinos Ensaiados</label>
             <input
@@ -311,7 +437,7 @@ function NovoEnsaioContent() {
               className="w-full border border-[var(--border-default)] rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-accent focus:border-accent transition-colors resize-y text-[var(--text-primary)] bg-white"
             />
             <p className="text-sm text-[var(--text-secondary)] mt-1">
-              Digite o nome do regente e a localidade (um por linha)
+              Digite um por linha. Exemplo: Regional - Eduardo - Cruzeiro
             </p>
           </div>
 

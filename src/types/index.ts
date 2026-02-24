@@ -39,6 +39,7 @@ export interface EnsaioFuncoes {
   diaconos: number;
   cooperadorOficio: number;
   cooperadorJovens: number;
+  examinadora: number;
   encarregadosLocais: number;
   encarregadosRegionais: number;
   instrutores: number;
@@ -48,6 +49,10 @@ export interface Ensaio {
   id: number;
   data: Date;
   instrutorId: number;
+  atendimento1Nome?: string | null;
+  atendimento1Tipo?: string | null;
+  atendimento2Nome?: string | null;
+  atendimento2Tipo?: string | null;
   instrutor?: {
     id?: number;
     nome: string;

@@ -103,7 +103,7 @@ export default function AdminPage() {
   }
 
   async function handleGerarPDF(ensaio: Ensaio) {
-    const pdf = gerarPDFEnsaio(ensaio, instrumentos);
+    const pdf = await gerarPDFEnsaio(ensaio, instrumentos);
     pdf.save(`ensaio-${ensaio.id}.pdf`);
 
     try {

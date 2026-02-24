@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/AdminLayout';
 import { Usuario, TipoUsuario } from '@/types';
 import { apiFetch } from '@/lib/api-client';
+import { obterSessao } from '@/lib/session';
 
 // Função helper para exibir nome amigável do tipo
 function getTipoLabel(tipo: TipoUsuario): string {
@@ -15,6 +16,17 @@ function getTipoLabel(tipo: TipoUsuario): string {
     secretario: 'Secretário',
   };
   return labels[tipo] || tipo;
+}
+
+const NOVA_IGREJA_VALUE = '__nova_igreja__';
+
+function normalizarIgreja(valor: string): string {
+  return valor
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
 }
 
 export default function UsuariosPage() {
@@ -41,8 +53,27 @@ export default function UsuariosPage() {
     confirmarSenha: '',
   });
   const [mensagem, setMensagem] = useState<{ tipo: 'sucesso' | 'erro'; texto: string } | null>(null);
+  const [opcaoIgreja, setOpcaoIgreja] = useState('');
+
+  const igrejasExistentes = useMemo(() => {
+    const igrejas = new Map<string, string>();
+    usuarios.forEach((usuario) => {
+      const igreja = usuario.igreja?.trim();
+      if (igreja) {
+        const chave = normalizarIgreja(igreja);
+        if (!igrejas.has(chave)) {
+          igrejas.set(chave, igreja);
+        }
+      }
+    });
+    return Array.from(igrejas.values()).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  }, [usuarios]);
 
   useEffect(() => {
+    const sessao = obterSessao();
+    if (!sessao || sessao.tipo !== 'admin') {
+      return;
+    }
     carregarUsuarios();
   }, []);
 
@@ -99,15 +130,25 @@ export default function UsuariosPage() {
   }, [filtroNome, filtroStatus, usuarios]);
 
   function iniciarEdicao(usuario: Usuario) {
+    const igrejaAtual = (usuario.igreja || '').trim();
+    const igrejaExistente = igrejasExistentes.find(
+      (item) => normalizarIgreja(item) === normalizarIgreja(igrejaAtual)
+    );
+
     setEditandoId(usuario.id);
     setFormData({
       nome: usuario.nome,
       email: usuario.email,
       senha: '',
-      tipo: usuario.tipo,
-      igreja: usuario.igreja || '',
+      tipo: usuario.tipo, 
+      igreja: igrejaAtual,
       aprovado: usuario.aprovado ?? true,
     });
+    setOpcaoIgreja(
+      igrejaAtual
+        ? igrejaExistente || NOVA_IGREJA_VALUE
+        : ''
+    );
     setMostrarForm(true);
   }
 
@@ -123,6 +164,7 @@ export default function UsuariosPage() {
     });
     setMostrarForm(false);
     setMostrarAlterarSenha(null);
+    setOpcaoIgreja('');
   }
 
   async function salvarUsuario() {
@@ -357,6 +399,7 @@ export default function UsuariosPage() {
                     igreja: '',
                     aprovado: false, // Por padrão, não aprovar - admin decide se aprova na hora
                   });
+                  setOpcaoIgreja('');
                 }}
                 className="px-4 py-2.5 rounded-lg whitespace-nowrap font-medium shadow-sm transition-colors"
                 style={{
@@ -413,13 +456,52 @@ export default function UsuariosPage() {
               </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[var(--text-primary)]">Igreja/Congregação</label>
-                <input
-                  type="text"
-                  value={formData.igreja}
-                  onChange={(e) => setFormData({ ...formData, igreja: e.target.value })}
-                  placeholder="Nome da igreja"
-                  className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] placeholder:text-gray-400 dark:placeholder:text-[var(--text-tertiary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                />
+                {igrejasExistentes.length > 0 && (
+                  <select
+                    value={opcaoIgreja}
+                    onChange={(e) => {
+                      const valor = e.target.value;
+                      setOpcaoIgreja(valor);
+
+                      if (!valor) {
+                        setFormData({ ...formData, igreja: '' });
+                        return;
+                      }
+
+                      if (valor === NOVA_IGREJA_VALUE) {
+                        setFormData({ ...formData, igreja: '' });
+                        return;
+                      }
+
+                      setFormData({ ...formData, igreja: valor });
+                    }}
+                    className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 mb-2 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  >
+                    <option value="">Selecione uma igreja existente (opcional)</option>
+                    {igrejasExistentes.map((igreja) => (
+                      <option key={igreja} value={igreja}>
+                        {igreja}
+                      </option>
+                    ))}
+                    <option value={NOVA_IGREJA_VALUE}>+ Cadastrar nova igreja</option>
+                  </select>
+                )}
+                {(igrejasExistentes.length === 0 || opcaoIgreja === NOVA_IGREJA_VALUE) && (
+                  <input
+                    type="text"
+                    name="igreja_nome"
+                    autoComplete="organization"
+                    value={formData.igreja}
+                    onChange={(e) => setFormData({ ...formData, igreja: e.target.value })}
+                    placeholder="Digite o nome da nova igreja"
+                    className="w-full border border-gray-300 dark:border-[var(--border-primary)] rounded-lg px-4 py-2.5 bg-white dark:bg-[var(--bg-secondary)] text-[var(--text-primary)] placeholder:text-gray-400 dark:placeholder:text-[var(--text-tertiary)] focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  />
+                )}
+                {igrejasExistentes.length > 0 && (
+                  <p className="mt-1 text-xs text-gray-500 dark:text-[var(--text-tertiary)]">
+                    Selecione uma igreja existente ou escolha "Cadastrar nova igreja".
+                  </p>
+                )}
               </div>
               {!editandoId && (
                 <div>

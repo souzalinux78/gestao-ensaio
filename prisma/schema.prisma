@@ -75,6 +75,10 @@ model Ensaio {
   instrutor   Usuario            @relation(fields: [instrutorId], references: [id])
   tenantId    Int?               // Nullable inicialmente para migração gradual
   tenant      Tenant?            @relation(fields: [tenantId], references: [id])
+  atendimento1Nome String?       @db.VarChar(255)
+  atendimento1Tipo String?       @db.VarChar(40)
+  atendimento2Nome String?       @db.VarChar(255)
+  atendimento2Tipo String?       @db.VarChar(40)
   instrumentos EnsaioInstrumento[]
   musicos     EnsaioMusico[]
   funcoes     EnsaioFuncoes?
@@ -147,6 +151,7 @@ model EnsaioFuncoes {
   diaconos              Int     @default(0)
   cooperadorOficio      Int     @default(0)
   cooperadorJovens      Int     @default(0)
+  examinadora           Int     @default(0)
   encarregadosLocais    Int     @default(0)
   encarregadosRegionais Int     @default(0)
   instrutores           Int     @default(0)

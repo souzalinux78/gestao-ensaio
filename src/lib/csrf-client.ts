@@ -3,6 +3,8 @@
  * Facilita a obtenção e uso de tokens CSRF
  */
 
+import { obterSessao, salvarSessao } from './session';
+
 let csrfToken: string | null = null;
 let tokenPromise: Promise<string> | null = null;
 
@@ -76,16 +78,66 @@ export async function fetchWithCSRF(
   options: RequestInit = {}
 ): Promise<Response> {
   const token = await getCSRFToken();
-
+  const sessao = obterSessao();
+  const hasJwtToken = Boolean(sessao?.accessToken);
   const headers = new Headers(options.headers);
 
   // Adicionar token CSRF ao header
   headers.set('X-CSRF-Token', token);
 
-  return fetch(url, {
-    ...options,
-    headers,
-  });
+  // Adicionar autenticação da sessão quando disponível
+  if (!headers.has('Authorization')) {
+    if (sessao?.accessToken) {
+      headers.set('Authorization', `Bearer ${sessao.accessToken}`);
+    } else if (sessao?.id) {
+      headers.set('Authorization', `Bearer ${sessao.id}`);
+    }
+  }
+
+  const requestWith = (requestHeaders: Headers) =>
+    fetch(url, {
+      ...options,
+      headers: requestHeaders,
+      credentials: 'same-origin',
+    });
+
+  let response = await requestWith(headers);
+
+  // Se JWT falhar, tentar fallback legado com ID
+  if (response.status === 401 && hasJwtToken && sessao?.id) {
+    const legacyHeaders = new Headers(headers);
+    legacyHeaders.set('Authorization', `Bearer ${sessao.id}`);
+    response = await requestWith(legacyHeaders);
+  }
+
+  // Se ainda 401, tentar refresh do token e repetir uma vez
+  if (response.status === 401 && sessao?.id) {
+    try {
+      const refreshResponse = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+      });
+
+      if (refreshResponse.ok) {
+        const refreshData = await refreshResponse.json();
+        if (refreshData?.accessToken) {
+          salvarSessao({
+            ...sessao,
+            accessToken: refreshData.accessToken,
+          });
+
+          const refreshedHeaders = new Headers(headers);
+          refreshedHeaders.set('Authorization', `Bearer ${refreshData.accessToken}`);
+          response = await requestWith(refreshedHeaders);
+        }
+      }
+    } catch {
+      // Ignorar falha de refresh e retornar o 401 original
+    }
+  }
+
+  return response;
 }
 
 /**

@@ -4,6 +4,16 @@ import { Ensaio, Instrumento } from '@/types';
 import { safeParseInt } from '@/lib/validators';
 import { getConfig } from '@/lib/config-cache';
 
+function nomeEhOrganista(nome: string | undefined) {
+  if (!nome) return false;
+  const normalizado = nome
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .trim();
+  return normalizado === 'ORGAO' || normalizado === 'ORGANISTA';
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { ensaioId } = await request.json();
@@ -69,9 +79,9 @@ export async function POST(request: NextRequest) {
     });
 
     // Separar instrumentos: Órgão vs outros
-    const orgaoItem = ensaio.instrumentos.find((item) => item.instrumento.nome === 'Órgão');
+    const orgaoItem = ensaio.instrumentos.find((item) => nomeEhOrganista(item.instrumento.nome));
     const outrosInstrumentos = ensaio.instrumentos.filter(
-      (item) => item.instrumento.nome !== 'Órgão'
+      (item) => !nomeEhOrganista(item.instrumento.nome)
     );
 
     // Calcular totais
@@ -85,13 +95,15 @@ export async function POST(request: NextRequest) {
     const instrutoresCount = ensaio.funcoes?.instrutores || 0;
     const encarregadosLocaisCount = ensaio.funcoes?.encarregadosLocais || 0;
     const encarregadosRegionaisCount = ensaio.funcoes?.encarregadosRegionais || 0;
+    const examinadoraCount = ensaio.funcoes?.examinadora || 0;
 
     // Calcular apenas ministério (sem instrutores, encarregados locais e regionais)
     const totalMinisterio = ensaio.funcoes
       ? ensaio.funcoes.ancioes +
         ensaio.funcoes.diaconos +
         ensaio.funcoes.cooperadorOficio +
-        ensaio.funcoes.cooperadorJovens
+        ensaio.funcoes.cooperadorJovens +
+        examinadoraCount
       : 0;
 
     // Total geral = Músicos + Organistas (SEM ministério)
@@ -135,6 +147,7 @@ export async function POST(request: NextRequest) {
             `*Cooperador de Ofício*: ${ensaio.funcoes.cooperadorOficio}`,
           ensaio.funcoes.cooperadorJovens > 0 &&
             `*Cooperador de Jovens*: ${ensaio.funcoes.cooperadorJovens}`,
+          examinadoraCount > 0 && `*Examinadora*: ${examinadoraCount}`,
         ]
           .filter(Boolean)
           .join('\n')
@@ -172,6 +185,7 @@ export async function POST(request: NextRequest) {
           ensaio.funcoes.diaconos > 0 && `• Diáconos: ${ensaio.funcoes.diaconos}`,
           ensaio.funcoes.cooperadorOficio > 0 && `• Cooperador de Ofício: ${ensaio.funcoes.cooperadorOficio}`,
           ensaio.funcoes.cooperadorJovens > 0 && `• Cooperador de Jovens: ${ensaio.funcoes.cooperadorJovens}`,
+          examinadoraCount > 0 && `• Examinadora: ${examinadoraCount}`,
         ]
           .filter(Boolean)
           .join('\n')
@@ -322,6 +336,7 @@ ${regenciaLista}
                 diaconos: ensaio.funcoes.diaconos,
                 cooperadorOficio: ensaio.funcoes.cooperadorOficio,
                 cooperadorJovens: ensaio.funcoes.cooperadorJovens,
+                examinadora: examinadoraCount,
               },
               total: totalMinisterio,
               resumo: [
@@ -331,6 +346,7 @@ ${regenciaLista}
                   `Cooperador de Ofício: ${ensaio.funcoes.cooperadorOficio}`,
                 ensaio.funcoes.cooperadorJovens > 0 &&
                   `Cooperador de Jovens: ${ensaio.funcoes.cooperadorJovens}`,
+                examinadoraCount > 0 && `Examinadora: ${examinadoraCount}`,
               ]
                 .filter(Boolean)
                 .join(', '),

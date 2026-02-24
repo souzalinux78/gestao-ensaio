@@ -15,11 +15,11 @@ export async function GET(request: NextRequest) {
   
   // Obter tenantId para isolamento de dados
   const tenantId = await resolveTenantFromRequest(request);
-  const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+  const tenantIdFinal = tenantId ?? null;
 
-  const where: any = {
-    tenantId: tenantIdFinal, // ISOLAMENTO: filtrar por tenant
-  };
+  const where: any = tenantIdFinal !== null
+    ? { tenantId: tenantIdFinal } // ISOLAMENTO: filtrar por tenant quando houver tenant resolvido
+    : {};
   
   // Se for instrutor (não admin), filtrar apenas seus ensaios
   // Admin pode ver todos os ensaios (a menos que especifique instrutorId)
@@ -110,6 +110,14 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const usuario = await obterUsuarioDaRequisicao(request);
+    if (!usuario) {
+      return NextResponse.json(
+        { error: 'Não autenticado' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const {
       data,
@@ -118,18 +126,19 @@ export async function POST(request: NextRequest) {
       totalGeral,
       hinosEnsaidos,
       regencia,
+      atendimento1Nome,
+      atendimento1Tipo,
+      atendimento2Nome,
+      atendimento2Tipo,
       instrutorId,
       musicos,
     } = body;
 
     // Usar instrutorId do body ou tentar obter da sessão
-    let instrutorIdFinal = instrutorId;
+    let instrutorIdFinal: number | string | undefined = instrutorId;
 
     if (!instrutorIdFinal) {
-      const usuario = await obterUsuarioDaRequisicao(request);
-      if (usuario && usuario.tipo === 'instrutor') {
-        instrutorIdFinal = usuario.id;
-      }
+      instrutorIdFinal = usuario.id;
     }
 
     if (!instrutorIdFinal) {
@@ -139,23 +148,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const instrutorIdNumerico = Number(instrutorIdFinal);
+    if (!Number.isInteger(instrutorIdNumerico) || instrutorIdNumerico <= 0) {
+      return NextResponse.json(
+        { error: 'ID do instrutor inválido' },
+        { status: 400 }
+      );
+    }
+
     const musicosSelecionados = Array.isArray(musicos) ? musicos : [];
     
     // Obter tenantId para isolamento
     const tenantId = await resolveTenantFromRequest(request);
-    const tenantIdFinal = tenantId || 1; // Fallback para tenant padrão
+    const tenantIdFinal = tenantId ?? null;
     
     // Validar instrutor e musicos em paralelo
     const [instrutor, totalMusicos] = await Promise.all([
       prisma.usuario.findUnique({
-        where: { id: instrutorIdFinal },
+        where: { id: instrutorIdNumerico },
       }),
       musicosSelecionados.length > 0
         ? prisma.musico.count({
             where: {
               id: { in: musicosSelecionados.map((item: any) => item.musicoId) },
-              instrutorId: instrutorIdFinal,
-              tenantId: tenantIdFinal, // ISOLAMENTO: garantir que músicos são do mesmo tenant
+              instrutorId: instrutorIdNumerico,
+              ...(tenantIdFinal !== null ? { tenantId: tenantIdFinal } : {}), // ISOLAMENTO quando tenant estiver definido
             },
           })
         : Promise.resolve(0),
@@ -169,7 +186,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ISOLAMENTO: Verificar se instrutor pertence ao mesmo tenant
-    if (instrutor.tenantId !== tenantIdFinal) {
+    if (tenantIdFinal !== null && instrutor.tenantId !== tenantIdFinal) {
       return NextResponse.json(
         { error: 'Instrutor não encontrado' },
         { status: 404 }
@@ -186,11 +203,15 @@ export async function POST(request: NextRequest) {
     const ensaio = await prisma.ensaio.create({
       data: {
         data: new Date(data),
-        instrutorId: instrutorIdFinal,
-        tenantId: tenantIdFinal, // ISOLAMENTO: associar ao tenant
+        instrutorId: instrutorIdNumerico,
+        tenantId: tenantIdFinal, // ISOLAMENTO: associar ao tenant quando existir
         totalGeral,
         hinosEnsaidos: hinosEnsaidos || null,
         regencia: regencia || null,
+        atendimento1Nome: atendimento1Nome || null,
+        atendimento1Tipo: atendimento1Tipo || null,
+        atendimento2Nome: atendimento2Nome || null,
+        atendimento2Tipo: atendimento2Tipo || null,
         instrumentos: {
           create: instrumentos.map((item: any) => ({
             instrumentoId: item.instrumentoId,

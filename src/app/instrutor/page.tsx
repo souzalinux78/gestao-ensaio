@@ -35,7 +35,7 @@ export default function InstrutorPage() {
 
   async function handleGerarPDF(ensaio: Ensaio) {
     // Gerar e baixar o PDF
-    const pdf = gerarPDFEnsaio(ensaio, instrumentos);
+    const pdf = await gerarPDFEnsaio(ensaio, instrumentos);
     pdf.save(`ensaio-${ensaio.id}.pdf`);
 
     // Enviar dados para o webhook

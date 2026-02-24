@@ -15,16 +15,12 @@ type Naipe = 'Cordas' | 'Madeiras' | 'Metais' | 'Teclas' | 'Outros';
 const ORDEM_NAIPES: Naipe[] = ['Cordas', 'Madeiras', 'Metais', 'Teclas', 'Outros'];
 
 const MAPEAMENTO_NAIPES: Record<string, Naipe> = {
-  // Cordas (minúsculas e maiúsculas)
+  // Cordas
   'violino': 'Cordas',
   'violino contralto': 'Cordas',
   'viola': 'Cordas',
   'violoncelo': 'Cordas',
-  'VIOLINO': 'Cordas',
-  'VIOLINO CONTRALTO': 'Cordas',
-  'VIOLA': 'Cordas',
-  'VIOLONCELO': 'Cordas',
-  // Madeiras (minúsculas e maiúsculas)
+  // Madeiras
   'flauta': 'Madeiras',
   'flauta contralto': 'Madeiras',
   'flauta baixo': 'Madeiras',
@@ -33,37 +29,21 @@ const MAPEAMENTO_NAIPES: Record<string, Naipe> = {
   'clarinete baixo': 'Madeiras',
   'clarinete contra baixo': 'Madeiras',
   'oboe': 'Madeiras',
+  "oboe d'amore": 'Madeiras',
   'oboe d amore': 'Madeiras',
   'corne ingles': 'Madeiras',
   'fagote': 'Madeiras',
   'saxofone sopranino c': 'Madeiras',
   'saxofone sopranino r': 'Madeiras',
+  'saxofone soprano cur': 'Madeiras',
+  'saxofone soprano ret': 'Madeiras',
   'saxofone soprano curvo': 'Madeiras',
   'saxofone soprano reto': 'Madeiras',
   'saxofone alto': 'Madeiras',
   'saxofone tenor': 'Madeiras',
   'saxofone baritono': 'Madeiras',
   'saxofone baixo': 'Madeiras',
-  'FLAUTA': 'Madeiras',
-  'FLAUTA CONTRALTO': 'Madeiras',
-  'FLAUTA BAIXO': 'Madeiras',
-  'CLARINETE': 'Madeiras',
-  'CLARINETE ALTO': 'Madeiras',
-  'CLARINETE BAIXO': 'Madeiras',
-  'CLARINETE CONTRA BAIXO': 'Madeiras',
-  'OBOÉ': 'Madeiras',
-  'OBOÉ D\'AMORE': 'Madeiras',
-  'CORNE INGLÊS': 'Madeiras',
-  'FAGOTE': 'Madeiras',
-  'SAXOFONE SOPRANINO C': 'Madeiras',
-  'SAXOFONE SOPRANINO R': 'Madeiras',
-  'SAXOFONE SOPRANO CUR': 'Madeiras',
-  'SAXOFONE SOPRANO RET': 'Madeiras',
-  'SAXOFONE ALTO': 'Madeiras',
-  'SAXOFONE TENOR': 'Madeiras',
-  'SAXOFONE BARÍTONO': 'Madeiras',
-  'SAXOFONE BAIXO': 'Madeiras',
-  // Metais (minúsculas e maiúsculas)
+  // Metais
   'pocket': 'Metais',
   'cornet': 'Metais',
   'trompete': 'Metais',
@@ -77,33 +57,20 @@ const MAPEAMENTO_NAIPES: Record<string, Naipe> = {
   'tuba wagneriana': 'Metais',
   'euphonium': 'Metais',
   'tuba': 'Metais',
-  'tuba helicon': 'Metais',
-  'POCKET': 'Metais',
-  'CORNET': 'Metais',
-  'TROMPETE': 'Metais',
-  'FLUGELHORN': 'Metais',
-  'TROMPA': 'Metais',
-  'TROMBONITO': 'Metais',
-  'BARÍTONO DE PISTO': 'Metais',
-  'MELOFONE': 'Metais',
-  'TROMBONE': 'Metais',
-  'SAX HORN': 'Metais',
-  'TUBA WAGNERIANA': 'Metais',
-  'EUPHONIUM': 'Metais',
-  'TUBA': 'Metais',
-  'TUBA HELICON': 'Metais',
-  // Teclas (minúsculas e maiúsculas)
+  // Teclas
   'acordeon': 'Teclas',
+  'organista': 'Teclas',
   'orgao': 'Teclas',
-  'ACORDEON': 'Teclas',
-  'ÓRGÃO': 'Teclas',
 };
 
 function normalizarTexto(valor: string) {
   return valor
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[’']/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function identificarNaipe(nomeInstrumento: string): Naipe {
@@ -138,6 +105,8 @@ export default function InstrumentoForm({
   function renderInstrumentoItem(instrumento: Instrumento) {
     // Validar se instrumento tem nome válido
     const nomeInstrumento = instrumento?.nome?.trim() || `Instrumento #${instrumento.id}`;
+    const nomeInstrumentoExibicao =
+      normalizarTexto(nomeInstrumento) === 'organista' ? 'Organista' : nomeInstrumento;
     
     // Obter valor do estado temporário ou do estado principal
     const valorTemporario = valoresTemporarios.get(instrumento.id);
@@ -155,9 +124,9 @@ export default function InstrumentoForm({
         <label 
           htmlFor={`instrumento-qtd-${instrumento.id}`}
           className="flex-1 text-sm sm:text-base text-gray-700 min-w-0 truncate"
-          title={nomeInstrumento}
+          title={nomeInstrumentoExibicao}
         >
-          {nomeInstrumento}
+          {nomeInstrumentoExibicao}
         </label>
         <input
           id={`instrumento-qtd-${instrumento.id}`}

@@ -6,6 +6,7 @@ interface FuncoesFormProps {
     diaconos: number | undefined;
     cooperadorOficio: number | undefined;
     cooperadorJovens: number | undefined;
+    examinadora: number | undefined;
     encarregadosLocais: number | undefined;
     encarregadosRegionais: number | undefined;
     instrutores: number | undefined;
@@ -19,6 +20,7 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
     { key: 'diaconos', label: 'Diáconos' },
     { key: 'cooperadorOficio', label: 'Cooperador de Ofício' },
     { key: 'cooperadorJovens', label: 'Cooperador de Jovens' },
+    { key: 'examinadora', label: 'Examinadora' },
     { key: 'encarregadosLocais', label: 'Encarregados Locais' },
     { key: 'encarregadosRegionais', label: 'Encarregados Regionais' },
     { key: 'instrutores', label: 'Instrutores' },
@@ -102,7 +104,7 @@ export default function FuncoesForm({ valores, onChange }: FuncoesFormProps) {
         <div>
           <h4 className="font-medium text-gray-700 mb-3 mt-4">Músicos (não contabilizado no total):</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {campos.filter(c => ['instrutores', 'encarregadosLocais', 'encarregadosRegionais'].includes(c.key)).map((campo) => (
+            {campos.filter(c => ['instrutores', 'encarregadosLocais', 'encarregadosRegionais', 'examinadora'].includes(c.key)).map((campo) => (
               <div key={campo.key} className="flex items-center gap-3">
                 <label 
                   htmlFor={`funcao-${campo.key}`}

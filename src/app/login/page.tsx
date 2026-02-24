@@ -60,6 +60,7 @@ export default function LoginPage() {
               src="/logo.png"
               alt="Logo Gestão de Ensaio"
               fill
+              sizes="(max-width: 640px) 96px, 128px"
               style={{ objectFit: 'contain' }}
               priority
               onError={(e) => {
