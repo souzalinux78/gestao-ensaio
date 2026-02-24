@@ -448,7 +448,22 @@ export default function UsuariosPage() {
         </div>
 
         {mostrarForm && (
-          <div className="bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-6 mb-6">
+          <div
+            className={
+              editandoId
+                ? 'fixed inset-0 z-50 bg-black/50 p-4 flex items-center justify-center'
+                : ''
+            }
+            onClick={editandoId ? cancelarEdicao : undefined}
+          >
+          <div
+            className={
+              editandoId
+                ? 'bg-white dark:bg-[var(--bg-primary)] rounded-xl shadow-2xl p-6 w-full max-w-5xl max-h-[92vh] overflow-y-auto'
+                : 'bg-white dark:bg-[var(--bg-primary)] rounded-lg shadow p-6 mb-6'
+            }
+            onClick={editandoId ? (e) => e.stopPropagation() : undefined}
+          >
             <h2 className="text-xl font-semibold mb-4 text-[var(--text-primary)]">
               {editandoId ? 'Editar Usuário' : 'Novo Usuário'}
             </h2>
@@ -632,6 +647,7 @@ export default function UsuariosPage() {
                 Cancelar
               </button>
             </div>
+          </div>
           </div>
         )}
 
