@@ -7,6 +7,7 @@ import RelatorioTable from '@/components/RelatorioTable';
 import { Ensaio, Instrumento, Usuario } from '@/types';
 import { gerarPDFEnsaio } from '@/lib/pdf';
 import { obterSessao } from '@/lib/session';
+import { apiFetch } from '@/lib/api-client';
 
 export default function InstrutorPage() {
   const router = useRouter();
@@ -26,11 +27,15 @@ export default function InstrutorPage() {
 
   async function carregarDados(instrutorId: number) {
     const [resEnsaios, resInstrumentos] = await Promise.all([
-      fetch(`/api/ensaios?instrutorId=${instrutorId}`),
-      fetch('/api/instrumentos'),
+      apiFetch(`/api/ensaios?instrutorId=${instrutorId}`),
+      apiFetch('/api/instrumentos'),
     ]);
-    setEnsaios(await resEnsaios.json());
-    setInstrumentos(await resInstrumentos.json());
+    if (resEnsaios.ok) {
+      setEnsaios(await resEnsaios.json());
+    }
+    if (resInstrumentos.ok) {
+      setInstrumentos(await resInstrumentos.json());
+    }
   }
 
   async function handleGerarPDF(ensaio: Ensaio) {

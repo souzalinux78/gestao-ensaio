@@ -36,7 +36,7 @@ function removerPrefixoBairro(valor: string) {
 
 function extrairCidadeLocalidade(igreja?: string | null) {
   if (!igreja) {
-    return { cidade: 'SEM CIDADE', localidade: 'GERAL' };
+    return { cidade: '', localidade: 'GERAL' };
   }
 
   const partes = igreja
@@ -48,15 +48,35 @@ function extrairCidadeLocalidade(igreja?: string | null) {
     const localidade = upperSemAcento(removerPrefixoBairro(partes[0]));
     const cidade = upperSemAcento(partes[1]);
     return {
-      cidade: cidade || 'SEM CIDADE',
+      cidade: cidade || '',
       localidade: localidade || 'GERAL',
     };
   }
 
+  const partesVirgula = igreja
+    .split(',')
+    .map((parte) => parte.trim())
+    .filter(Boolean);
+
+  if (partesVirgula.length >= 2) {
+    return {
+      cidade: upperSemAcento(partesVirgula[1]),
+      localidade: upperSemAcento(removerPrefixoBairro(partesVirgula[0])) || 'GERAL',
+    };
+  }
+
   return {
-    cidade: 'SEM CIDADE',
+    cidade: '',
     localidade: upperSemAcento(removerPrefixoBairro(igreja)) || 'GERAL',
   };
+}
+
+function formatarLabelInstrumento(valor: string) {
+  const texto = valor
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+  return texto.replace(/\b\w/g, (letra) => letra.toUpperCase());
 }
 
 function extrairNomesAtendimento(ensaio: Ensaio) {
@@ -250,11 +270,15 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
   });
 
   const contagem = new Map<string, number>();
+  const nomeOriginalPorChave = new Map<string, string>();
   for (const item of ensaio.instrumentos || []) {
-    const nome = mapaNomeInstrumento.get(item.instrumentoId);
+    const nome = item.instrumento?.nome || mapaNomeInstrumento.get(item.instrumentoId);
     const chave = normalizar(nome);
     if (!chave) continue;
     contagem.set(chave, (contagem.get(chave) || 0) + (item.quantidade || 0));
+    if (!nomeOriginalPorChave.has(chave) && nome) {
+      nomeOriginalPorChave.set(chave, nome);
+    }
   }
 
   const somaAliases = (aliases: string[]) => {
@@ -264,20 +288,38 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
     return aliasesUnicos.reduce((total, aliasNormalizado) => total + (contagem.get(aliasNormalizado) || 0), 0);
   };
 
-  const linhasCordas = CORDAS.map((linha) => ({ ...linha, qtd: somaAliases(linha.aliases) }));
-  const linhasMadeiras = MADEIRAS.map((linha) => ({ ...linha, qtd: somaAliases(linha.aliases) }));
-  const linhasMetais = METAIS.map((linha) => ({ ...linha, qtd: somaAliases(linha.aliases) }));
+  const linhasCordas = CORDAS
+    .map((linha) => ({ ...linha, qtd: somaAliases(linha.aliases) }))
+    .filter((linha) => linha.qtd > 0);
+  const linhasMadeiras = MADEIRAS
+    .map((linha) => ({ ...linha, qtd: somaAliases(linha.aliases) }))
+    .filter((linha) => linha.qtd > 0);
+  const linhasMetais = METAIS
+    .map((linha) => ({ ...linha, qtd: somaAliases(linha.aliases) }))
+    .filter((linha) => linha.qtd > 0);
 
-  const extrasCordas = contagem.get(normalizar('VIOLINO CONTRALTO')) || 0;
-  const extrasMadeiras =
-    (contagem.get(normalizar('SAXOFONE SOPRANINO C')) || 0) +
-    (contagem.get(normalizar('SAXOFONE SOPRANINO R')) || 0);
-  const extrasMetais = contagem.get(normalizar('TUBA WAGNERIANA')) || 0;
+  const chavesDoTemplate = new Set<string>();
+  [...CORDAS, ...MADEIRAS, ...METAIS].forEach((linha) => {
+    linha.aliases.forEach((alias) => {
+      const chave = normalizar(alias);
+      if (chave) chavesDoTemplate.add(chave);
+    });
+  });
 
-  const totalCordas = linhasCordas.reduce((total, item) => total + item.qtd, 0) + extrasCordas;
-  const totalMadeiras = linhasMadeiras.reduce((total, item) => total + item.qtd, 0) + extrasMadeiras;
-  const totalMetais = linhasMetais.reduce((total, item) => total + item.qtd, 0) + extrasMetais;
-  const totalMusicos = totalCordas + totalMadeiras + totalMetais;
+  const chavesOrganista = new Set(ALIASES_ORGANISTA.map((alias) => normalizar(alias)));
+
+  const linhasOutros = Array.from(contagem.entries())
+    .filter(([chave, qtd]) => qtd > 0 && !chavesDoTemplate.has(chave) && !chavesOrganista.has(chave))
+    .map(([chave, qtd]) => ({
+      label: formatarLabelInstrumento(nomeOriginalPorChave.get(chave) || chave),
+      qtd,
+    }));
+
+  const totalCordas = linhasCordas.reduce((total, item) => total + item.qtd, 0);
+  const totalMadeiras = linhasMadeiras.reduce((total, item) => total + item.qtd, 0);
+  const totalMetais = linhasMetais.reduce((total, item) => total + item.qtd, 0);
+  const totalOutros = linhasOutros.reduce((total, item) => total + item.qtd, 0);
+  const totalMusicos = totalCordas + totalMadeiras + totalMetais + totalOutros;
   const totalOrganistas = somaAliases(ALIASES_ORGANISTA);
   const totalHinosEnsaiados = (ensaio.hinosEnsaidos || '')
     .split(/[,\n;]+/)
@@ -291,6 +333,7 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
   };
 
   const { cidade, localidade } = extrairCidadeLocalidade(ensaio.instrutor?.igreja);
+  const cidadeLocalidadeTexto = cidade ? `${cidade} - ${localidade}` : localidade;
   const atendimento = montarAtendimentoPDF(ensaio);
   const dataCurta = format(new Date(ensaio.data), 'dd/MM/yy', { locale: ptBR });
 
@@ -327,7 +370,7 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
   drawCentered('SECRETARIA DA M\u00daSICA - ATIBAIA', 51.18, 10, true);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.text(`${cidade} - ${localidade}`, 145, 71.62);
+  doc.text(cidadeLocalidadeTexto, 145, 71.62);
   doc.setFontSize(11);
   doc.text(dataCurta, 453.59, 70.9);
 
@@ -382,66 +425,83 @@ export async function gerarPDFEnsaio(ensaio: Ensaio, instrumentos: Instrumento[]
   }
 
   // Participacao musicos
-  doc.rect(50, 216, 500, 442.7);
-  doc.line(50, 226, 550, 226);
-  drawCentered('PARTICIPA\u00c7\u00c3O M\u00daSICOS', 223.03, 7, true);
-  doc.line(85, 226, 85, 658.7);
-  doc.line(330, 226, 330, 658.7);
-  doc.line(390, 226, 390, 658.7);
+  const linhasTabela = [...linhasCordas, ...linhasMadeiras, ...linhasMetais, ...linhasOutros];
+  const yTabelaTopo = 216;
+  const yTabelaCabecalho = 226;
+  const alturaLinhaTabela = 12.7;
+  const yTabelaBaseMinimo = 658.7;
+  const yTabelaBaseCalculado = yTabelaCabecalho + Math.max(linhasTabela.length, 1) * alturaLinhaTabela;
+  const yTabelaBase = Math.max(yTabelaBaseMinimo, yTabelaBaseCalculado);
 
-  const linhasTabela = [...linhasCordas, ...linhasMadeiras, ...linhasMetais];
+  doc.rect(50, yTabelaTopo, 500, yTabelaBase - yTabelaTopo);
+  doc.line(50, yTabelaCabecalho, 550, yTabelaCabecalho);
+  drawCentered('PARTICIPA\u00c7\u00c3O M\u00daSICOS', 223.03, 7, true);
+  doc.line(85, yTabelaCabecalho, 85, yTabelaBase);
+  doc.line(330, yTabelaCabecalho, 330, yTabelaBase);
+  doc.line(390, yTabelaCabecalho, 390, yTabelaBase);
+
   linhasTabela.forEach((linha, index) => {
-    const y = 226 + index * 12.7;
-    doc.rect(50, y, 35, 12.7);
-    doc.rect(85, y, 245, 12.7);
-    drawCount(linha.qtd, 64.998, 234.462 + index * 12.7);
+    const y = yTabelaCabecalho + index * alturaLinhaTabela;
+    doc.rect(50, y, 35, alturaLinhaTabela);
+    doc.rect(85, y, 245, alturaLinhaTabela);
+    drawCount(linha.qtd, 64.998, 234.462 + index * alturaLinhaTabela);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.5);
-    doc.text(linha.label, 90, 234.103 + index * 12.7);
+    doc.text(linha.label, 90, 234.103 + index * alturaLinhaTabela);
   });
 
-  doc.line(50, 264.1, 550, 264.1);
-  doc.line(50, 518.1, 550, 518.1);
+  const grupos = [
+    { label: 'CORDAS', total: totalCordas, inicio: 0, quantidade: linhasCordas.length },
+    { label: 'MADEIRAS', total: totalMadeiras, inicio: linhasCordas.length, quantidade: linhasMadeiras.length },
+    { label: 'METAIS', total: totalMetais, inicio: linhasCordas.length + linhasMadeiras.length, quantidade: linhasMetais.length },
+    {
+      label: 'OUTROS',
+      total: totalOutros,
+      inicio: linhasCordas.length + linhasMadeiras.length + linhasMetais.length,
+      quantidade: linhasOutros.length,
+    },
+  ];
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.text(percentual(totalCordas), 349.995, 247.23);
-  doc.text(percentual(totalMadeiras), 352.775, 393.28);
-  doc.text(percentual(totalMetais), 349.995, 590.13);
-
-  doc.text('CORDAS', 420, 247.23);
-  doc.text('MADEIRAS', 420, 393.28);
-  doc.text('METAIS', 420, 590.13);
+  grupos.forEach((grupo) => {
+    if (grupo.quantidade <= 0 || grupo.total <= 0) return;
+    const yCentro = yTabelaCabecalho + ((grupo.inicio + (grupo.quantidade - 1) / 2) * alturaLinhaTabela) + 8.1;
+    doc.text(percentual(grupo.total), 349.995, yCentro);
+    doc.text(grupo.label, 420, yCentro);
+  });
 
   // Totais
-  doc.rect(50, 669, 500, 57);
-  doc.line(50, 679, 550, 679);
-  drawCentered('TOTAIS DE M\u00daSICOS, ORGANISTAS E HINOS ENSAIADOS', 676.03, 7, true);
-  doc.line(125, 679, 125, 726);
+  const yTotaisTopo = yTabelaBase + 10.3;
+  const yTotaisCabecalho = yTotaisTopo + 10;
+  doc.rect(50, yTotaisTopo, 500, 57);
+  doc.line(50, yTotaisCabecalho, 550, yTotaisCabecalho);
+  drawCentered('TOTAIS DE M\u00daSICOS, ORGANISTAS E HINOS ENSAIADOS', yTotaisTopo + 7.03, 7, true);
+  doc.line(125, yTotaisCabecalho, 125, yTotaisTopo + 57);
 
-  doc.rect(50, 679, 75, 11.6);
-  doc.rect(50, 690.6, 75, 11.6);
-  doc.rect(50, 702.2, 75, 11.6);
-  doc.rect(50, 713.8, 75, 12.2);
+  doc.rect(50, yTotaisCabecalho, 75, 11.6);
+  doc.rect(50, yTotaisCabecalho + 11.6, 75, 11.6);
+  doc.rect(50, yTotaisCabecalho + 23.2, 75, 11.6);
+  doc.rect(50, yTotaisCabecalho + 34.8, 75, 12.2);
 
   doc.setTextColor(204, 0, 0);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.text(String(totalOrganistas), 84.72, 687.68);
-  doc.text(String(totalMusicos), 84.72, 699.28);
-  doc.text(String(totalHinosEnsaiados), 84.72, 710.88);
+  doc.text(String(totalOrganistas), 84.72, yTotaisCabecalho + 8.68);
+  doc.text(String(totalMusicos), 84.72, yTotaisCabecalho + 20.28);
+  doc.text(String(totalHinosEnsaiados), 84.72, yTotaisCabecalho + 31.88);
   doc.setFontSize(11);
-  doc.text(String(totalGeral), 84.442, 723.598);
+  doc.text(String(totalGeral), 84.442, yTotaisCabecalho + 44.598);
   doc.setTextColor(0, 0, 0);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  doc.text('Organista', 130, 687.68);
-  doc.text('M\u00fasico', 130, 699.28);
-  doc.text('Hinos Ensaiados', 130, 710.88);
+  doc.text('Organista', 130, yTotaisCabecalho + 8.68);
+  doc.text('M\u00fasico', 130, yTotaisCabecalho + 20.28);
+  doc.text('Hinos Ensaiados', 130, yTotaisCabecalho + 31.88);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.text('TOTAL GERAL', 130, 723.598);
+  doc.text('TOTAL GERAL', 130, yTotaisCabecalho + 44.598);
 
   return doc;
 }

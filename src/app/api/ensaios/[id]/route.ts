@@ -247,3 +247,65 @@ export async function PUT(
     );
   }
 }
+
+// DELETE - Excluir ensaio (somente admin)
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const id = safeParseInt(params.id);
+    if (!id || id <= 0) {
+      return NextResponse.json(
+        { error: 'ID inválido' },
+        { status: 400 }
+      );
+    }
+
+    const usuario = await obterUsuarioDaRequisicao(request);
+    if (!usuario) {
+      return NextResponse.json(
+        { error: 'Não autenticado' },
+        { status: 401 }
+      );
+    }
+
+    if (usuario.tipo !== 'admin') {
+      return NextResponse.json(
+        { error: 'Acesso negado. Apenas administradores podem excluir ensaios.' },
+        { status: 403 }
+      );
+    }
+
+    const tenantId = await resolveTenantFromRequest(request);
+    const tenantIdFinal = tenantId ?? null;
+
+    const ensaioExistente = await prisma.ensaio.findUnique({
+      where: { id },
+      select: { id: true, tenantId: true },
+    });
+
+    if (!ensaioExistente) {
+      return NextResponse.json(
+        { error: 'Ensaio não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    if (tenantIdFinal !== null && ensaioExistente.tenantId !== tenantIdFinal) {
+      return NextResponse.json(
+        { error: 'Ensaio não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    await prisma.ensaio.delete({ where: { id } });
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
+  }
+}

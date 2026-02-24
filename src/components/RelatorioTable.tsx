@@ -10,6 +10,7 @@ interface RelatorioTableProps {
   onGerarPDF: (ensaio: Ensaio) => void;
   onEnviarWebhook?: (ensaio: Ensaio) => void;
   onEditar?: (ensaio: Ensaio) => void;
+  onExcluir?: (ensaio: Ensaio) => void;
 }
 
 export default function RelatorioTable({
@@ -18,6 +19,7 @@ export default function RelatorioTable({
   onGerarPDF,
   onEnviarWebhook,
   onEditar,
+  onExcluir,
 }: RelatorioTableProps) {
   return (
     <div className="overflow-x-auto rounded-lg shadow-sm" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
@@ -70,6 +72,20 @@ export default function RelatorioTable({
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-main)'}
                       >
                         Enviar
+                      </button>
+                    ) : null}
+                    {onExcluir ? (
+                      <button
+                        onClick={() => onExcluir(ensaio)}
+                        className="px-3 py-2 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+                        style={{
+                          backgroundColor: '#ef4444',
+                          color: '#ffffff'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ef4444'}
+                      >
+                        Excluir
                       </button>
                     ) : null}
                     <button
@@ -160,6 +176,20 @@ export default function RelatorioTable({
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--pe-gold-main)'}
                       >
                         Enviar
+                      </button>
+                    ) : null}
+                    {onExcluir ? (
+                      <button
+                        onClick={() => onExcluir(ensaio)}
+                        className="px-4 py-2 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+                        style={{
+                          backgroundColor: '#ef4444',
+                          color: '#ffffff'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ef4444'}
+                      >
+                        Excluir
                       </button>
                     ) : null}
                     <button

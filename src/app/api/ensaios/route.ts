@@ -12,6 +12,12 @@ export async function GET(request: NextRequest) {
 
   // Obter usuário da requisição para verificar se é admin
   const usuario = await obterUsuarioDaRequisicao(request);
+  if (!usuario) {
+    return NextResponse.json(
+      { error: 'Não autenticado' },
+      { status: 401 }
+    );
+  }
   
   // Obter tenantId para isolamento de dados
   const tenantId = await resolveTenantFromRequest(request);

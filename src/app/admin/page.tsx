@@ -67,11 +67,16 @@ export default function AdminPage() {
     }
 
     const [resEnsaios, resInstrumentos] = await Promise.all([
-      fetch(`/api/ensaios?${params.toString()}`),
-      fetch('/api/instrumentos'),
+      apiFetch(`/api/ensaios?${params.toString()}`),
+      apiFetch('/api/instrumentos'),
     ]);
-    setEnsaios(await resEnsaios.json());
-    setInstrumentos(await resInstrumentos.json());
+
+    if (resEnsaios.ok) {
+      setEnsaios(await resEnsaios.json());
+    }
+    if (resInstrumentos.ok) {
+      setInstrumentos(await resInstrumentos.json());
+    }
   }
 
   async function carregarMetricas() {
@@ -142,6 +147,29 @@ export default function AdminPage() {
 
   function handleEditar(ensaio: Ensaio) {
     router.push(`/instrutor/novo-ensaio?id=${ensaio.id}`);
+  }
+
+  async function handleExcluir(ensaio: Ensaio) {
+    const confirmar = confirm(`Excluir ensaio de ${new Date(ensaio.data).toLocaleDateString('pt-BR')}? Esta ação não pode ser desfeita.`);
+    if (!confirmar) return;
+
+    try {
+      const res = await apiFetch(`/api/ensaios/${ensaio.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        const erro = await res.json().catch(() => null);
+        alert(erro?.error || 'Erro ao excluir ensaio');
+        return;
+      }
+
+      await carregarDados();
+      alert('Ensaio excluído com sucesso.');
+    } catch (error) {
+      console.error('Erro ao excluir ensaio:', error);
+      alert('Erro ao excluir ensaio.');
+    }
   }
 
   function formatarData(data: string) {
@@ -395,6 +423,7 @@ export default function AdminPage() {
             onGerarPDF={handleGerarPDF}
             onEnviarWebhook={handleEnviarWebhook}
             onEditar={handleEditar}
+            onExcluir={handleExcluir}
           />
         </div>
       </div>
